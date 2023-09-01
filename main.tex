@@ -1,0 +1,315 @@
+\documentclass{article}
+% Packages used
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage[round]{natbib}
+\usepackage{graphicx}
+\graphicspath{{gfx/}}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{titling}
+%\usepackage{lscape} 
+%\usepackage{adjustbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue}
+%\usepackage{minted}
+% New commands
+\newcommand{\beginsupplement}{
+  \setcounter{table}{1}  
+  \renewcommand{\thetable}{S\arabic{table}} 
+  \setcounter{figure}{1} 
+  \renewcommand{\thefigure}{S\arabic{figure}}
+  \setcounter{section}{0} 
+  \renewcommand{\thesection}{S\arabic{section}}
+}
+
+\def\fillandplacepagenumber{%
+ \par\pagestyle{empty}%
+ \vbox to 0pt{\vss}\vfill
+ \vbox to 0pt{\baselineskip0pt
+   \hbox to\linewidth{\hss}%
+   \baselineskip\footskip
+   \hbox to\linewidth{%
+     \hfil\thepage\hfil}\vss}}
+     
+\begin{document}
+\title{Retrospective estimation of latent COVID-19 infections over the pandemic in US states}
+\author{Rachel Lobay, Maria Jahja, Ajitesh Srivastava, Ryan J. Tibshirani, Daniel J. McDonald}
+\date{August 2023}
+\maketitle
+
+\begin{abstract}
+The timing and magnitude of infections from the COVID-19 pandemic are of interest to both the public and public health, but these have challenging to pin down for a variety of data-driven and methodological reasons. Accurate estimates of latent infections can improve our understanding of the true size and scope of the pandemic and provide an indication of disease patterns and burden over time. Therefore, we estimate daily incident infections for each US state by deconvolving reported COVID-19 cases using estimated infection-onset-to-case-report distributions followed by a serology-based adjustment procedure to capture the unreported infections. We find clear variability in the timing and magnitude in the resulting estimates, indicating a differential impact of the pandemic across states and revealing disease burden that appears earlier and more extensive than indicated by cases. Our findings help to better understand the impact of the pandemic in the US and demonstrate the utility of using reported case data to produce infection estimates in a simple deconvolution-based approach. 
+\end{abstract}
+
+\section{Introduction}
+
+Reported COVID-19 cases are a staple in tracking the pandemic at varying geographic resolutions such as national, state and county levels \citep{dong2020interactive, nyt2020corona, wp2020tracking}. Yet, for a case that is eventually reported to public health, the reporting pipeline is structured in such a way that many infections would be missed as it is subject to several sources of built-in bias. For instance, diagnostic testing mainly targets symptomatic individuals; thus, infected individuals exhibiting little to no symptoms are likely to be missed \citep{cdc2022estimated}. In addition, testing practices, availability, and the public use of them vary across space and time \citep{pitzer2021impact, ecdc2020strategies, hitchings2021usefulness}. Finally, cases provide a belated view of how the pandemic progressed as they are subject to delays due to the viral incubation period, the speed and severity of symptom onset, laboratory confirmation and test turnaround times, and submission to public health \citep{pellis2021challenges, wash2020dash}. 
+
+Importantly, all of these issues that are present in local health authority data are also present in the gold standard for case data from the JHU CSSE \citep{dong2020interactive, guidotti2022worldwide} because JHU scrapes case data from the local health authority dashboards \citep{jahja2022real}. Furthermore, the cases shown on the JHU CSSE Coronavirus Resource Center \citep{jhucsse2020covid} are those that have been disseminated to the public on a given day. Such reported cases are lagging indicators of the course of the pandemic and do not represent the number of new infections that onset on a given day (as indicated by exposure to the pathogen). Ascertaining infection onset is not an easy task because there is no large-scale surveillance stream in the United States that reliably tracks when people are infected. So an alternative approach would need to be developed to obtain estimates of the numbers of new infections, which would almost inevitably rely on the available case data (as this has been the major source of surveillance data to monitor disease intensity and trends over time \citep{ecdc2020strategies}). Yet, even if such an approach were developed, it would not capture all infections, but only those that are eventually reported to public health.
+
+Tracking the course of the pandemic is a challenging endeavour because many infections go unreported. So while reported cases provide some understanding of the disease burden in a population, it is incomplete and understates the true size of the pandemic. Regardless of these difficulties, it is important to the public and public health to perform a pandemic post-mortem and try to get closer to true extent of its effect - to attempt to capture the true size and impact of the pandemic as much as we can. Estimates of daily incident infections are one such way to measure this and can guide public and professional understanding of the pandemic burden over time.
+
+Since the size and impact of the pandemic on each US state remains unknown, we estimate daily incident infections for each state from June 1, 2020 to Dec. 5, 2021. To our knowledge, no other modelling approach has been used to reconstruct the infection time series for each state over as large of a time interval. We achieve this by using flexible, nonparametric approach where we first deconvolve daily reported COVID-19 case count data using state-specific incubation period distributions in combination with their symptom-onset-to-case-report delay distributions. Then, we adjust those estimates to account for the unreported infections by using available seroprevalence data in a leaky immunity model. Finally, the adjusted estimates are applied in a lagged correlation analysis with state hospitalization data where we find the lag between infection and hospitalization that gave the maximum average correlation across US states and used it to compute time-varying infection-hospitalization ratios (IHRs) for each state.
+
+\section{Results}
+% May decide to include figure for inverse reporting ratios in the appendix!
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=.99\textwidth]{state_nia_est_faceted.pdf} % Note extend this to all states (not just the sample of states)... So this figure is currently more a preview
+    \caption{Estimates of the number of daily new (adjusted) infections per $100,000$ for each US state from June 1, 2020 to Dec. 5, 2021 (dark blue line). The shaded regions depict the 50, 80, and 90\% confidence intervals.}
+    \label{fig:state_nia_est_faceted}
+\end{figure}
+
+From reconstructing the time series of COVID-19 infections per $100,000$ population for each US state from June 1, 2020 to December 5, 2021, we observe rates of infections that vary in intensity and disease burden across space and time (Figures ~\ref{fig:state_nia_est_faceted} and \ref{fig:chloro_inf_rates}). The largest observed outbreak is over \rule{1cm}{0.15mm} in \rule{1cm}{0.15mm} and \rule{1cm}{0.15mm}, suggesting a similar spread of the virus in states that are in close geographic proximity. During this time, the state that has the highest rate of infections per $100,000$ is \rule{1cm}{0.15mm} ($90\%$ CI $[\rule{1cm}{0.15mm}]$) on \rule{1cm}{0.15mm}. Out of all infections in the United States on that day, this comprises \rule{1cm}{0.15mm}\% ($90\%$ CI $[\rule{1cm}{0.15mm}]$) of them. For these and most other states, smaller surges can be observed in the fall of \rule{1cm}{0.15mm}, winter of \rule{1cm}{0.15mm}, and spring of \rule{1cm}{0.15mm}. Similar patterns in the major surges of infections are observed in nearly all states, though to varying degrees. In general, greater similarities in the strength and magnitude of outbreaks are observed in the clusters of states that border each other and in those that have similar population profiles in terms of age and other major medical risk factors (such as obesity or chronic lung conditions). It is also notable that states with high population density such as New Jersey, New York, and Rhode Island are routinely subject to surges that are of greater in intensity and duration than states with lower population density such as Alaska, Montana, and Wyoming. % #%% Maybe this last sentence doesn't turn out to be true?
+
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=.99\textwidth]{chloro_inf_rates.pdf}
+    \caption{Chloropleth maps of the state-level estimates of the number of daily new (adjusted) infections per $100,000$ population for various times over June 1, 2020 to Dec. 5, 2021. These maps are generated from the usmap package in R \citep{lorenzo2023usmap}.} 
+    \label{fig:chloro_inf_rates}
+\end{figure}
+
+The period of lowest viral transmission is observed over the summer of \rule{1cm}{0.15mm}, where \rule{1cm}{0.15mm} achieves the lowest rate of infections on \rule{1cm}{0.15mm} (and maintains a rate under \rule{1cm}{0.15mm} for a span of \rule{1cm}{0.15mm} days). \rule{1cm}{0.15mm} states (\rule{1cm}{0.15mm}, \rule{1cm}{0.15mm} and \rule{1cm}{0.15mm}) meets the Centers for Disease Control and Prevention (CDC)’s definition of having a low level of coronavirus transmission for that time of at most \rule{1cm}{0.15mm} new cases per $100,000$ per week. As expected, the states that consistently achieve the lowest rates of infections are those with the lowest population density (Montana and Wyoming) and/or are geographically removed from the contiguous United States (Alaska and Hawaii). % Add reference for the CDC’s definition of having a low level of coronavirus when know the specific time this applies to
+
+From a brief inspection of the geo-contiguous states, we can observe similar patterns in surges and periods of waning over time, suggesting that states who share similarities in climate and topography performed similarly to each other. More precisely, we can observe neighboring states such as New York and New Jersey or North Dakota and South Dakota that present waves that mirror each other in amplitude and timing.
+
+The infection estimates exhibit modest changes under different assumptions about the variant-specific incubation periods, the construction of the delay distribution (the window size for the considered onset dates), the fraction of new infections over time, and the population estimates (see Supplementary Materials Section X). % Do these sensitivity analyses + update this link accordingly.
+
+Naturally, outbreaks in infections precipitate those in cases and are reliably larger in magnitude (Figure~\ref{fig:state_niauc_est_faceted}). Hence, our infection estimates indicate that the pandemic had a differential impact across states earlier and at a larger scale than is suggested by cases. For many states in July 2020 and September 2021, there are clear outbreaks in infections that are difficult to detect from cases alone, suggesting that these are mainly comprised of unreported infections. Early on in the pandemic, such discrepancies may be largely attributable to failures in the reporting pipeline, while later on in the pandemic, they may be largely due to the rise in asymptomatic infections across variants \citep{oph2022covid, garrett2022high}. % The following sentence may be making too much of a statement - Based on our infection estimates, we found that the total cases account for \rule{1cm}{0.15mm}\% of the reported infections from June 1, 2020 to December 5, 2021.
+
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=.99\textwidth]{state_niauc_est_faceted.pdf} % Note extend this to all states (not just the sample of states)... So this figure is currently more a preview
+    \caption{Estimates of the number of daily new (adjusted) infections per $100,000$ population for each US state from June 1, 2020 to Dec. 5, 2021 (dark blue line). The shaded regions depict the 50, 80, and 90\% confidence intervals for those adjusted estimates, while the teal line represents the number of new daily new unadjusted infections per $100,000$, and the dotted orange line represents the 7-day average of the new cases per $100,000$ as of the same date.}
+    \label{fig:state_niauc_est_faceted}
+\end{figure}
+
+%Since we were interested in how our incident infection estimates associate with the statewise hospitalization rates for COVID-19, 
+We perform a lagged correlation analysis where we systematically investigate the rank-based (ie. Spearman’s) correlation between our infection and confirmed hospitalization rates per $100,000$ population over a broad range of lag values (Figure~\ref{fig:infect_case_hosp_lag_corr}). The maximum average correlation across US states of $0.82$ is observed at a lag of $13$ days (the largest median correlation of $0.837$ is also observed at this lag). In contrast, we find that the greatest average rank-based correlations for cases with confirmed hospitalizations is achieved at a lag of $0$. That is, we find that case report rates are nearly contemporaneous to hospitalizations, while infection estimates clearly precede them. As a counterpart to our lagged correlation analysis, we compute the time-varying IHRs for each state using the optimal lag for infection and hospitalization rates (Figure~\ref{fig:IHR_7dav}). 
+
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=.80\textwidth, height=.44\textheight]{infect_case_hosp_lag_corr.pdf} 
+    \caption{Average rank-based correlation across US states between the infection and hospitalization rates per $100,000$ (blue curve) as well as between case and hospitalization rates per $100,000$ (orange curve) for a broad range of non-negative lag values. Note that infections, cases, and hospitalization counts are subject to a center-aligned 7-day average to remove spurious day of the week effects. The dashed lines indicate the lags for which the highest average correlation is attained.}
+    \label{fig:infect_case_hosp_lag_corr}
+\end{figure}
+
+The IHRs that are obtained using this lag are generally small (in most cases less than $0.1$) and they exhibit similar geospatial and temporal trends as are noted for infections. Namely, states that are close in proximity (such as North Carolina and South Carolina) exhibit similar patterns in the IHRs over time. In addition, there are similar spikes observed across many states at particular instances in time. For example, many states such as Florida, Texas, and South Carolina exhibit a striking spike in hospitalizations in mid-2021, which coincides with the rapid takeover of the Delta variant during that time \citep{hodcroft2021covariants}. This finding aligns with previous studies that found an increased risk in hospitalizations with Delta in comparison to other variants \citep{twohig2022hospital, nyberg2022comparative}. Additionally, states that have higher proportions of vulnerable populations such as the well-known retirement states of Florida and Arizona are routinely subject to higher IHRs than other states. There may be similar implications for states with a higher prevalence of medical risk factors such as obesity or chronic lung diseases that are known to increase the risk of severe illness or hospitalization from COVID-19 \citep{phc2020people, cdc2020people}. Overall the IHRs presented similar geospatial and temporal trends as are observed for infections, but they are generally less prominent and more constant across states and time. % More analysis later after decide on which IHRs (cumulative vs noncumualtive) to use. Can look into North vs South divide, which states had the consistently lowest IHRs, etc.
+
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=.99\textwidth]{IHR_7dav.pdf} 
+    \caption{Time-varying IHR estimates for each state over our study period that are obtained using the optimal lag from the systematic lag analysis. Note that the infection and hospitalization counts are subject to a center-aligned 7-day average to remove spurious day of the week effects. Also note that the different starting points across states are due to the availability of the hospitalization data.}
+    \label{fig:IHR_7dav}
+\end{figure}
+
+\section{Discussion}
+We obtain retrospective estimates of daily incident infections for each US state for June 1, 2020 to Dec. 5, 2021. The clear variability in the timing and magnitude of our estimates indicate that the intensity and disease burden are heterogenous across states. And yet, there are similar epidemic patterns such as surges and periods of waning observed in clusters of neighboring states. In addition, we observe that states of higher population density tended to suffer from longer and more intense surges than states with lower population density, which is supported by findings from both US and international studies \citep{carozzi2022urban, iderus2022correlation, wong2020spreading}.  \citep{carozzi2022urban} suggests that the geographic connectivity and social connectedness of denser areas can affect the timing of outbreaks, but they also found that by the end of 2020 density had little to no impact on time-adjusted COVID-19 cases. In simple terms, although dense locations are struck first, they are not necessarily hit the hardest \citep{carozzi2022urban}. However, further investigation beyond the first year of the pandemic is warranted. As well, this study only looks relation between density and cases, not infections (this same limitation applies to \citet{jalal2021prominent}). The relationship between density and infections has remained relatively unexplored. Therefore, a more detailed study of it is necessary (beyond our somewhat cursory inspection). % Maybe the longer and more intense surges thing doesn't turn out to be true... It may be more that states with older populations & with a greater prevalence of chronic health conditions that areas major risk factors exhbit longer and more intense surges
+
+Our infection estimates suggest that the pandemic has a differential impact across states earlier and at a larger scale than is indicated by cases. Since case reporting is not consistent across time and states, case counts underestimate the true number of infections and, hence, the impact of the pandemic \citep{cdc2022estimated, simon2022inconsistent}. For example, some states report the number of individuals tested rather than the numbers of tests performed \citep{schechtman2020counting, chitwood2021reconstructing}.
+
+We observe outbreaks in infections that are virtually undetectable from cases alone. This suggests that cases provide an incomplete picture of the pandemic, especially with respect to outbreaks that are largely driven by unreported infections. Furthermore, since case report dates follow symptom and infection onset, cases are a fundamentally flawed indicator of disease burden because they have a built-in temporal bias. This is in addition to other biases from differences in reporting across states (such as temporary bottlenecks due influxes of data or more persistent processing issues that increase the average time from case detection to report \citep{wash2020dash, dunkel2020covid19}. So while reported cases provide an indication of the trajectory of the pandemic, it is a delayed and incomplete version. Estimating the new number of infections by symptom or infection onset date would more closely align with the definition of incidence as we know it \citep{jahja2022real}.
+
+From the correlation analysis between our daily infection estimates and hospitalizations, a lag of $13$ days gives the maximum average correlation across states. This is commensurate with the early estimate of the average time from infection to hospitalization of $9.7$ days ($95\%$ CI: $[5.4, 17.0]$) for cases reported in January, 2020 in Wuhan, China as well as with estimates from across the pandemic in the UK that ranged from an average of $8.0$ to $9.7$ days (more precisely, $8.0$ days ($95\%$ interval: $[2.7, 18.5]$) for the first wave to $9.7$ days ($95\%$ interval: $[4.1, 19.6]$) for the second wave) \citep{ward2021understanding}. However, we should note the first study is based on a small sample size for outbreak cases reported well before our study start date. As well, both sets of estimates depend upon the healthcare system and the population structure, amongst other things \citep{ward2021understanding}. Nevertheless, their relative agreement with our estimate of $13$ days for the US states lends some credence to of our results. 
+
+Although we computed IHRs for all states, the IHR is also likely to vary within states by confounding variables such as age and the presence of major comorbidities \citep{russell2023comorbidities}. Therefore, it would be beneficial to account for such variables in the IHR calculations by, for example, stratifying infections and hospitalizations by age to produce age-specific estimates of the IHRs for each state (similar to \citet{fox2023disproportionate} though with the additional element of being time-varying). We strongly believe this would be a worthwhile direction to pursue in future work should the necessary information be available. 
+
+To the best of our knowledge, no other modelling approach has been used to reconstruct the infection time series for every state over as much of the COVID-19 pandemic as in this study. Furthermore, we aim to incorporate as much state-specific information as possible when deriving our estimates. For instance, using variant circulation and line list data, we are able to construct incubation and delay distributions that were unique for each state. By using time-varying and state-specific seroprevalence data, we are able to allow the reporting ratio to vary over both time and state, which is an advantage over such ratios that are non-time varying but state-specific and those that are time-varying but the same for all states \citep{unwin2020state, uga2020covid19}.
+
+Existing approaches that use the delay distribution to generate infection estimates often only construct one delay distribution that is used for all states \citep{chitwood2021reconstructing, jahja2022real}. That is, they operate under the assumption of geographic invariance, where it is assumed that all states have the same patterns of delay from infection onset to case report, which is unlikely to be true due to differences in reporting pipelines, pandemic response, and variants in circulation, amongst other things. 
+
+Another major limitation is that these models do not to account for reinfections. Now, it may be contended that reinfections did not account for a substantial fraction of the infections until later in the pandemic, so they were not absolutely necessary to include in the earlier stages of the pandemic. Still, at no stage did infection with the COVID-19 virus confer lifelong immunity. Rather immunity is transient and wanes over time. And we believe it is important to account for such defining characteristics of the virus when charting infections over time. Therefore, we account for reinfections and waning of detectable immunity in our leaky immunity model. However, we acknowledge that the extent to which each of these are accounted for could be improved upon in future work. 
+
+Since the waning of detectable immunity is likely to be variant-dependent \citep{pooley2023durability}, it follows that the leaky parameter may be better posed as a mixture of parameters for different variants with weights determined by the proportion of the variants circulating at the time in the state. Related to this is the issue of how newer variants may escape detection \citep{nih2022assessing, fda2023sars}. While in a retrospective analysis where finalized data is used this is less likely to be an issue, this could very well pose a problem for real-time estimates of infections.
+
+As for reinfections, it would be ideal to have confirmed rates of reinfections over time for each US state. However, we are unable to find such data available over the entire time period considered for even one state. So we have turned to suspected reinfection data over time for Clark County, USA, as that surveillance is amongst the most detailed that we have found for the United States. Nevertheless, using such localized data raises questions of representativeness and the applicability of such estimates to Nevada and all other states. Furthermore, this data has no information available beyond suspected third infections, which imposes an irremediable bias. However, based on the third infection data available there, we expect that the probability of being reinfected more than three times is likely very low for time frame considered and so the omission of these would impact our infection estimates to a small extent. 
+
+The vast majority of issues we encountered when trying to reconstruct the infection time series for each state are due to an absence or a lack of data. Such is the primary issue we had with the restricted line list. In comparison to the number of JHU cases (which we are treating as a gold standard) for the same release date, we noted there are about $10$ million cases that are unaccounted for in the CDC line list. Moreover, the missingness does not appear to be random and uniformly distributed across states, rather it is unequally distributed, suggesting that the dataset may be biased. However, more information on the cases that are missing versus present would be required to determine the extent the missing cases led to a nonrepresentative, and therefore, biased sample, and could be a topic of further study.
+
+Seroprevalence data also runs the risk of being nonrepresentative of the intended population \citep{bajema2021estimated}. For example, in the blood donor dataset some states have region specific-estimates, which clearly do not stand for the entire state. Another source of systematic variation is in the characteristics of the individuals who opt for blood tests versus those who do not. For instance, there may be a healthy user bias, in which a number of those who opt for blood tests are generally more inclined to partake in proactive healthy behaviors (such as checking on basic health markers by taking an annual blood test) than those who do not \citep{parsley2018blood}. Alternatively, a number of individuals may be recommended for blood tests by their doctors due to signs of ill-health (ex. vitamin or mineral deficiencies or underlying medical conditions). The extent that each such bias persists depends on the purpose of the blood test and whether it was used as a proactive or reactive medical tool. Since such information is unavailable to us, all we can conclude is that participant-driven sources of bias impact the seroprevalence samples to an undetermined extent. There are additional concerns about the performance of antibody testing for individuals with mild or asymptomatic disease as well as the loss of immunity over time \citep{kaku2021performance, seow2020longitudinal, ibarrondo2020rapid}.
+
+In this work, we do not attempt to directly address infection underascertainment due to the increase in asymptomatic infections across variants \citep{pho2023covid19}. We simply note that this would likely pose a greater problem later in the pandemic, particularly during the Omicron era \citep{fan2022sars}. We hope that such infections would be largely represented by the seroprevalence and reinfection estimates, but there is undoubtedly increasing reliance on such estimates to be able to do this over time (owing to the simultaneous decline in the reporting cadence and the apparent rise in asymptomatic infections over time) \citep{oph2022covid, garrett2022high, blauer2022reduce, ren2021asymptomatic}. Consequently, there is an increasing uncertainty over time that is not expressed by the model or the estimates.   
+
+Due to such concerns with the seroprevalence data, one further area of research is on investigating the utility of various sources to estimate the incidence of infections. Intuitively, one might expect that leveraging data from multiple sources would likely lead to more accurate and stable infection estimates than from using seroprevalence data alone. Wastewater surveillance data is one promising source that may be complementary to seroprevalence data, especially when testing is low \citep{mcmanus2023predicting}. However, there has been limited success in predicting incidence using such data and the extent that wastewater concentration data is a useful in estimating COVID-19 incidence is unclear owing to problems with viral occurrence and detectability in wastewater that render detection inconsistent across locations (ex. due to temperature, per-capita water use, and in-sewer travel time) \citep{mcmanus2023predicting, hart2020computational, li2023correlation}. Sentinel surveillance streams for influenza-like illness or acute respiratory infection may provide decent proxies for COVID-19 incidence, especially when testing for mild cases of COVID-19 is diminishing or has ceased completely. Finally, alternative surveillance streams (potentially outside of public health) such as those from surveys, helplines, or medical records could potentially be integrated if they provide at least a rough indication of the disease intensity over time \citep{ecdc2020strategies}.
+ 
+Overall, we adopt a relatively simple deconvolution-based approach and devote much of our efforts to tailoring our approach to the available data. In a way, our approach is built for the data rather than trying to force the data to fit to an existing approach. However, the lack of data is both a barrier to entry and a continual roadblock. The assumptions we are required to make as a consequence of this clearly limit the generalizability and call into question the tenability of the results. So while we highlight some interesting trends and numerical findings, these results are not definitive, but rather exploratory and intended to stimulate discussion on the challenging task of estimating infections. Despite these limitations, we are encouraged by the ability to use routine data to produce estimates of infections in the United States and by the plausibility of the apparent geospatial and temporal trends. 
+
+Our approach is predicated upon having case, line list, viral circulation, and seroprevalence data for each state, all of which are readily available (or available upon request in the case of restricted line list data). As a result of this, we are able to demonstrate the feasibility of estimating COVID-19 infections at the state level by using standard sources of data. 
+
+Our framework is quite versatile as it lends itself to more localized, county or community level estimates, or globalized, country-specific estimates. Fundamentally, to produce estimates of infections for different geographic regions, one would simply need to input the required data and re-run the pipeline. In this way, one could readily adapt our approach to generate estimates for the provinces in Canada or regions in England.
+
+Well-informed, localized estimates of COVID-19 infections over time can help us to have a more clear and comprehensive understanding of the course of the pandemic. Such estimates contribute important information on the timing and magnitude of disease burden for each location and they highlight trends that may not be visible from case data alone. Therefore, our infection estimates provide key information for the ongoing debate on the true size and impact of the pandemic.
+
+\section{Methods}
+\subsection{Data} The variant-specific incubation periods are taken to be the same for all states. They are built using literature estimates of the gamma distribution parameters or, if those are not readily available, the mean and standard deviation of the number of days of incubation. Since the literature is lacking on reliable estimates for the incubation period of Epsilon and Iota, we decided to use the incubation period for Beta for both because Epsilon, Iota, and Beta are all children from the same parent in the phylogenetic tree of the Nextstrain Clades (as depicted in \citet{hodcroft2021covariants}).
+
+To estimate the daily proportions of the variants circulating in each state, we obtain the GISAID genomic sequencing data counts from CoVariants.org \citep{hodcroft2021covariants, elbe2017data}\footnote{The complete list of EPI\_SET Identifiers that were used to produce the CoVariants data are provided in the Acknowledgements section of their website \citep{hodcroft2021covariants}}. Since these counts are biweekly totals, we use a simple convex optimization approach to interpolate daily numbers, where we enforce that the counts in each interval must sum to the right boundary (the biweekly total) and linear growth between the pairs of adjacent days. 
+
+The COVIDcast API \citep{reinhart2021open} is used to retrieve the daily number of new confirmed COVID-19 cases for each state that are based on reports from the John Hopkins Center for Systems Science and Engineering (JHU CSSE) \citep{dong2020interactive}. From the same API, we also retrieve the daily number of confirmed COVID-19 hospital admissions for each state that are collected by the U.S. Department of Health and Human Services (HHS). Both datasets are as of June 6, 2022.
+
+Annual estimates of the resident state populations (as of July 1 of 2020, 2021, and 2022) are based on the December 2022 press release on the US Census Bureau website \citep{uscensus2022annual}.
+
+We obtain de-identified patient-level line list data on COVID-19 cases from the CDC. Although there are both public and restricted versions of the dataset available containing the same patient records \citep{cdc2020casepub, cdc2020caserestr}, the restricted dataset\footnote{The CDC does not take responsibility for the scientific validity or accuracy of methodology, results, statistical analyses, or conclusions presented.} is selected because it contains information on the state of residence which is essential for constructing state-specific delay distributions. Since the restricted dataset is updated monthly and cases may undergo revision, we use a single version of it that was released on June 6, 2022. We consider this version to be finalized in that it well-beyond our study end date such that the dataset is unlikely to be subject to significant revisions.
+
+In this dataset, the two key variables of interest are the dates of symptom onset and report to the CDC. However, we find that the line list is prone to high percentages of missing data, notably with respect to our variables of interest. Nearly $60\%$ of cases are missing the symptom onset date, while about $9\%$ of cases are missing the report date. In addition, we faced the fundamental issue that \citet{jahja2022real} described, in which cases with missing report dates may be filled with their symptom onset date. Figure~\ref{fig:prop_cc_zero_delay} (which follows Figure 2 from \citet{jahja2022real}) suggests that this impacts states differentially due to the inconstant proportions of complete cases (those with both onset and report date) that have zero delay between onset and report across states. Due to this contamination in the zero delay cases (the true extent of which is unknown to us), we omit all such cases from our analysis.
+
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=.99\textwidth]{prop_cc_zero_delay.pdf}
+    \caption{Proportion of complete cases with zero delay by state in the restricted CDC line list dataset.}
+    \label{fig:prop_cc_zero_delay}
+\end{figure}
+
+For the same release date, the restricted line list contains 74,849,225 cases (rows) in total compared to 84,714,805 cases reported by the JHU CSSE; that is, line list is missing about $10$ million cases for the same release date. The extent that this issue impacts each state is shown in Figure~\ref{fig:prop_cc_cdc_vs_jhu}, from which it is clear the fraction of missing cases is substantial for many states as it often surpasses $50\%$ \citep{jahja2022real}. In addition, the probability of being missing does not appear to be the same for states, so there is likely bias introduced from using the complete case line list data. We consider such bias to be unavoidable in our analysis due to a lack of alternative line list sources.
+
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=1.20\textwidth]{prop_cc_cdc_vs_jhu.pdf} % possible overflow - may need to change dimensions later on
+    \caption{Complete case counts by state in the CDC line list versus the cumulative complete case counts from JHU CSSE as of June 6, 2022. 
+}
+    \label{fig:prop_cc_cdc_vs_jhu}
+\end{figure}
+
+In the line list, we observe unusual spikes in reporting in 2020 in comparison to 2021. When plotting by report date, we find that a few states are contributing unusually large case counts on isolated days very late in the reporting process (usually well beyond $50$ days). We strongly suspect that these large accumulations of cases over time are due breakdowns of the reporting pipeline (which may be expected to occur more frequently in the year following its instantiation than later on). Such anomalies are not likely to be reliable indicators of the delay from symptom onset to case report. Therefore, we devise a simple, ad hoc approach to detect and prune these reporting backlogs. 
+
+For each of three considered dates, June 1, 2020, September 1, 2020, and December 1, 2020 (which are chosen so that we do not include a case more often than is necessary in the pruning process), we bin the reporting delays occurring from $50$ days up to the maximum observed delay. Then, for each bin, we obtain the total delay count for each state. We then check whether each count on the log scale is at least the median (for the bin) plus $1.5$ times the interquartile range and retain only those that met this criterion as potential candidates for pruning. Next, we compute the counts by report date for each candidate state. If there is a report date with a count greater than or equal to the pre-specified threshold, then we remove those cases from the line list. Based on inspection and intuition, we set the threshold to be $2000$ for the first two bins, and then $500$ for all remaining bins. A similar trial and error approach is used to set the bin size (to $50$ days). % Area for sensitivity analysis? Also, could discuss the choice of using only 3 dates 
+
+To estimate the proportion of the population in each state with evidence of previous infection across time, we use two major seroprevalence surveys that were led by the CDC: the 2020-2021 Blood Donor Seroprevalence Survey and the Nationwide Commercial Lab Seroprevalence Survey \citep{cdc2021blood, cdc2021comm}. In the former, the CDC collaborated with $17$ blood collection organizations in the largest nationwide COVID-19 seroprevalence survey to date \citep{cdc2021blood}. The blood donation samples were used to construct monthly seroprevalence estimates for nearly all states from July 2020 to December 2021 \citep{jones2021estimated}. In the latter survey, the CDC collaborated with two private commercial laboratories and used blood samples to test for the antibodies to the virus from people that were in for routine or clinical management (presumably unrelated to COVID-19) \citep{bajema2021estimated}. The resulting dataset contains seroprevalence estimates for a number of multi-week collection periods starting in July 2020 to February 2022. 
+
+Both datasets are based on repeated, cross-sectional studies that aimed, at least in part, to estimate the percentage of people who were previously infected with COVID-19 using the percentage of people from a convenience sample who had antibodies against the virus \citep{bajema2021estimated, cdc2020data, jones2021estimated}. Adjustments were made in both for age and sex to account for the demographic differences between the sampled and the target populations. However, both datasets are incomplete and they differed in the number and the timing of the data points for each state (Figure~\ref{fig:sero_blood_comm_compar}). For example, in the commercial dataset, the last estimate for North Dakota is in September 2020. In the blood donor dataset, Arkansas does not have estimates available until October 2020. Furthermore, this blood donor dataset lacks measurements for any states in 2022 (as the corresponding survey ended in December 2021). Due to these limitations, reliance upon only one seroprevalence survey is ill-advised for our purposes. 
+
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=.99\textwidth]{sero_blood_comm_compar.pdf}
+    \caption{A comparison of the seroprevalence estimates from the Commercial Lab Seroprevalence Survey dataset (yellow) and the 2020-2021 Blood Donor Seroprevalence Survey dataset (blue). Note that the maximum and the minimum of the line ranges are the provided 95\% confidence interval bounds to give a rough indication of uncertainty.}
+    \label{fig:sero_blood_comm_compar}
+\end{figure}
+
+The date variables that came with the two seroprevalence datasets were not the same and so the date variables that we are able to construct from them are different. For the commercial dataset, we use the midpoint of the provided specimen collection date variable. A major difference in the structure of the two datasets is that the commercial dataset always has the seroprevalence estimates by state, while the blood donor dataset could either for the state or for multiple separate regions within the state. So for the blood donor dataset, we use the median donation date if the seroprevalence estimates are designated to be for entire state. If they are instead for regions in the state, since there is reliably one measurement per region per month, we aggregate the measurements into one per month per state by using a weighted average (to account for the given sample sizes of the regions). The median of the median dates is taken to be the date for the weighted average.
+
+Estimates of the daily new infections over our study period are approximated by the provided incidence of suspected reinfections over March 2020 to April 2022 in Clark County, which is based on surveillance work conducted by the Southern Nevada Health District (SNHD) and reported by \citet{ruff2022rapid}. The proportion of new cases per week that are suspected reinfections are calculated by dividing the number of suspected reinfections by all new PCR-identified cases during the same week.  % Possible problem here – reinfections not include third infections (see comments in the discussion section about this)
+
+\subsection{Incubation period distribution estimation} For each state at each time over June 1, 2020 to December 5, 2021, we estimate the incubation period distribution from a finite and countable mixture of gamma distributions to account for the gradual decline in the incubation period across variants. The variants considered are Alpha, Beta, Gamma, Delta and Omicron, which are designated as variants of concern by WHO based on their potential to cause new waves, dethrone the dominant variant, and lead to changes in public health policy \citep{who2021tracking}. In addition, we include the Epsilon (California) and Iota (New York) variants because of their impact on those and the surrounding states \citep{yang2022investigation, duerr2021dominance}. We relegate all other variants to be in an Other category (so that the proportions circulating in a state at a time always sum to one). This decision is, in part, motivated by the lack of sequencing data for most states in 2020 as well as the presence of an others category in the sequencing data for that time. % Perhaps include heatmap(s) from https://docs.google.com/document/d/1WSa_CN5gXsa-5Ozuj6xZt2-knflL507QdwiiRscaW2o/edit
+Then, for each variant in a state at a time, the proportion of the variant circulating (the mixture weight) is multiplied by the corresponding component gamma distribution for the incubation period. These distributions are the same for all states and based on literature estimates of the gamma parameters or the mean and standard deviation of the incubation period (in which case the method of moments is used to fit a gamma density). Finally, we discretized the resulting mixture density to the support set, which is taken to be from $1$ and $21$ days. In other words, those are taken to be the lower and upper limits for the number of days that the virus could be incubating in someone. The implicit assumption for the lower bound is that there must be at least one day between infection and symptom onset (which follows the convention given in \citet{phcan2021covid}). The assumption underlying the upper bound is that $21$ days is the maximum number of days that the virus could be incubating in someone (which is reasonable based on \citet{zaki2021estimations} and \citet{cortes2022sars}).
+
+\subsection{Delay distribution estimation} We use the restricted CDC line list to estimate the distribution between symptom onset and report for each state at each time. For brevity and consistency with \citet{jahja2022real}, let this be known as the delay distribution. More formally, let $y_t$ denote the count of new cases reported at time $t$ and $x_t$ denote the count of new infections with onset at $t$ for a state. Solely from knowing that each case had both an onset and a report date (ie. is a complete case), we could count the cases that are reported at time $t$ by enumerating them according to onset (as in \citet{jahja2022real}):
+\begin{align*}
+y_t = \sum_{s=1}^{t} \sum_{i=1}^{x_s}1 \left ( \text{the }i\text{th infection at } s \text{ gets reported at }t \right )
+\end{align*}
+Taking the conditional expectation of the above yields
+\begin{align*}
+E(y_t | x_s, s \leq t) = \sum_{s=1}^{t} \pi_t(s) x_s 
+\end{align*}
+where $\pi_t(s) = P(\text{case report at }t| \text{infection onset at }s)$ for each $s \leq t$ are the delay probabilities and the $\left ( \pi_t(s) : s \leq t \right)$ sequence comprises the delay distribution at time $t$. Notice that there are no time restrictions placed on the infection onset save that it must have been between the first time and the report date, inclusive. This is unlikely to be a realistic assumption to make as $t$ moves farther away from $s$. 
+
+Thus, we make two key assumptions about the delay distributions. Firstly, infections that are reported to the CDC are always reported within $d = 60$ days, which is chosen because the vast majority of cases are found to be reported within $60$ days. Secondly, the probability of zero delay is zero, which stems from the contamination of zero delay in the line list. 
+
+As in \citet{jahja2022real}, we update the conditional expectation formula to reflect these two assumptions: % May need to update the below and deconvolution equation to better reflect center-alignment
+\begin{align*}
+E(y_t | x_s, s \leq t) = \sum_{k=1}^{d} p_t(k) x_{t-k}
+\end{align*}
+where for $k = 1, \dots, d$,
+\begin{align*}
+p_t(k) = P(\text{case report at }t | \text{infection onset at }t-k).
+\end{align*}
+
+For each state, we estimate the delay distribution (ie. the probabilities for $1$ to $60$ days of delay) at each $t$ by using the empirical distribution of all non-zero lags between the complete cases whose onset dates fall in the center-aligned interval about $t$ designated by $\left [ t - 1.25d + 1, t + d \right ]$). 
+
+Now, the task of estimating the delay distribution for each state at each time can be described by four distinct steps. First, we obtain the empirical distribution of all lags (excluding zero) from all cases with onset dates falling in the center-aligned interval. Next, we weight the state-specific empirical distribution by the proportion of CDC to JHU cases. That is, we compare the number of CDC cases used to make the empirical distribution to the number of JHU reported cases in the time window of $\left [t - d + 2, t + 1.25d\right ]$ (to correspond appropriately to the center aligned interval for the CDC cases). This proportion is used as the weight for the state’s empirical distribution, while the complement is used to weight the overall empirical distribution that is forged from the data for all states. This construction allows for more reliance on the state’s distribution when there are more CDC cases relative to JHU (and vice versa). After implementing the shrinkage method, we fit a gamma density to the resulting empirical distribution by the method of moments. Finally, we discretize the resulting density to the support set of $1$ to $d = 60$ days.
+ 
+\subsection{Convolution} From the incubation period and delay distribution estimation, we acquire one delay and one incubation period distribution for each state at each time under consideration. We then convolve each pair of distributions to get the estimated infection-to-report distributions and, hence, the estimated probabilities for the delay from infection onset to case report. 
+
+\subsection{Retrospective deconvolution} The goal for retrospective deconvolution is to estimate the daily number of new infections in the above conditional expectation formula. For each state, we achieve this goal by solving the following optimization problem. 
+
+Following the notation of \citet{jahja2022real} (save for suppressing the state/location subscript), let $T$ represent the deconvolution period from June 1, 2020 to December 5, 2021. Let $\hat{p}_t$ be probabilities from the estimated infection-to-report distribution for $t \in T$, $y_t$ the number of new cases reported, and $D^{(4)}x$ yields all $4$th-order differences of the $x$ vector (by using the discrete derivative matrix of order $4$, $D^{(4)}$). From these, we estimate the latent infection counts for the reported cases across time by solving for the vector $x$ in
+\begin{align*}
+\min_{x} \sum_{t \in T} \left ( y_t -  \sum_{k = 1}^{d} \hat{p}_t(k)x_{t-k} \right )^2 + \lambda \|D^{(4)}x\|_1. 
+\end{align*}
+
+The above loss function decouples into two parts with competing interests (that encapsulate the classic bias-variance trade off). The first part represents minimising the sum of squared residuals between the JHU reported cases and the fitted values, while the second part captures the smoothness (between every set of five infection counts). The underlying idea here is to introduce bias to reduce the amount of variance, so that the model is not overfit to the training data.
+
+We solve this trend-filtering-regularized least squares deconvolution problem by employing the ADMM algorithm from \citet{ramdas2016fast} that is described in Appendix A of \citet{jahja2022real}. The solution to the problem is an adaptive piecewise cubic polynomial estimate \citep{tibshirani2014adaptive, tibshirani2022divided}.
+
+We select the tuning parameter, $\lambda$, by using $3$-fold cross validation as in \citet{jahja2022real} in which every third incident infection count is reserved for testing and imputed with the average of the two surrounding counts. We use each imputed count to construct a fitted value and compare it to the actual number of new cases reported. The tuning parameter that resulted in the smallest sum of squared residuals is ultimately chosen.
+
+\subsection{Inverse reporting ratio} To be clear, the latent infection estimates from retrospective deconvolution are derived solely from the infection onset dates of the reported cases. Therefore, it is necessary to adjust those estimates to account for the unreported infections. The simplest adjustment we considered is to multiply each of our unadjusted infection estimates by a ratio of the true number of new infections to the new reported infections for some time. We refer to this quantity as the inverse reporting ratio and denote it by $a(t)$ for time $t$. So our new goal is to estimate this quantity for every state at every time. 
+
+Now, we had already acquired the new number of reported infections from our unadjusted estimates (produced by deconvolution). And as for the new true infections, since seroprevalence of anti-nucleocapsid antibodies is used to estimate the percentage of people who have at least one resolving or past infection \citep{cdc2020data}, we could use the change in subsequent seroprevalence measurements to estimate this quantity. With the subscript for the state suppressed (to avoid cluttering the notation), let $s(t)$ be a seroprevalence measure at time $t$ and $\Delta R(t)$ be the change in cumulative reported infections scaled by the state’s population, then 
+\begin{align*}
+    s(t) = s(t-1) + a(t)\Delta R(t).
+\end{align*}
+
+However, this simple approach does not account for important limitations to seroprevalence measures such as being unable to capture reinfections \citep{cdc2020data} and being affected by the waning of infection-induced immunity over time \citep{seow2020longitudinal, ibarrondo2020rapid}. We address these concerns by refashioning the simple seroprevalence-based model into a leaky immunity model, which we term ``leaky'' to indicate the decrease in detectability of antibodies due to the natural degradation of infection-induced immunity over time. Since the true course of immunity over time is unknown \citep{goldberg2022protection}, we take a simple approach to model this to try avoid making gratuitous and overly restrictive assumptions.
+
+\subsection{Leaky immunity model} To convert the simple seroprevalence-based model into a leaky immunity model, the key change we make is that we introduce a leaky parameter, $\gamma$, to represent the percentage of people that lose enough immunity to go below detection threshold in a single time step:
+\begin{align*}
+s(t) = (1 -\gamma)s(t-1) + a(t)\Delta R(t). %\label{eq-simplesmod}
+\end{align*}
+For example, if $\gamma$ is $0.02$, this implies that about $2\%$ of those who have detectable immunity would lose enough immunity to go below detection threshold in a single time step.
+
+To account for reinfections, we multiply the change in reported infections by the fraction of new infections, $n(t)$:
+\begin{align*}
+s(t) = (1 -\gamma)s(t-1) + a(t)\Delta R(t)n(t).
+\end{align*}
+
+At this stage, our aim is to find $a(t)$ and $\gamma$ and we accomplish this by solving the following objective function separately for each state
+\begin{align*}
+\min_{a, \gamma}\frac{1}{2}\sum_{t \in T}w(t)\left (s(t) - (1 -\gamma)s(t-1)-a(t)\Delta R(t)n(t)  \right )^2 + \frac{\lambda}{2} \|D^{(3)}a\|_2^2 \label{eqn-leakymod}
+\end{align*}
+where $w(t)$ are the inverse variance weights, $D^{(3)}$ is the discrete derivative matrix of order $3$, and lambda is the tuning parameter chosen by $5$-fold cross validation. 
+
+Recall that we previously stated that we use two sources of seroprevalence data. So we will now describe how the data from those sources are used to obtain estimates of $s(t)$ and $w(t)$ that are inputted into the leaky immunity model.
+
+For each seroprevalence source, we predict a smoothing spline fit to get seroprevalence along with standard error estimates at all $t$ by using the gam function from the mgcv package in R \citep{wood2011fast}. We then use a simple average to combine the two predicted seroprevalence estimates for each time to give equal weight to the serology sources. The standard error is calculated from the pair of predicted estimates by using the formula for the average of two independent proportions. These are subsequently converted into inverse variance weights that are rescaled to sum to the sample size.
+
+The combined seroprevalence estimates and their weights are entered into the leaky immunity model from which we ultimately obtain one vector of inverse reporting ratios and one parameter epsilon for each state. Constant imputation is then performed to get inverse reporting ratios back to the June 1, 2020 start date. Finally, we multiply each unadjusted estimate by the inverse reporting ratio to obtain adjusted estimates of new infections for each state. Note that we are able to convert the resulting counts of infections to infections per $100,000$ population by simple re-scaling (enabled by the fact that normality is preserved under linear transformations).
+
+The $50$, $80$, and $90\%$ confidence intervals are constructed by taking a Bayesian view of the leaky immunity model (refer to the Online Supplement~\ref{supp:bayesleaky} for the Bayesian specification of the leaky immunity model). That is, for each time, $t$, we obtain an estimate of the posterior variance of $a(t)$, apply the unadjusted estimate as a constant multiplier, and then use resulting variance to build a normal confidence interval about the adjusted estimate. We additionally enforce that the lower bound must be at least the unadjusted estimate for the time under consideration.
+
+\subsection{Lagged correlation to hospitalizations} We use our adjusted infection estimates in a lagged correlation analysis with confirmed COVID-19 hospitalizations. Our primary goal of this analysis is to find the lag between infection and hospitalization rates that gives the highest average rank-based correlation across US states. To that end, we consider a wide range of possible lag values ranging from $1$ to $50$ days. Zero and negative lags are not considered because COVID-19 infection onset must precede hospitalization due to the virus. To remove day of the week effects, both the adjusted infections and hospitalization signals are subject to a $7$-day moving average (center-aligned) before their conversion to rates.
+
+For each state and over all days in our June 1, 2020 to December 5, 2021 time period, we compute the (Spearman’s) correlation between and infection and hospitalization rates for each lag using the epi\_cor function from the epiprocess package \citep{brooks2023epiprocess}. We then calculate the average correlation across all states for each lag. The lag that led to the highest average correlation is then used to estimate the time-varying IHRs for each state. To compute this for a given day, the number of individuals who are hospitalized due to COVID-19 on a day are divided by the estimated total number who were infected on the lagged number of days before.
+% To compute this for a given day, the number of individuals who are hospitalized due to COVID-19 up to the day are divided by the estimated total number who had been infected up to the lagged number of days before (as in \citep{hoze2021monitoring}).
+% May change the IHRs to cumulative (instead of non-cumulative) if that's preferred. In that case, change the last sentence to the following...
+
+
+%#%% Question for Ryan and Maria: In the Figure 3.16 caption from Maria’s thesis, she says that she computes The correlation is taken over a rolling window of d = 45 days. Should we be doing something similar (instead of computing the correlation For each state over all days)? Is that a lot more suitable than what we're currently doing?
+
+\section{Acknowledgements}
+% Maria and Ryan acknowledgement
+This work follows and builds on the remarkable work done by \citet{jahja2022real} on the real-time estimation of infections.
+
+% Required Gisaid acknowledgement
+We gratefully acknowledge all data contributors, i.e., the Authors and their Originating laboratories responsible for obtaining the specimens, and their Submitting laboratories for generating the genetic sequence and metadata and sharing via the GISAID Initiative \citep{elbe2017data}, on which this research is based.
+
+%\bibliographystyle{naturemag} #%% Change back to numeric references in line with requirements for Nature Communications articles (see pg 3 fro here: https://www.nature.com/documents/ncomms-formatting-instructions.pdf)
+\bibliographystyle{plainnat}
+
+\newpage
+\bibliography{bibliography.bib}
+
+\newpage
+% Eventually make the supplement a separate document with its own title page 
+\beginsupplement
+\title{Online Supplement} 
+\maketitle
+\section{Text}  
+\subsection{Models}
+\subsubsection{Bayesian specification of the leaky immunity model}\label{supp:bayesleaky}
+In brief, the leaky immunity model where we let $\beta = \left \{  \gamma, a(1),\dots, a(t) \right \}$ and $X$ be the design matrix, corresponds to a Bayesian model with prior 
+\begin{align*}
+    \beta \sim N\left ( 0,  \frac{\sigma^2 }{ \lambda} \left ( A^TD^TDA \right ) ^{-1}  \right )
+\end{align*} and likelihood 
+\begin{align*}
+    s|X,\beta \sim N \left( X\beta, \sigma^2W^{-1} \right ),
+\end{align*} where $A$ is indicator matrix save for the first column of $0$s (corresponding to epsilon), $D$ represents the discrete derivative matrix of order $3$, and $W$ is the inverse variance weights matrix. Then, the posterior on $a(t)$ is normally distributed with mean 
+\begin{align*}
+    \left ( X^TWX + \lambda A^TD^TDA \right )^{-1}X^TWs
+\end{align*} 
+and variance 
+\begin{align*}
+    \sigma^2 (X^TWX + \lambda A^TD^TDA)^{-1}.
+\end{align*}
+
+\end{document}
