@@ -139,9 +139,15 @@ Well-informed, localized estimates of COVID-19 infections over time can help us 
 
 \section{Methods}
 
-\attn{need some text here before the subsections}
+\attn{need some text here before the subsections. An overview (with a figure) outlining the process (take cases, deconvolve using the linelist + delays from infection to onset, by variant. Then use seroprevalence to adjust for underascertainment.)}
 
-\subsection{Data} The variant-specific incubation periods are taken to be the same for all states. They are built using literature estimates of the gamma distribution parameters or, if those are not readily available, the mean and standard deviation of the number of days of incubation. Since the literature is lacking on reliable estimates for the incubation period of Epsilon and Iota, we decided to use the incubation period for Beta for both because Epsilon, Iota, and Beta are all children from the same parent in the phylogenetic tree of the Nextstrain Clades (as depicted in \citet{hodcroft2021covariants}).
+
+\subsection{Data} 
+
+\attn{We should reorder this section to be more logical. First, list the data required (perhaps a figure). Then, launch into descriptions, following the same order. Probably, cases first, then line list, then variants, then seroprevalence.}
+
+
+The variant-specific incubation periods are taken to be the same for all states. They are built using literature estimates of the gamma distribution parameters or, if those are not readily available, the mean and standard deviation of the number of days of incubation. Since the literature is lacking on reliable estimates for the incubation period of Epsilon and Iota, we decided to use the incubation period for Beta for both because Epsilon, Iota, and Beta are all children from the same parent in the phylogenetic tree of the Nextstrain Clades (as depicted in \citet{hodcroft2021covariants}).
 
 To estimate the daily proportions of the variants circulating in each state, we obtain the GISAID genomic sequencing data counts from CoVariants.org \citep{hodcroft2021covariants, elbe2017data}\footnote{The complete list of EPI\_SET Identifiers that were used to produce the CoVariants data are provided in the Acknowledgements section of their website \citep{hodcroft2021covariants}}. Since these counts are biweekly totals, we use a simple convex optimization approach to interpolate daily numbers, where we enforce that the counts in each interval must sum to the right boundary (the biweekly total) and linear growth between the pairs of adjacent days. 
 
