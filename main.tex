@@ -300,14 +300,14 @@ where $w_t$ are the inverse variance weights derived from seroprevalence estimat
 
 \subsection{State space representation of the leaky immunity model}
 
-An alternative representation of this penalized regression problem is as a linear time series model, which has a state space representation. We will now introduce the Gaussian state space model from \citet{helske2016kfas} (as we use the KFAS package to implement our model) and then we specify our model in that form.
+An alternative representation of this penalized regression problem is as a linear time series model, which has a state space representation. We will now introduce the Gaussian state space model from \citet{helske2017kfas} (as we use the KFAS package to implement our model) and then we specify our model in that form.
 
 For $t = 1, \dots, n$, we let $\alpha_t$ be the $m \times 1$ vector of latent state processes at time $t$ and $y_t$ be the $p \times 1$ vector of observations at time $t$. Under the assumption that $\eta$ is a $k \times 1$ vector, the general form of the linear Gaussian state space model is 
 \begin{align}
 y_t &= Z_T\alpha_t + \epsilon_t  \text{     (observation equation)} \label{eq:ss1}\\
 \alpha_{t+1} &= T_t\alpha_t + R_t\eta_t  \text{     (state equation) \label{eq:ss2}}
 \end{align}
-where $\epsilon \sim N(0, H_t)$, $\eta \sim N(0, Q_t)$, and $\alpha_1 \sim N(a_1, P_1)$ independently of each other \citep{helske2016kfas}. For notational compactness, we let $\alpha = \left ( \alpha_1^T, \dots, \alpha_n^T \right )$ and $y = \left ( y_1^T, \dots, y_n^T \right )$.
+where $\epsilon \sim N(0, H_t)$, $\eta \sim N(0, Q_t)$, and $\alpha_1 \sim N(a_1, P_1)$ independently of each other \citep{helske2017kfas}. For notational compactness, we let $\alpha = \left ( \alpha_1^T, \dots, \alpha_n^T \right )$ and $y = \left ( y_1^T, \dots, y_n^T \right )$.
 
 The observation equation can be viewed as a linear regression model with the time-varying coefficient $\alpha_t$, while the second equation is a first-order autoregressive model, which is Markovian in nature \citep{durbin2012time}. 
 
@@ -327,7 +327,7 @@ Then, the state smoothing equations are run back in time to give
 \hat{a}_t &= E(\alpha_{t}|y_n, \dots, y_1) \label{eq:hatat}\\
 V_t &= Var(\alpha_{t}|y_n, \dots, y_1). \label{eq:Vt}
 \end{align}
-The filtering and smoothing steps are based on recursions that are described in Appendix A of \citep{helske2016kfas}. 
+The filtering and smoothing steps are based on recursions that are described in Appendix A of \citep{helske2017kfas}. 
 
 We should note that the Kalman filter and smoothing approach offers a number of advantages over the penalized regression approach for our situation. For example, the parameters are estimated all at once (so cross validating for model parameter tuning is not necessary). In addition, it can handle unevenly spaced time series and and forward/backward extrapolation can be used to extrapolate outside the observed seroprevalence range (refer to \citet{durbin2012time} for further details).
 
