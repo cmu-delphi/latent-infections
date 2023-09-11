@@ -23,8 +23,9 @@
 
 \begin{abstract}
 The true timing and magnitude of infections from the COVID-19 pandemic are of
-interest to both the public and public health, but these have challenging to pin
-down for a variety of data-driven and methodological reasons. Accurate estimates
+interest to both the public and public health, but these are challenging to pin
+down for a variety of data-driven and methodological reasons. Nonetheless, 
+accurate estimates
 of all latent infections can improve our understanding of the true size and
 scope of the pandemic and provide an indication of disease patterns and burden
 over time. In this work, we estimate the true daily incident infections for each
@@ -32,11 +33,9 @@ US state by deconvolving reported COVID-19 cases using estimated
 infection-onset-to-case-report distributions followed by a serology-based
 adjustment procedure to infer additional unreported infections. We find clear
 variability in the timing and magnitude in the resulting estimates, indicating a
-differential impact of the pandemic across states and revealing disease burden
-that appears earlier and more extensive than indicated by cases alone. Our
+differential impact of the pandemic across states and revealing a disease burden
+that appears earlier and more extensively than indicated by cases alone. Our
 findings help to better understand the impact of the pandemic in the US.
-%and demonstrate the utility of using reported case data to produce infection
-%estimates in a simple deconvolution-based approach. 
 \end{abstract}
 
 \section{Introduction}
@@ -45,9 +44,9 @@ Reported COVID-19 cases are a staple in tracking the pandemic at varying
 geographic resolutions such as national, state and county levels
 \citep{dong2020interactive, nyt2020corona, wp2020tracking}. Yet, for every case
 that is eventually reported to public health, several infections are likely to
-be missed. To see why, it is important to understand who is being reported and,
+be missed. To see why, it is important to understand who's cases are being reported and,
 in particular, what differentiates them from the unreported cases. Refer to
-\autoref{fig:chain_events_onset_report} for a simple chain of events for a
+\autoref{fig:chain_events_onset_report} for an illustration of the path of a
 symptomatic infection that is eventually reported to public health. 
 
 Using this figure, we can discern a number of sources of bias in the reporting
@@ -63,8 +62,8 @@ confirmation and test turnaround times, and submission to public health
 are lagging indicators of the course of the pandemic. Furthermore, they do not
 represent the actual number of new infections that occur on a given day, as
 indicated by exposure to the pathogen. Ascertaining infection onset is difficult
-because there is no large-scale surveillance efforts in the United States that
-reliably track symptom onset, let alone infection onset.
+because there was no large-scale surveillance effort in the United States that
+reliably tracked symptom onset, let alone infection onset.
 
 \begin{figure}[!tb]
 \centering
@@ -88,15 +87,18 @@ future pandemics is challenging because the true spatial and temporal behaviour
 is unknown. So while reported cases provide some understanding of the disease
 burden in a population, it is incomplete, delayed, and understates the true size
 of the pandemic. Regardless of these difficulties, it is important to the public
-and public health to perform a pandemic post-mortem and try to get closer to
-true extent of its effect - to attempt to capture the true size and impact of
+and public health to perform a pandemic post-mortem and try to better estimate the
+true extent of its effect---to attempt to capture the true size and impact of
 the pandemic as much as we can. Estimates of daily incident infections are one
 such way to measure this and can guide public and professional understanding of
-the pandemic burden over time.
+the pandemic burden over space and time.
 
-An approach to estimate the numbers of new infections would almost inevitably
+\attn{This next paragraph, reads like a hypothetical. If this is what we do,
+then we should directly say so.}
+
+\attn{An approach to estimate the numbers of new infections would almost inevitably
 rely on the available case data as that has been the major source of
-surveillance data to monitor disease intensity and trends over time
+surveillance data to monitor disease intensity and trends
 \citep{ecdc2020strategies}. However, the task of estimating the time of
 infection onset from case report appears intractable when we only consider those
 two endpoints because the time between them is not known and is likely to vary
@@ -110,7 +112,7 @@ parts of estimating the time from infection to symptom onset and the time from
 symptom onset to report date. Since the infection estimates obtained this way
 would only be representative of the reported cases, they would need to be
 adjusted to account for the unreported infections. This forms the basis for our
-approach to estimate incident infections.
+approach to estimate incident infections.}
 
 %\attn{We need at least one figure showing the various delays. Maybe one showing
 %the idealized infection to report, and another showing how we go back from
@@ -149,17 +151,20 @@ our work will prove an important benchmark for others to undertake retrospective
     \label{fig:state_nia_est_faceted}
 \end{figure}
 
-We developed estimates for incident infections for each US state over June 1,
-2020 to December 5, 2021, from which we can inspect the disease burden and viral
-transmission dynamics at the state level across time. From converting the number
-of infections to rates (infections per $100,000$ population), we can look at
+This work estimates incident infections for each US state over June 1,
+2020 to December 5, 2021 and better illustrates the disease burden and viral
+transmission dynamics at the state level across time. By converting the number
+of infections to rates (infections per $100,000$ population), we \attn{can look
+at these things, but do we? If yes, what do we "see"?}
+
+\attn{can look at
 patterns in infections across the states and postulate what may be contributing
 to these trends based on defining characteristics. Finally, we can perform a
 brief comparison between infection and case estimates within each state and see
-to what extent surges in infections are apparent from cases alone. %%
+to what extent surges in infections are apparent from cases alone.} %%
 
 \subsection{Disease burden and viral transmission}
-From reconstructing the time series of COVID-19 infections per $100,000$
+By reconstructing the time series of COVID-19 infections per $100,000$
 population for each US state from June 1, 2020 to December 5, 2021, we observe
 rates of infections that vary in intensity and disease burden across space and
 time (\autoref{fig:state_nia_est_faceted} and \autoref{fig:chloro_inf_rates}).
@@ -215,10 +220,11 @@ present waves that mirror each other in amplitude and timing.
 The infection estimates exhibit modest changes under different assumptions about the
 variant-specific incubation periods, the construction of the delay distribution (the
 window size for the considered onset dates), the fraction of new infections over time, and
-the population estimates (see Supplementary Materials Section X). % Do these sensitivity
-analyses + update this link accordingly.
+the population estimates (see Supplementary Materials Section X). \attn{this is
+pretty terse}
+% Do these sensitivity analyses + update this link accordingly.
 
-\subsection{Apparent differences from inspecting infections and cases}
+\subsection{Impact of analyzing infections rather than cases}
 Naturally, outbreaks in infections precipitate those in cases and are reliably larger in
 magnitude (\autoref{fig:state_niauc_est_faceted}). Hence, our infection estimates indicate
 that the pandemic had a differential impact across states earlier and at a larger scale
@@ -226,12 +232,13 @@ than is suggested by cases. For many states in July 2020 and September 2021, the
 clear outbreaks in infections that are difficult to detect from cases alone, suggesting
 that these are mainly comprised of unreported infections. Early on in the pandemic, such
 discrepancies may be largely attributable to failures in the reporting pipeline, while
-later on in the pandemic, they may be largely due to the rise in asymptomatic infections
+later on in the pandemic, they more likely due to the rise in asymptomatic infections
 across variants \citep{oph2022covid, garrett2022high}.
-% The following sentence may be
-making too much of a statement - Based on our infection estimates, we found that the total
-cases account for \rule{1cm}{0.15mm}\% of the reported infections from June 1, 2020 to
-December 5, 2021.
+\attn{We need some statements! The results can't just say, "we note
+differences". What differences? What are the implications?}
+The following sentence may be making too much of a statement -
+Based on our infection estimates, we found that the total cases account for
+\rule{1cm}{0.15mm}\% of the reported infections from June 1, 2020 to December 5, 2021.
 
 \begin{figure}[!tb]
 \centering
@@ -246,9 +253,12 @@ December 5, 2021.
     \label{fig:state_niauc_est_faceted}
 \end{figure}
 
-%Since we were interested in how our incident infection estimates associate with the statewise hospitalization rates for COVID-19, 
+%Since we were interested in how our incident infection estimates associate with
+%the statewise hospitalization rates for COVID-19, 
+\attn{Be more declarative: "Examining the correlation between infections and
+hospitalizations shows...}
 We perform a lagged correlation analysis where we systematically investigate the
-rank-based (ie. Spearman’s) correlation between our infection and confirmed
+rank-based (ie. Spearman's) correlation between our infection and confirmed
 hospitalization rates per $100,000$ population over a broad range of lag values
 (\autoref{fig:infect_case_hosp_lag_corr}). The maximum average correlation across US
 states of $0.82$ is observed at a lag of $13$ days (the largest median correlation of
@@ -272,7 +282,7 @@ optimal lag for infection and hospitalization rates (\autoref{fig:IHR_7dav}).
 \end{figure}
 
 The IHRs that are obtained using this lag are generally small (in most cases less than
-$0.1$) and they exhibit similar geospatial and temporal trends as are noted for
+$0.1$ \attn{units}) and they exhibit similar geospatial and temporal trends as are noted for
 infections. Namely, states that are close in proximity (such as North Carolina and South
 Carolina) exhibit similar patterns in the IHRs over time. In addition, there are similar
 spikes observed across many states at particular instances in time. For example, many
@@ -305,6 +315,8 @@ vs South divide, which states had the consistently lowest IHRs, etc.
 
 \section{Discussion}
 
+\attn{there's lots of "our" language everywhere}
+
 %\attn{suggest breaking this into subsections} - Not allowed for journal
 
 We obtained retrospective estimates of daily incident infections for each US
@@ -326,12 +338,14 @@ first year of the pandemic is warranted. As well, this study only looks relation
 between density and cases, not infections (this same limitation applies to
 \citet{jalal2021prominent}). The relationship between density and infections has
 remained relatively unexplored. Therefore, a more detailed study of it is
-necessary (beyond our somewhat cursory inspection). % Maybe the longer and more
-intense surges thing doesn't turn out to be true... It may be more that states
-with older populations and with a greater prevalence of chronic health conditions
-that areas major risk factors exhbit longer and more intense surges
+necessary (beyond our somewhat cursory inspection).
+% Maybe the longer and more intense surges thing doesn't turn out to be true...
+% It may be more that states with older populations and with a greater
+% prevalence of chronic health conditions that areas major risk factors exhbit
+% longer and more intense surges
 
-Our infection estimates suggest that the pandemic has a differential impact
+Our infection estimates suggest that the pandemic has a \attn{differential,
+again} impact
 across states earlier and at a larger scale than is indicated by cases. Since
 case reporting is not consistent across time and states, case counts
 underestimate the true number of infections and, hence, the impact of the
@@ -340,7 +354,7 @@ states report the number of individuals tested rather than the numbers of tests
 performed \citep{schechtman2020counting, chitwood2021reconstructing}.
 
 We observe outbreaks in infections that are virtually undetectable from cases
-alone. This suggests that cases provide an incomplete picture of the pandemic,
+alone. \attn{examples} This suggests that cases provide an incomplete picture of the pandemic,
 especially with respect to outbreaks that are largely driven by unreported
 infections. Furthermore, since case report dates follow symptom and infection
 onset, cases are a fundamentally flawed indicator of disease burden because they
@@ -353,7 +367,7 @@ is a delayed and incomplete version. Estimating the new number of infections by
 symptom or infection onset date would more closely align with the definition of
 incidence as we know it \citep{jahja2022real}.
 
-From the correlation analysis between our daily infection estimates and
+From the correlation analysis between daily infection estimates and
 hospitalizations, a lag of $13$ days gives the maximum average correlation
 across states. This is commensurate with the early estimate of the average time
 from infection to hospitalization of $9.7$ days ($95\%$ CI: $[5.4, 17.0]$) for
@@ -369,7 +383,7 @@ Nevertheless, their relative agreement with our estimate of $13$ days for the US
 states lends some credence to of our results. 
 
 Although we computed IHRs for all states, the IHR is also likely to vary within
-states by confounding variables such as age and the presence of major
+states and depend on additional variables such as age and the presence of major
 comorbidities \citep{russell2023comorbidities}. Therefore, it would be
 beneficial to account for such variables in the IHR calculations by, for
 example, stratifying infections and hospitalizations by age to produce
@@ -379,8 +393,8 @@ time-varying). We strongly believe this would be a worthwhile direction to
 pursue in future work should the necessary information be available. 
 
 The remainder of our discussion consists of an in-depth look into advantages and
-limitations of our approach and of other comparable approaches followed by a
-high level summary of our work and its major benefits. %%
+limitations of our approach and of other comparable approaches, followed by a
+high level summary of our work and its major contributions. %%
 
 Our approach offers a number of advantages. To the best of our knowledge, no
 other modelling approach has been used to reconstruct the infection time series
@@ -904,7 +918,12 @@ smallest sum of squared residuals is ultimately chosen.
 
 \subsection{Inverse reporting ratio} 
 
-To be clear, the latent infection estimates from retrospective deconvolution are
+\attn{Too much "could" and "maybe". Again, more declarative: "we adjust the
+retrospective deconvolution estimates using a model for seroprevalence. That
+model is the following. This is reasonable because...
+}
+
+Latent infection estimates from retrospective deconvolution are
 derived solely from the infection onset dates of the reported cases. Therefore,
 it is necessary to adjust those estimates to account for the unreported
 infections. The simplest adjustment we considered is to multiply each of our
@@ -939,6 +958,10 @@ avoid making gratuitous and overly restrictive assumptions.
 
 \subsection{Leaky immunity model} 
 
+\attn{why so "simple"? Maybe start with the leaky immunity rather than building
+up the other thing first and then getting here. 
+}
+
 To convert the simple seroprevalence-based model into a leaky immunity model,
 the key change we make is that we introduce a leaky parameter, $\gamma$, to
 represent the percentage of people that lose enough immunity to go below
@@ -946,6 +969,9 @@ detection threshold in a single time step:
 \begin{align*}
 s_t = (1 -\gamma)s_{t-1} + a_t\Delta R_t. %\label{eq-simplesmod}
 \end{align*}
+\attn{, where $\gamma$ is the percentage of people who lose immunity between
+time $t$ and time $t+1$.
+}
 For example, if $\gamma$ is $0.02$, this implies that about $2\%$ of those who
 have detectable immunity would lose enough immunity to go below detection
 threshold in a single time step.
@@ -956,6 +982,7 @@ the fraction of new infections, $n_t$:
 s_t = (1 -\gamma)s_{t-1} + a_t\Delta R_t n_t.
 \end{align*}
 
+\attn{but we don't do this at all, we do the next thing.}
 At this stage, our aim is to find $a_t$ and $\gamma$ and we can accomplish this
 by solving the following objective function separately for each state
 \begin{align*}
@@ -1006,11 +1033,15 @@ validation.
 
 \subsection{State space representation of the leaky immunity model}
 
+\attn{Declarative: to estimate the model in equation xx, we express it as...}
 An alternative representation of this penalized regression problem is as a
 linear time series model, which has a state space representation. We will now
 introduce the Gaussian state space model from \citet{helske2017kfas} (as we use
 the KFAS package to implement our model) and then we specify our model in that
-form.
+form. \attn{we should cite the correct place. This is just an R package. SS
+models date back to the 1960s. We need to cite the science, not the
+implementation. We can eventually say "we use the R package KFAS to estimate
+this model" but the science comes from Durbin and Koopman or Kalman}
 
 For $t = 1, \dots, n$, we let $\alpha_t$ be the $m \times 1$ vector of latent
 state processes at time $t$ and $y_t$ be the $p \times 1$ vector of observations
@@ -1062,8 +1093,10 @@ time series and and forward/backward extrapolation can be used to extrapolate
 outside the observed seroprevalence range (refer to \citet{durbin2012time} for
 further details).
 
-Our leaky immunity model can be written in state space form by defining the
+The leaky immunity model can be written in state space form by defining the
 components in Equations \ref{eq:ss1} and \ref{eq:ss2} as follows:
+
+\attn{definitely appendix.}
 
 \begin{alignat*}{3}
 R &= \begin{bmatrix}
@@ -1145,6 +1178,7 @@ a greater sample size contributes more weight in the model on average.
 %% Is the red sentence quite right or is it just that the source with larger
 %weights on average will have more weight? 
 
+\attn{this is appendix.}
 For setting the initial state $\alpha_1$, note that covariance matrix $P_1$ can
 be decomposed into $\kappa P_{\infty, 1} + P_{*, 1}$ where $P_{\infty, 1}$ is a
 diagonal matrix that only marks the diffuse elements of $\alpha_1$, while $P_{*,
@@ -1223,7 +1257,7 @@ who were infected on the lagged number of days before.
 %computing the correlation For each state over all days)? Is that a lot more
 %suitable than what we're currently doing?
 
-\section{Acknowledgements}
+\subsection*{Acknowledgements}
 
 % Required Gisaid acknowledgement
 We gratefully acknowledge all data contributors, i.e., the Authors and their
