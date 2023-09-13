@@ -1080,7 +1080,9 @@ Following the maximum likelihood estimation of the unknown parameters, $\gamma$,
 $\lambda$, and $\sigma^2_s$, we use the Kalman filtering and smoothing to obtain the
 smoothed estimates of the states (which are the inverse reporting ratios) and
 their covariance matrices as shown in Equations \ref{eq:hatat} and \ref{eq:Vt}.
-After we obtain one vector of inverse reporting ratios for each state in this
+Forwards and backwards extrapolation is used to estimate the ratios outside of the 
+observed seroprevalence range \citet{durbin2012time}. After we obtain one vector of 
+inverse reporting ratios for each state in this
 way, we take each inverse reporting ratio and multiply it by the corresponding
 unadjusted estimate to obtain an adjusted estimate of new infections for each
 state at each time. We are able to convert these numbers of infections to
