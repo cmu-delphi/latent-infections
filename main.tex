@@ -166,16 +166,8 @@ patterns in infections across the states and postulate what may be contributing
 to these trends based on defining characteristics such as population density and 
 composition and geographical contiguity. Finally, we perform a
 brief comparison between infection and case estimates within each state and see
-to what extent surges in infections are apparent from cases alone. 
-
-% Main takeaway maybe
-
-%\attn {can look
-% at these things, but do we? If yes, what do we "see"? A: Above is meant to be
-% an intro/signposting what's to come in this section - the patterns in infections across 
-% states  stuff is covered in the next section on disease burden and viral transmission, while the 
-% brief comparison between cases and infections is in a subsequent subsection. So left 
-% mostly as is, but took out "can"s because that makes it seem hypothetical.}
+to what extent that surges in infections are apparent in both cases and infections
+and instances where surges are only apparent from infections.
 
 \subsection{Disease burden and viral transmission}
 By reconstructing the time series of COVID-19 infections per $100,000$
@@ -274,7 +266,8 @@ We perform a lagged correlation analysis where we systematically investigate the
 rank-based (ie. Spearman's) correlation between our infection and confirmed
 hospitalization rates per $100,000$ population over a broad range of lag values
 (\autoref{fig:infect_case_hosp_lag_corr}). Examining the correlation between infections and
-hospitalizations shows that the maximum average correlation across states of $0.82$ is observed at a lag of $13$ days. In contrast, we find that the greatest average
+hospitalizations shows that the maximum average correlation across states of $0.82$ is 
+observed at a lag of $13$ days. In contrast, we find that the greatest average
 rank-based correlations for cases with confirmed hospitalizations is achieved at a lag of
 $0$. That is, we find that case report rates are nearly contemporaneous to
 hospitalizations, while infection estimates clearly precede them. As a counterpart to our
@@ -294,9 +287,9 @@ optimal lag for infection and hospitalization rates (\autoref{fig:IHR_7dav}).
 \end{figure}
 
 The IHRs that are obtained using this lag are generally small (in most cases less than
-$0.1$ hospitalizations per infections and they exhibit similar geospatial and temporal trends as are noted for
-infections. Namely, states that are close in proximity (such as North Carolina and South
-Carolina) exhibit similar patterns in the IHRs over time. In addition, there are similar
+$0.1$ hospitalizations per infections and they exhibit similar geospatial and temporal trends 
+as are noted for infections. Namely, states that are close in proximity (such as North Carolina 
+and South Carolina) exhibit similar patterns in the IHRs over time. In addition, there are similar
 spikes observed across many states at particular instances in time. For example, many
 states such as Florida, Texas, and South Carolina exhibit a striking spike in
 hospitalizations in mid-2021, which coincides with the rapid takeover of the Delta variant
@@ -326,8 +319,6 @@ are generally less prominent and more constant across states and time. % More an
 \end{figure}
 
 \section{Discussion}
-
-%\attn {there's lots of "our" language everywhere}
 
 We obtained retrospective estimates of daily incident infections for each US
 state for June 1, 2020 to Dec. 5, 2021, which we will now discuss in more depth
@@ -841,7 +832,6 @@ which stems from the contamination of zero delay in the line list.
 
 As in \citet{jahja2022real}, we update the conditional expectation formula to
 reflect these two assumptions: 
-% May need to update the below and deconvolution equation to better reflect center-alignment
 \begin{align*}
 E(y_t | x_s, s \leq t) = \sum_{k=1}^{d} p_t(k) x_{t-k}
 \end{align*}
@@ -923,11 +913,6 @@ smallest sum of squared residuals is ultimately chosen.
 
 \subsection{Inverse reporting ratio and the leaky immunity model} 
 
-%\attn {Too much "could" and "maybe". Again, more declarative: "we adjust the
-%retrospective deconvolution estimates using a model for seroprevalence. That
-%model is the following. This is reasonable because...
-%}
-
 The infection estimates from retrospective deconvolution are
 derived solely from the infection onset dates of the reported cases. Hence,
 to capture the unreported infections, it is necessary to adjust those estimates by 
@@ -967,130 +952,8 @@ immunity over time. Since the true course of immunity over time is unknown
 and simply model a singular $\gamma$ to try
 avoid making gratuitous or overly restrictive assumptions.
 
-
-%However, this simple approach does not account for important limitations to
-%seroprevalence measures such as being unable to capture reinfections
-%\citep{cdc2020data} and being affected by the waning of infection-induced
-%immunity over time \citep{seow2020longitudinal, ibarrondo2020rapid}. We address
-%these concerns by refashioning the simple seroprevalence-based model into a
-%
-%leaky immunity model, We term this the leaky immunity model where ``leaky'' to indicate the decrease in
-%detectability of antibodies due to the natural degradation of infection-induced
-%immunity over time. Since the true course of immunity over time is unknown
-%\citep{goldberg2022protection}, we take a simple approach to model this to try
-%avoid making gratuitous or overly restrictive assumptions.
-%
-%At this stage, our aim is to find $a_t$ and $\gamma$ and one way to accomplish
-%this is by solving the objective function separately for each state. 
-%
-%The simplest adjustment we considered is to multiply each of our
-%unadjusted infection estimates by a ratio of the true number of new infections
-%to the new reported infections for some time. We refer to this quantity as the
-%inverse reporting ratio and denote it by $a_t$ for time $t$. Our new goal is
-%to estimate this quantity for every state at every time under consideration.
-%
-%Now, we had already acquired the new number of reported infections from our
-%unadjusted estimates (produced by deconvolution). As for the new true
-%infections, since seroprevalence of anti-nucleocapsid antibodies is used to
-%estimate the percentage of people who have at least one resolving or past
-%infection \citep{cdc2020data}, we can use the change in subsequent
-%seroprevalence measurements to estimate this quantity. With the subscript for
-%the state suppressed (to avoid cluttering the notation), let $s_t$ be a
-%seroprevalence measure at time $t$ and $\Delta R_t$ be the change in cumulative
-%reported infections scaled by the state’s population, then 
-%\begin{align*}
-%    s_t = s_{t-1}+ a_t\Delta R_t.
-%\end{align*}
-%
-%However, this simple approach does not account for important limitations to
-%seroprevalence measures such as being unable to capture reinfections
-%\citep{cdc2020data} and being affected by the waning of infection-induced
-%immunity over time \citep{seow2020longitudinal, ibarrondo2020rapid}. We address
-%these concerns by refashioning the simple seroprevalence-based model into a
-%leaky immunity model, which we term ``leaky'' to indicate the decrease in
-%detectability of antibodies due to the natural degradation of infection-induced
-%immunity over time. Since the true course of immunity over time is unknown
-%\citep{goldberg2022protection}, we take a simple approach to model this to try
-%avoid making gratuitous or overly restrictive assumptions.
-%
-%\subsection{Leaky immunity model} 
-%
-% \attn {why so "simple"? Maybe start with the leaky immunity rather than building
-% up the other thing first and then getting here. A: I think it's logical to show how 
-% we build up to it using the data (esp. if we introduce the data first as in other
-% Nature Comms papers. Then, it makes sense to go data --> how we use the
-% data (building up from simple to most complex I think guides the reader)
-% }
-%
-%To convert the seroprevalence-based model into a leaky immunity model,
-%the key change we make is that we introduce a leaky parameter, $\gamma$, to
-%represent the percentage of people that lose enough immunity to go below
-%detection threshold in a single time step. That is,
-%\begin{align*}
-%s_t = (1 -\gamma)s_{t-1} + a_t\Delta R_t,
-%\end{align*}
-%where $\gamma$ is the percentage of people who lose immunity between
-%time $t$ and time $t+1$. For example, if $\gamma$ is $0.02$, this implies that 
-%about $2\%$ of those who have detectable immunity would lose enough 
-%immunity to go below detection threshold in a single time step.
-%
-%To account for reinfections, we multiply the change in reported infections by
-%the fraction of new infections, $n_t$:
-%\begin{align*}
-%s_t = (1 -\gamma)s_{t-1} + a_t\Delta R_t n_t.
-%\end{align*}
-%
-%\attn {but we don't do this at all, we do the next thing.}
-%At this stage, our aim is to find $a_t$ and $\gamma$ and one way to accomplish
-%this is by solving the following objective function separately for each state
-%\begin{align*}
-%\min_{a, \gamma}\frac{1}{2}\sum_{t \in T}w_t\left (s_t - (1 -\gamma)s_{t-1} 
-%- a_t\Delta R_t n_t  \right )^2 + \frac{\lambda}{2} \|D^{(3)}a\|_2^2  
-%\end{align*}
-%where $w_t$ are the inverse variance weights derived from seroprevalence
-%estimates and their sample sizes, $D^{(3)}$ is the discrete derivative matrix of
-%order $3$, and lambda is the tuning parameter chosen by cross
-%validation. 
-%
-%Recall that we previously stated that we use two sources of seroprevalence
-%data. So we will now describe how the data from those sources are used to
-%obtain estimates of $s_t$ and $w_t$ that are inputted into the leaky immunity
-%model.
-%
-%For each seroprevalence source, we predict a smoothing spline fit to get
-%seroprevalence along with standard error estimates at all $t$ by using the gam
-%function from the mgcv package in R \citep{wood2011fast}. We then use a simple
-%average to combine the two predicted seroprevalence estimates for each time to
-%give equal weight to the serology sources. The standard error is calculated
-%from the pair of predicted estimates by using the formula for the average of
-%two independent proportions. These are subsequently converted into inverse
-%variance weights that are rescaled to sum to the sample size.
-%
-%The combined seroprevalence estimates and their weights are entered into the
-%leaky immunity model from which we ultimately obtain one vector of inverse
-%reporting ratios and one gamma parameter for each state. Constant imputation is
-%then performed to get inverse reporting ratios back to the June 1, 2020 start
-%date. 
-%
-%Finally, we multiply each unadjusted estimate by the inverse reporting ratio to
-%obtain adjusted estimates of new infections for each state. Note that we are
-%able to convert the resulting counts of infections to infections per $100,000$
-%population by simple re-scaling (enabled by the fact that normality is
-%preserved under linear transformations).
-%
-%The $50$, $80$, and $90\%$ confidence intervals are constructed by taking a
-%Bayesian view of the leaky immunity model (refer to the Online
-%Supplement~\ref{supp:bayesleaky} for the Bayesian specification of the leaky
-%immunity model). That is, for each time, $t$, we obtain an estimate of the
-%posterior variance of $a(t)$, apply the unadjusted estimate as a constant
-%multiplier, and then use resulting variance to build a normal confidence
-%interval about the adjusted estimate. We additionally enforce that the lower
-%bound must be at least the unadjusted estimate for the time under
-%consideration.
-
 \subsection{State space representation of the leaky immunity model}
 
-%attn {Declarative: to estimate the model in equation~\ref{}, we express it as...}
 To estimate the leaky immunity model in \autoref{eq:leakypr}, we express it as a 
 Gaussian state space model (as in \citet{durbin2012time} and \citet{helske2017kfas}).
 
@@ -1156,7 +1019,7 @@ further details).
 The leaky immunity model can be written in state space form by defining the
 components in Equations \ref{eq:ss1} and \ref{eq:ss2} as follows:
 
-\attn {definitely appendix.}
+% Probably move the below specification to the appendix
 
 \begin{alignat*}{3}
 R &= \begin{bmatrix}
@@ -1225,17 +1088,9 @@ commercial source is double the average weight of the blood donor source (for an
 arbitrary state), then we scale all of the weights in the commercial source
 (including the ones) by two. The main purpose of this step is to to ensure that
 the source with a greater sample size contributes more weight in the model on
-average. %% Is the red sentence quite right or is it just that the source with larger
+average. % Is the red sentence quite right or is it just that the source with larger
 %weights on average will have more weight? 
 
-
-\attn {This block to appendix or cut:}
-%For setting the initial state $\alpha_1$, note that covariance matrix $P_1$ can
-%be decomposed into $\kappa P_{\infty, 1} + P_{*, 1}$ where $P_{\infty, 1}$ is a
-%diagonal matrix that only marks the diffuse elements of $\alpha_1$, while $P_{*,
-%1}$ contains the covariances of the non-diffuse elements and zeros otherwise
-%\citep{koopman2003filtering}. So, as $\kappa$ goes to infinity, the initial
-%states that are unknown would tend toward having infinite variance. 
 The prior distribution for $\alpha_1$ is estimated using both data-driven constraints 
 and externally sourced information. The initial values of the two seroprevalence 
 components are expected to be close to
@@ -1249,7 +1104,7 @@ error of a proportion. For all of the initial values of the trend components, we
 use the inverse ascertainment ratio estimate as of June 1, 2020 for the state
 based on Table 1 in \citet{unwin2020state} and denote this by $\tilde{a}_1$. The
 initial variance estimate of $\sigma^2_{\tilde{a}_1}$ is roughly the standard
-deviation implied by the interval in that table.  %% Update this last sentence if end up 
+deviation implied by the interval in that table.  % Update this last sentence if end up 
 % using u_m ~ Beta(12,5) to get the var. est. as in the unwin2020state paper
 
 The initial $\sigma^2_s$ is taken to be the average of the estimated variances
@@ -1298,13 +1153,6 @@ average correlation is then used to estimate the time-varying IHRs for each
 state. To compute this for a given day, the number of individuals who are
 hospitalized due to COVID-19 on a day are divided by the estimated total number
 who were infected on the lagged number of days before.
-% To compute this for a given day, the number of individuals who are
-% hospitalized due to COVID-19 up to the day are divided by the estimated total
-% number who had been infected up to the lagged number of days before (as in
-% \citep{hoze2021monitoring}). May change the IHRs to cumulative (instead of
-% non-cumulative) if that's preferred. In that case, change the last sentence to
-% the following...
-
 
 %#%% Question for Ryan and Maria: In the Figure 3.16 caption from Maria’s
 %thesis, she says that she computes The correlation is taken over a rolling
