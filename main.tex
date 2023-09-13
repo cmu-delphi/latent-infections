@@ -123,11 +123,17 @@ the pandemic burden over space and time.
 In this work, we attempt to provide a statistically justified reconstruction of daily
 incident infections for each US state from June 1, 2020 to Dec. 5, 2021. To our knowledge,
 no other modelling approach has been used to reconstruct the infection time series for
-each state over as large of a time interval. We achieve this by first breaking the task of estimating infection onset from report date into the more manageable parts of estimating the time 
+each state over as large of a time interval. We achieve this by first breaking the task of 
+estimating infection onset from report date into the more manageable parts of estimating the time 
 from infection to symptom onset and the time from symptom onset to report date (as depicted in
-\autoref{fig:chain_events_onset_report}). Using statewise data, we are able to construct state-time-specific incubation period and symptom-onset-to-case report delay distributions. We then use these estimated incubation period distributions in conjunction with their delay distributions to deconvolve daily reported COVID-19 cases to infection onset.
+\autoref{fig:chain_events_onset_report}). Using statewise data, we are able to construct 
+state-time-specific incubation period and symptom-onset-to-case report delay distributions. 
+We then use these estimated incubation period distributions in conjunction with their 
+delay distributions to deconvolve daily reported COVID-19 cases to infection onset.
 The resulting infection estimates are adjusted to
-account for the unreported infections by using seroprevalence data in a novel leaky immunity model that is defined by its ability to account for the waning of detectable immunity.  We examine some features of the adjusted estimates and the implications of
+account for the unreported infections by using seroprevalence data in a novel leaky 
+immunity model that is defined by its ability to account for the waning of detectable immunity.  
+We examine some features of the adjusted estimates and the implications of
 using them rather than reported cases. Comparing the correlations between adjusted
 infections and state-level hospitalization data reveals much more believable delay
 relationships than with reported cases. Relatedly, we demonstrate how to use our infection
@@ -157,7 +163,8 @@ This work estimates incident infections for each US state over June 1,
 transmission dynamics at the state level across time. After converting the number
 of infections to rates (infections per $100,000$ population), we look at
 patterns in infections across the states and postulate what may be contributing
-to these trends based on defining characteristics such as population density and composition and geographical contiguity. Finally, we perform a
+to these trends based on defining characteristics such as population density and 
+composition and geographical contiguity. Finally, we perform a
 brief comparison between infection and case estimates within each state and see
 to what extent surges in infections are apparent from cases alone. 
 
@@ -356,9 +363,9 @@ states report the number of individuals tested rather than the numbers of tests
 performed \citep{schechtman2020counting, chitwood2021reconstructing}.
 
 We observe outbreaks in infections that are virtually undetectable from cases
-alone. \attn {examples} This suggests that cases provide an incomplete picture of the pandemic,
-especially with respect to outbreaks that are largely driven by unreported
-infections. Furthermore, since case report dates follow symptom and infection
+alone. \attn {examples} This suggests that cases provide an incomplete picture 
+of the pandemic, especially with respect to outbreaks that are largely driven by 
+unreported infections. Furthermore, since case report dates follow symptom and infection
 onset, cases are a fundamentally flawed indicator of disease burden because they
 have a built-in temporal bias. This is in addition to other biases from
 differences in reporting across states (such as temporary bottlenecks due
@@ -934,22 +941,30 @@ unadjusted estimates (produced by deconvolution). As for the new true
 infections, since seroprevalence of anti-nucleocapsid antibodies is used to
 estimate the percentage of people who have at least one resolving or past
 infection \citep{cdc2020data}, we can use the change in subsequent
-seroprevalence measurements to estimate this quantity. Hence, we adjust the retrospective 
-deconvolution estimates using a model that is based on the seroprevalence. With the subscript for
-the state suppressed (to avoid cluttering the notation), let $s_t$ be a
-seroprevalence estimate at time $t$, $w_t$ be the inverse variance weights derived from those
-estimates, and $\Delta R_t$ be the change in cumulative reported infections scaled by the state’s population. To account for reinfections, we multiply the change in reported infections at time $t$ by
-the corresponding fraction of new infections, $n_t$. Using these components, we construct the following objective function for each state
+seroprevalence measurements to estimate this quantity. Hence, we adjust the 
+retrospective deconvolution estimates using a model that is based on the 
+seroprevalence. With the subscript for the state suppressed (to avoid 
+cluttering the notation), let $s_t$ be a seroprevalence estimate at time $t$, $w_t$ be
+ the inverse variance weights derived from those
+estimates, and $\Delta R_t$ be the change in cumulative reported infections 
+scaled by the state’s population. To account for reinfections, we multiply the 
+change in reported infections at time $t$ by the corresponding fraction
+ of new infections, $n_t$. Using these components, we construct the 
+ following objective function for each state
 \begin{align}
 \min_{a, \gamma}\frac{1}{2}\sum_{t \in T}w_t\left (s_t - (1 -\gamma)s_{t-1} 
 - a_t\Delta R_t n_t  \right )^2 + \frac{\lambda}{2} \|D^{(3)}a\|_2^2 \label{eq:leakypr}
 \end{align}
 where $D^{(3)}$ is the discrete derivative matrix of
-order $3$, lambda is the tuning parameter, and $\gamma$ is the percentage of people who lose immunity between time $t$ and time $t+1$. 
+order $3$, lambda is the tuning parameter, and $\gamma$ is the percentage of
+ people who lose immunity between time $t$ and time $t+1$. 
 
-We refer to $\gamma$ as the leaky parameter and we call this model leaky immunity model. By ``leaky'' we mean the decrease in detectability of antibodies due to the natural degradation of infection-induced
+We refer to $\gamma$ as the leaky parameter and we call this model leaky 
+immunity model. By ``leaky'' we mean the decrease in detectability of antibodies 
+due to the natural degradation of infection-induced
 immunity over time. Since the true course of immunity over time is unknown
-\citep{goldberg2022protection}, we take this rather straightforward approach and simply model a singular $\gamma$ to try
+\citep{goldberg2022protection}, we take this rather straightforward approach 
+and simply model a singular $\gamma$ to try
 avoid making gratuitous or overly restrictive assumptions.
 
 
@@ -1076,8 +1091,8 @@ avoid making gratuitous or overly restrictive assumptions.
 \subsection{State space representation of the leaky immunity model}
 
 %attn {Declarative: to estimate the model in equation~\ref{}, we express it as...}
-To estimate the leaky immunity model in \autoref{eq:leakypr}, we express it as a Gaussian state space model
-(as in \citet{durbin2012time} and \citet{helske2017kfas}).
+To estimate the leaky immunity model in \autoref{eq:leakypr}, we express it as a 
+Gaussian state space model (as in \citet{durbin2012time} and \citet{helske2017kfas}).
 
 %An alternative representation of this penalized regression problem is as a
 %linear time series model, which has a state space representation. We will now
@@ -1221,7 +1236,9 @@ average. %% Is the red sentence quite right or is it just that the source with l
 %1}$ contains the covariances of the non-diffuse elements and zeros otherwise
 %\citep{koopman2003filtering}. So, as $\kappa$ goes to infinity, the initial
 %states that are unknown would tend toward having infinite variance. 
-The prior distribution for $\alpha_1$ is estimated using both data-driven constraints and externally sourced information. The initial values of the two seroprevalence components are expected to be close to
+The prior distribution for $\alpha_1$ is estimated using both data-driven constraints 
+and externally sourced information. The initial values of the two seroprevalence 
+components are expected to be close to
 but smaller than the first observed value from the sources. Hence, we
 extract the first observed seroprevalence measurement from each source, round
 those down to two decimal places, and take those to be the estimated initial
