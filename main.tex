@@ -1064,12 +1064,14 @@ those down to two decimal places, and take those to be the estimated initial
 values $\tilde{s}_{1,c}$ and $\tilde{s}_{1,b}$. The corresponding initial
 variance estimates of $\sigma^2_{\tilde{s}_{1,c}}$ and
 $\sigma^2_{\tilde{s}_{1,b}}$ are obtained from the formula for the standard
-error of a proportion. For all of the initial values of the trend components, we
-use the inverse ascertainment ratio estimate as of June 1, 2020 for the state
-based on Table 1 in \citet{unwin2020state} and denote this by $\tilde{a}_1$. The
-initial variance estimate of $\sigma^2_{\tilde{a}_1}$ is roughly the standard
-deviation implied by the interval in that table.  % Update this last sentence if end up 
-% using u_m ~ Beta(12,5) to get the var. est. as in the unwin2020state paper
+error of a proportion. For all of the initial values of the trend components, 
+ we use the inverse of the ascertainment ratio estimate as of June 1, 2020 for each state
+from Table 1 in \citet{unwin2020state} and denote this by $\tilde{a}_1$. The
+initial variance estimate of $\sigma^2_{\tilde{a}_1}$ is based on the variance implied 
+by the inverse ascertainment ratio distribution.
+% standard deviation implied by the interval in that table.  
+% Update this last sentence if end up going with the standard deviation implied by the interval in Table 1
+% instead of the variance implied by u_m ~ Beta(12,5) from the unwin2020state paper
 
 The initial $\sigma^2_s$ is taken to be the average of the estimated variances
 from the linear models for the sources where the observed seroprevalence
