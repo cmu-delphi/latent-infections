@@ -239,7 +239,7 @@ rank-based (ie. Spearman's) correlation between our infection and confirmed
 hospitalization rates per $100,000$ population over a broad range of lag values
 (\autoref{fig:infect_case_hosp_lag_corr}). Examining the correlation between infections and
 hospitalizations shows that the maximum average correlation across states of $0.82$ is 
-observed at a lag of $13$ days. In contrast, we find that the greatest average
+observed at a lag of $15$ days. In contrast, we find that the greatest average
 rank-based correlations for cases with confirmed hospitalizations is achieved at a lag of
 $1$. That is, we find that case report rates are nearly contemporaneous to
 hospitalizations, while infection estimates clearly precede them. 
@@ -248,10 +248,10 @@ We perform an ablation study for the lagged correlation of infections, the resul
 shown in \autoref{fig:adj_unadj_sym_hosp_lag_corr}. From this, we can see that the infection estimates from each intermediate 
 step are all leading indicators of hospitalizations. However, the degree that each such step 
 leads hospitalizations depends on its location in the sequence of steps and in relation to 
-infections. For example, the results for the earliest step considered show that the 
+infections. For example, the results for the earliest step show that the 
 reported infections by symptom onset tend to precede hospitalizations by about $11$
 days, while those for the subsequent step show that the unadjusted infection estimates
-tend to precede hospitalizations by about $13$ days.
+tend to precede hospitalizations by about $15$ days.
 
 In terms of average correlation, the unadjusted infection estimates provide slightly more
 information that is indicative to hospitalizations than the reported infections about $4$ 
@@ -259,7 +259,7 @@ days before the latter tends to occur, which highlights a time-based benefit of 
 infection estimates by the dates of infection onset over symptom onset. 
 
 Unsurprisingly, the unadjusted and adjusted estimates achieve their maximum correlation
-at the same lag of $13$ days. That said, the average correlation to hospitalizations
+at the same lag of $15$ days. And yet, the average correlation to hospitalizations
 tends to be greater for the unadjusted estimates than for the adjusted estimates (and
 the reported infections by symptom onset). This suggests that the production of the
 unadjusted estimates is likely to be the most informative step in the process and
@@ -375,9 +375,9 @@ symptom or infection onset date would more closely align with the definition of
 incidence as we know it \citep{jahja2022real}.
 
 From the correlation analysis between daily infection estimates and
-hospitalizations, a lag of $13$ days gives the maximum average correlation
-across states. This is commensurate with the early estimate of the average time
-from infection to hospitalization of $9.7$ days ($95\%$ CI: $[5.4, 17.0]$) for
+hospitalizations, a lag of $15$ days gives the maximum average correlation
+across states. This is in agreement with the early estimates of the average time from
+ infection to hospitalization of $9.7$ days ($95\%$ CI: $[5.4, 17.0]$) for
 cases reported in January, 2020 in Wuhan, China as well as with estimates from
 across the pandemic in the UK that ranged from an average of $8.0$ to $9.7$
 days, more precisely, $8.0$ days ($95\%$ interval: $[2.7, 18.5]$) for the first
@@ -386,7 +386,7 @@ wave to $9.7$ days ($95\%$ interval: $[4.1, 19.6]$) for the second wave,
 on a small sample size for outbreak cases reported well before our study start
 date. As well, both sets of estimates depend upon the healthcare system and the
 population structure, amongst other things \citep{ward2021understanding}.
-Nevertheless, their relative agreement with our estimate of $13$ days for the US
+Nevertheless, their relative agreement with our estimate of $15$ days for the US
 states lends some credence to of our results. 
 
 Although we computed IHRs for all states, the IHR is also likely to vary within
