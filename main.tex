@@ -201,6 +201,7 @@ The infection estimates exhibit modest changes under different assumptions about
 variant-specific incubation periods, the construction of the delay distribution (the
 window size for the considered onset dates), the fraction of new infections over time, and
 the population estimates (see Supplementary Materials Section X). 
+
 % \attn {Add a sentence or two about what is meant by modest changes... Did any of these result in noticeably higher or lower (biased) estimates of infections? To what extent (ie. an additional X infections)? For what states? Ablation stuff should also probably go here/near to this section.}
 % Do these sensitivity analyses + update this link accordingly.
 
@@ -241,20 +242,55 @@ hospitalizations shows that the maximum average correlation across states of $0.
 observed at a lag of $13$ days. In contrast, we find that the greatest average
 rank-based correlations for cases with confirmed hospitalizations is achieved at a lag of
 $1$. That is, we find that case report rates are nearly contemporaneous to
-hospitalizations, while infection estimates clearly precede them. As a counterpart to our
-lagged correlation analysis, we compute the time-varying IHRs for each state using the
-optimal lag for infection and hospitalization rates (\autoref{fig:IHR_7dav}). 
+hospitalizations, while infection estimates clearly precede them. 
+
+We perform an ablation study for the lagged correlation of infections, the results of which are 
+shown in \autoref{fig:adj_unadj_sym_hosp_lag_corr}. From this, we can see that the infection estimates from each intermediate 
+step are all leading indicators of hospitalizations. However, the degree that each such step 
+leads hospitalizations depends on its location in the sequence of steps and in relation to 
+infections. For example, the results for the earliest step considered show that the 
+reported infections by symptom onset tend to precede hospitalizations by about $11$
+days, while those for the subsequent step show that the unadjusted infection estimates
+tend to precede hospitalizations by about $13$ days.
+
+In terms of average correlation, the unadjusted infection estimates provide slightly more
+information that is indicative to hospitalizations than the reported infections about $4$ 
+days before the latter tends to occur, which highlights a time-based benefit of opting for
+infection estimates by the dates of infection onset over symptom onset. 
+
+Unsurprisingly, the unadjusted and adjusted estimates achieve their maximum correlation
+at the same lag of $13$ days. That said, the average correlation to hospitalizations
+tends to be greater for the unadjusted estimates than for the adjusted estimates (and
+the reported infections by symptom onset). This suggests that the production of the
+unadjusted estimates is likely to be the most informative step in the process and
+these estimates are perhaps the most meaningful signal for future hospitalizations.
+
+As a counterpart to our lagged correlation analysis, we compute the time-varying IHRs 
+for each state using the optimal lag for the adjusted infection and hospitalization rates 
+(\autoref{fig:IHR_7dav}). 
 
 \begin{figure}[!tb]
 \centering
     \includegraphics[width=.9\textwidth]{infect_case_hosp_lag_corr.pdf} 
     \caption{Average rank-based correlation across US states between the infection and 
-    hospitalization rates per $100,000$ (blue curve) as well as between case and 
-    hospitalization rates per $100,000$ (orange curve) for a broad range of non-negative
-     lag values. Note that infections, cases, and hospitalization counts are subject 
-     to a center-aligned 7-day average to remove spurious day of the week effects. 
+    hospitalization rates per $100,000$ as well as between case and 
+    hospitalization rates per $100,000$ for a broad range of non-negative
+     lag values. Note that the infections, cases, and hospitalization counts are subject 
+     to a center-aligned 7-day averaging to remove spurious day of the week effects. 
      The dashed lines indicate the lags for which the highest average correlation is attained.}
     \label{fig:infect_case_hosp_lag_corr}
+\end{figure}
+
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=.9\textwidth]{adj_unadj_sym_hosp_lag_corr.pdf} 
+    \caption{Average rank-based correlation across US states between the infection 
+    and the hospitalization rates per $100,000$ for a broad range of non-negative lag values. 
+    The infection rates we use are the unadjusted, adjusted, and the reported infections 
+    by symptom onset and these are considered separately. Note that each such set of infection counts 
+    is subject to a center-aligned 7-day averaging to remove spurious day of the week effects. 
+     The dashed lines indicate the lags for which the highest average correlation is attained.}
+    \label{fig:adj_unadj_sym_hosp_lag_corr}
 \end{figure}
 
 The IHRs that are obtained using this lag are generally small (in most cases less than
@@ -525,7 +561,6 @@ key information for the ongoing debate on the true size and impact of the
 pandemic.
 
 \section{Methods}
-
 
 In what follows, we provide details on how we estimate the daily incident
 infections for each state over the considered time period of June 1, 2020 to
@@ -1099,7 +1134,7 @@ multiplier, and then use resulting variance to build a normal confidence
 interval about the adjusted estimate. We additionally enforce that the lower
 bound must be at least the unadjusted estimate for the time under consideration.
 
-\subsection{Lagged correlation to hospitalizations} 
+\subsection{Lagged correlation to hospitalizations and time-varying IHRs} 
 
 We use our adjusted infection estimates in a lagged correlation analysis with
 confirmed COVID-19 hospitalizations. Our primary goal of this analysis is to
@@ -1112,7 +1147,7 @@ adjusted infections and hospitalization signals are subject to a $7$-day moving
 average (center-aligned) before their conversion to rates.
 
 For each state and over all days in the June 1, 2020 to December 5, 2021 time
-period, we compute the (Spearman’s) correlation between and infection and
+period, we compute the (Spearman’s) correlation between the infection and
 hospitalization rates for each lag using the epi\_cor function from the
 epiprocess package \citep{brooks2023epiprocess}. We then calculate the average
 correlation across all states for each lag. The lag that led to the highest
@@ -1126,6 +1161,17 @@ who were infected on the lagged number of days before.
 %window of d = 45 days. Should we be doing something similar (instead of
 %computing the correlation For each state over all days)? Is that a lot more
 %suitable than what we're currently doing?
+
+\subsection{Ablation study for the lagged correlation analysis} 
+
+To better understand the contribution of the intermediate steps to the lagged 
+correlation analysis, we carry out a brief ablation study in which we recalculate the 
+lagged correlation using the following: 1. solely using the reporting delay data in 
+the deconvolution to produce the infection estimates for the reported cases by symptom 
+onset; 2. adding in the incubation period data in the deconvolution resulting in the 
+infection estimates for the reported cases by infection onset (ie. the unadjusted estimates); 
+3. applying the leaky model  to produce the adjusted infection estimates for both the reported 
+and the unreported cases (ie. the adjusted estimates).
 
 \subsection*{Acknowledgements}
 
