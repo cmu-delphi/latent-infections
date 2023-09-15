@@ -90,6 +90,7 @@ Naturally, outbreaks in infections precipitate those in cases and are reliably l
     \label{fig:state_niauc_est_faceted}
 \end{figure}
 
+<<<<<<< Updated upstream
 %Since we were interested in how our incident infection estimates associate with the statewise hospitalization rates for COVID-19, 
 We perform a lagged correlation analysis where we systematically investigate the rank-based (ie. Spearman’s) correlation between our infection and confirmed hospitalization rates per $100,000$ population over a broad range of lag values (\autoref{fig:infect_case_hosp_lag_corr}). The maximum average correlation across US states of $0.82$ is observed at a lag of $13$ days (the largest median correlation of $0.837$ is also observed at this lag). In contrast, we find that the greatest average rank-based correlations for cases with confirmed hospitalizations is achieved at a lag of $0$. That is, we find that case report rates are nearly contemporaneous to hospitalizations, while infection estimates clearly precede them. As a counterpart to our lagged correlation analysis, we compute the time-varying IHRs for each state using the optimal lag for infection and hospitalization rates (\autoref{fig:IHR_7dav}). 
 
@@ -101,6 +102,51 @@ We perform a lagged correlation analysis where we systematically investigate the
 \end{figure}
 
 The IHRs that are obtained using this lag are generally small (in most cases less than $0.1$) and they exhibit similar geospatial and temporal trends as are noted for infections. Namely, states that are close in proximity (such as North Carolina and South Carolina) exhibit similar patterns in the IHRs over time. In addition, there are similar spikes observed across many states at particular instances in time. For example, many states such as Florida, Texas, and South Carolina exhibit a striking spike in hospitalizations in mid-2021, which coincides with the rapid takeover of the Delta variant during that time \citep{hodcroft2021covariants}. This finding aligns with previous studies that found an increased risk in hospitalizations with Delta in comparison to other variants \citep{twohig2022hospital, nyberg2022comparative}. Additionally, states that have higher proportions of vulnerable populations such as the well-known retirement states of Florida and Arizona are routinely subject to higher IHRs than other states. There may be similar implications for states with a higher prevalence of medical risk factors such as obesity or chronic lung diseases that are known to increase the risk of severe illness or hospitalization from COVID-19 \citep{phc2020people, cdc2020people}. Overall the IHRs presented similar geospatial and temporal trends as are observed for infections, but they are generally less prominent and more constant across states and time. % More analysis later after decide on which IHRs (cumulative vs noncumualtive) to use. Can look into North vs South divide, which states had the consistently lowest IHRs, etc.
+=======
+We perform a lagged correlation analysis where we systematically investigate the
+rank-based (ie. Spearman's) correlation between our infection and confirmed
+hospitalization rates per $100,000$ population over a broad range of lag values
+(\autoref{fig:infect_case_hosp_lag_corr}). Examining the correlation between infections and
+hospitalizations shows that the maximum average correlation across states of $0.82$ is 
+observed at a lag of $13$ days. In contrast, we find that the greatest average
+rank-based correlations for cases with confirmed hospitalizations is achieved at a lag of
+$1$. That is, we find that case report rates are nearly contemporaneous to
+hospitalizations, while infection estimates clearly precede them. As a counterpart to our
+lagged correlation analysis, we compute the time-varying IHRs for each state using the
+optimal lag for infection and hospitalization rates (\autoref{fig:IHR_7dav}). 
+
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=.75\textwidth, height=.44\textheight]{infect_case_hosp_lag_corr.pdf} 
+    \caption{Average rank-based correlation across US states between the infection and 
+    hospitalization rates per $100,000$ (blue curve) as well as between case and 
+    hospitalization rates per $100,000$ (orange curve) for a broad range of non-negative
+     lag values. Note that infections, cases, and hospitalization counts are subject 
+     to a center-aligned 7-day average to remove spurious day of the week effects. 
+     The dashed lines indicate the lags for which the highest average correlation is attained.}
+    \label{fig:infect_case_hosp_lag_corr}
+\end{figure}
+
+The IHRs that are obtained using this lag are generally small (in most cases less than
+$0.1$ hospitalizations per infection and they exhibit similar geospatial and temporal trends 
+as are noted for infections. Namely, states that are close in proximity (such as North Carolina 
+and South Carolina) exhibit similar patterns in the IHRs over time. In addition, there are similar
+spikes observed across many states at particular instances in time. For example, many
+states such as Florida, Texas, and South Carolina exhibit a striking spike in
+hospitalizations in mid-2021, which coincides with the rapid takeover of the Delta variant
+during that time \citep{hodcroft2021covariants}. This finding aligns with previous studies
+that found an increased risk in hospitalizations with Delta in comparison to other
+variants \citep{twohig2022hospital, nyberg2022comparative}. Additionally, states that have
+higher proportions of vulnerable populations such as the well-known retirement states of
+Florida and Arizona are routinely subject to higher IHRs than other states. There may be
+similar implications for states with a higher prevalence of medical risk factors such as
+obesity or chronic lung diseases that are known to increase the risk of severe illness or
+hospitalization from COVID-19 \citep{phc2020people, cdc2020people}. Overall the IHRs
+presented similar geospatial and temporal trends as are observed for infections, but they
+are generally less prominent and more constant across states and time. % More analysis
+% later after decide on which IHRs (cumulative vs noncumualtive) to use. Can look into North
+% vs South divide, which states had the consistently lowest IHRs, etc.
+>>>>>>> Stashed changes
 
 \begin{figure}[!tb]
 \centering
