@@ -990,17 +990,17 @@ achieved through Kalman filtering and smoothing.
 
 Kalman filtering gives the one-step-ahead predictions and prediction errors:
 \begin{align*}
-a_{t+1} &= \textup{E}(\alpha_{t+1}|y_t, \dots, y_1) \\
+a_{t+1} &= \E[\alpha_{t+1}\given y_t, \dots, y_1] \\
 v_t &= y_t - Z_ta_t
 \end{align*} with covariance, 
 \begin{align*}
-P_{t+1} &= Var(\alpha_{t+1}|y_t, \dots, y_1) \\
-Var(v_t) &= Z_tP_tZ_t^T + H_t.
+P_{t+1} &= \Var(\alpha_{t+1}\given y_t, \dots, y_1) \\
+\Var(v_t) &= Z_tP_tZ_t^T + H_t.
 \end{align*}
 Then, the state smoothing equations are run back in time to give
 \begin{align}
-\hat{a}_t &= E(\alpha_{t}|y_n, \dots, y_1) \label{eq:hatat}\\
-V_t &= Var(\alpha_{t}|y_n, \dots, y_1). \label{eq:Vt}
+\hat{a}_t &= \E[\alpha_{t}\given y_n, \dots, y_1] \label{eq:hatat}\\
+V_t &= \Var(\alpha_{t}\given y_n, \dots, y_1). \label{eq:Vt}
 \end{align}
 The filtering and smoothing steps are based on recursions that are described in
 Appendix A of \citet{helske2017kfas} as we use the R package KFAS to estimate
