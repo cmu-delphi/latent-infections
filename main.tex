@@ -245,19 +245,22 @@ $1$. That is, we find that case report rates are nearly contemporaneous to
 hospitalizations, while infection estimates clearly precede them. 
 
 We undertake an ablation study for the lagged correlation of infections, the results of which 
-are  shown in \autoref{fig:adj_unadj_sym_hosp_lag_corr}. From this, we can see that the 
+are shown in \autoref{fig:adj_unadj_sym_inc_hosp_lag_corr}. From this, we can see that the 
 infection estimates from each intermediate 
-step are all leading indicators of hospitalizations. However, the degree that each such step 
-leads hospitalizations depends on its location in the sequence of steps and in relation to 
-infections. For example, the results for the earliest step show that the 
-reported infections by symptom onset tend to precede hospitalizations by about $11$
-days, while those for the subsequent step show that the unadjusted infection estimates
-tend to precede hospitalizations by about $15$ days.
+step are all leading indicators of hospitalizations. However, the degree that each such set of estimates
+lead hospitalizations depend on its location in the sequence of steps and how close the estimates 
+are to infection onset. For example, 
+ the reported infections by symptom onset tend to precede hospitalizations by about $11$
+days, while those for the subsequent step show that the unadjusted estimates by infection onset
+tend to precede hospitalizations by about $15$ days. When we solely rely on incubation period data 
+in the deconvolution (ie. under the assumption that the date of symptom
+onset is the same as the date of report), we can see that the reported infections tend to precede
+hospitalizations by about $5$ days. 
 
-In terms of average correlation, the unadjusted infection estimates provide slightly more
-information that is indicative to hospitalizations than the reported infections about $4$ 
-days before the latter tends to occur, which highlights a time-based benefit of opting for
-infection estimates by the dates of infection onset over symptom onset. 
+In terms of average correlation, the unadjusted infections provide slightly more
+information that is indicative to hospitalizations than the reported infections by symptom onset
+about $4$ days before the latter tends to occur, which highlights a time-based benefit of opting for
+infection estimates by the date of infection onset over symptom onset. 
 
 Unsurprisingly, the unadjusted and adjusted estimates achieve their maximum correlation
 at the same lag of $15$ days. And yet, the average correlation to hospitalizations
@@ -284,11 +287,12 @@ for each state using the optimal lag for the adjusted infection and hospitalizat
 
 \begin{figure}[!tb]
 \centering
-    \includegraphics[width=.9\textwidth]{adj_unadj_sym_hosp_lag_corr.pdf} 
+    \includegraphics[width=.9\textwidth]{adj_unadj_sym_inc_hosp_lag_corr.pdf} 
     \caption{Average rank-based correlation across US states between the infection 
     and the hospitalization rates per $100,000$ for a broad range of non-negative lag values. 
-    The infection rates we use are the unadjusted, adjusted, and the reported infections 
-    by symptom onset and these are considered separately. Note that each such set of infection counts 
+    The infection rates are based on the counts for the unadjusted and adjusted estimates as 
+    well as the reported infections by symptom onset and when the report is symptom onset. 
+    Note that each such set of infection counts 
     is subject to a center-aligned 7-day averaging to remove spurious day of the week effects. 
      The dashed lines indicate the lags for which the highest average correlation is attained.}
     \label{fig:adj_unadj_sym_hosp_lag_corr}
@@ -662,7 +666,7 @@ which is unknown to us), we omit all such cases from our analysis.
 
 For the same release date, the restricted line list contains 74,849,225 cases
 (rows) in total compared to 84,714,805 cases reported by the JHU CSSE; that is,
-line list is missing about $10$ million cases for the same release date. The
+line list is missing about $10$ million cases. The
 extent that this issue impacts each state is shown in
 \autoref{fig:prop_cc_cdc_vs_jhu}, from which it is clear the fraction of missing
 cases is substantial for many states as it often surpasses $50\%$
@@ -1167,12 +1171,14 @@ who were infected on the lagged number of days before.
 
 To better understand the contribution of the intermediate steps to the lagged 
 correlation analysis, we carry out a brief ablation study in which we recalculate the 
-lagged correlation using the following: 1. solely using the reporting delay data in 
-the deconvolution to produce the infection estimates for the reported cases by symptom 
-onset; 2. adding in the incubation period data in the deconvolution resulting in the 
-infection estimates for the reported cases by infection onset (ie. the unadjusted estimates); 
-3. applying the leaky model  to produce the adjusted infection estimates for both the reported 
-and the unreported cases (ie. the adjusted estimates).
+lagged correlation using the following infection estimates: 1. those from the
+deconvolution procedure under the assumption that the report date is the 
+same as the symptom onset date (ie. excluding
+the reporting delay data) 2. those from the deconvolution procedure when only the
+reporting delay data is used (ie. excluding the incubation period data) 3. those from
+the deconvolution procedure that utilizes both the incubation period and delay data 
+(ie. the unadjusted estimates); 4. those from applying the leaky model to produce
+estimates for both the reported and the unreported cases (ie. the adjusted estimates).
 
 \subsection*{Acknowledgements}
 
