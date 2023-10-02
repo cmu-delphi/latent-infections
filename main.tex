@@ -1022,11 +1022,12 @@ seroprevalence measurements to the nearest Monday. If there are multiple
 measurements in a week from a source, then the average of those 
 measurements is used (and similarly for the weights). We denote these changes by 
 changing the time-based subscript from $t$ to $m$ where $m$ indicates the Monday 
-relative to our June 1, 2020 start date and $\Delta R_m$ is the change in weekly reported 
-infections.
+relative to our June 1, 2020 start date and $\Delta R_m$ is the change in weekly 
+reported infections.
 
-The leaky immunity model on weekly data can be written in state space form by defining the
-corresponding components in Equations \ref{eq:ss1} and \ref{eq:ss2} as follows:
+The leaky immunity model on weekly data can be written in state space form by 
+defining the corresponding components in Equations \ref{eq:ss1} and 
+ref{eq:ss2} as follows:
 
 % Probably move the below specification to the appendix
 
@@ -1075,9 +1076,10 @@ P_{1} &= \begin{bmatrix}
 \end{bmatrix} 
 \end{alignat*}
 where $\sigma^2_o$ is the variance of observations,
-$\sigma^2_s$ is the variance of the seroprevalence estimates (in terms of smoothness), and
-$\sigma^2_a$ is the trend variance. Since we expect the inverse ratios to be more variable 
-than the seroprevalence estimates, we enforce that the estimate of $\sigma^2_a$ is a multiple of 
+$\sigma^2_s$ is the variance of the seroprevalence estimates (in terms of 
+smoothness), and $\sigma^2_a$ is the trend variance. Since we expect the 
+inverse ratios to be more variable than the seroprevalence estimates, 
+we enforce that the estimate of $\sigma^2_a$ is a multiple of 
 $\sigma^2_s$. Letting the subscripts $b$ and $c$ denote
 the blood donor and commercial datasets, $w_{m,c}$ and $w_{m,b}$ are the
 time-varying inverse variance weights computed from the commercial and blood
@@ -1103,9 +1105,9 @@ component, $\tilde{s}_{1}$, we extract the first observed seroprevalence measure
 each source, round down to two decimal places, and take the average to be the
 estimated initial value $\tilde{s}_{1}$. The corresponding initial
 variance estimate, $\sigma^2_{\tilde{s}_{1}}$, is taken to be the mean of the standard
-errors of the two seroprevalence estimates. For all of the initial values of the trend components, 
-we use the inverse of the ascertainment ratio estimate as of June 1, 2020 for each state
-from Table 1 in \citet{unwin2020state} and denote this by $\tilde{a}_1$. The
+errors of the two seroprevalence estimates. For all of the initial values of the trend 
+components, we use the inverse of the ascertainment ratio estimate as of June 1, 2020 
+for each state from Table 1 in \citet{unwin2020state} and denote this by $\tilde{a}_1$. The
 initial variance estimate of $\sigma^2_{\tilde{a}_1}$ is based on the variance implied 
 by the given inverse ascertainment ratio distribution.
 % standard deviation implied by the interval in that table.  
