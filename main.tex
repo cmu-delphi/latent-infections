@@ -994,89 +994,92 @@ achieved through Kalman filtering and smoothing.
 
 Kalman filtering gives the one-step-ahead predictions and prediction errors:
 \begin{align*}
-a_{t+1} &= \textup{E}(\alpha_{t+1}|y_t, \dots, y_1) \\
+a_{t+1} &= \E[\alpha_{t+1}\given y_t, \dots, y_1] \\
 v_t &= y_t - Z_ta_t
 \end{align*} with covariance, 
 \begin{align*}
-P_{t+1} &= Var(\alpha_{t+1}|y_t, \dots, y_1) \\
-Var(v_t) &= Z_tP_tZ_t^T + H_t.
+P_{t+1} &= \Var(\alpha_{t+1} \given y_t, \dots, y_1) \\
+\Var(v_t) &= Z_tP_tZ_t^T + H_t.
 \end{align*}
 Then, the state smoothing equations are run back in time to give
 \begin{align}
-\hat{a}_t &= E(\alpha_{t}|y_n, \dots, y_1) \label{eq:hatat}\\
-V_t &= Var(\alpha_{t}|y_n, \dots, y_1). \label{eq:Vt}
+\hat{a}_t &= \E[\alpha_{t}\given y_n, \dots, y_1] \label{eq:hatat}\\
+V_t &= \Var(\alpha_{t}\given y_n, \dots, y_1). \label{eq:Vt}
 \end{align}
 The filtering and smoothing steps are based on recursions that are described in
 Appendix A of \citet{helske2017kfas} as we use the R package KFAS to estimate
 our model.
 
-% Maybe include the following somewhere, though perhaps not necessary:
-% We should note that the Kalman filter and smoothing approach offers a number of
-% advantages over the penalized regression approach for our situation. For
-% example, the parameters are estimated all at once (so cross validating for model
-% parameter tuning is not necessary). In addition, it can handle unevenly spaced
-% time series and and forward/backward extrapolation can be used to extrapolate
-% outside the observed seroprevalence range (refer to \citet{durbin2012time} for
-% further details).
+For our situation, the Kalman filter and smoothing approach offers a number of
+advantages over the penalized regression approach. Perhaps most notably,
+ the parameters are estimated all at once (so cross validating for model
+parameter tuning is not necessary). In addition, it can handle unevenly spaced
+time series and (refer to \citet{durbin2012time} for further details).
 
-The leaky immunity model can be written in state space form by defining the
-components in Equations \ref{eq:ss1} and \ref{eq:ss2} as follows:
+To help manage the sparseness in the seroprevalence data, we convert our data 
+to weekly by summing the reported infections and shifting the observed 
+seroprevalence measurements to the nearest Monday. If there are multiple 
+measurements in a week from a source, then the average of those 
+measurements is used (and similarly for the weights). We denote these changes by 
+changing the time-based subscript from $t$ to $m$ where $m$ indicates the Monday 
+relative to our June 1, 2020 start date and $\Delta R_m$ is the change in weekly reported 
+infections.
+
+The leaky immunity model on weekly data can be written in state space form by defining the
+corresponding components in Equations \ref{eq:ss1} and \ref{eq:ss2} as follows:
 
 % Probably move the below specification to the appendix
 
 \begin{alignat*}{3}
 R &= \begin{bmatrix}
-1 & 0 & 0 \\ 
-0 & 1 & 0\\ 
-0 & 0 & 1\\ 
-0 & 0 & 0\\ 
-0 & 0 & 0 
+1 & 0  \\ 
+0 & 1 \\ 
+0 & 0 \\ 
+0 & 0 
 \end{bmatrix} &\qquad 
 Z &= \begin{bmatrix}
-1 & 0 & 0 & 0 & 0 \\ 
-0 & 1 & 0 & 0 & 0
+1 & 0 & 0 & 0 \\ 
+0 & 1 & 0 & 0 
 \end{bmatrix} &\qquad 
-H &= \begin{bmatrix}
-0 & 0 \\ 
-0 & 0
+H_m &= \begin{bmatrix} %%
+w_{m,c}\sigma^2_o & 0 \\ 
+0 & w_{m,b}\sigma^2_o
 \end{bmatrix} \\
 \alpha_t &= \begin{bmatrix}
-s_{t,c}\\
-s_{t,b}\\ 
-a_t\\ 
-a_{t-1}\\ 
-a_{t-2}
+s_{m}\\
+a_m\\ 
+a_{m-1}\\ 
+a_{m-2}
 \end{bmatrix} & 
-T_t &= \begin{bmatrix}
- \gamma & 0 & \Delta R_tn_t & 0 & 0\\ 
- 0 & \gamma & \Delta R_tn_t & 0 & 0 \\ 
- 0 & 0 & 3 & -3 & 1 \\ 
- 0 & 0 & 1 & 0 & 0\\ 
- 0 & 0 & 0 & 1 & 0
+T_m &= \begin{bmatrix}
+ \gamma & \Delta R_mn_m & 0 & 0\\ 
+ 0 & 3 & -3 & 1 \\ 
+ 0 & 1 & 0 & 0\\ 
+ 0 & 0 & 1 & 0
 \end{bmatrix}  & 
-Q_t &= \begin{bmatrix}
-w_{t,c}\sigma^2_s & 0 & 0 \\ 
-0 & w_{t,b}\sigma^2_s  & 0 \\ 
-0 & 0 & \sigma^2_a
+Q &= \begin{bmatrix} %%
+\sigma^2_s & 0  \\ 
+0 & \sigma^2_a
 \end{bmatrix} \\
 a_1 &= \begin{bmatrix}
-\tilde{s}_{1,c}\\ 
-\tilde{s}_{1,b}\\ 
+\tilde{s}_{1}\\ 
 \tilde{a}_1\\ 
 \tilde{a}_1 \\
 \tilde{a}_1
 \end{bmatrix} & 
 P_{1} &= \begin{bmatrix}
-\sigma^2_{\tilde{s}_{1,c}} & 0 & 0 & 0 & 0\\ 
-0 & \sigma^2_{\tilde{s}_{1,b}} & 0 & 0 & 0\\ 
-0 & 0 & \sigma^2_{\tilde{a}_1} & 0 & 0\\ 
-0 & 0 & 0 & \sigma^2_{\tilde{a}_1} & 0 \\ 
-0 & 0 & 0 & 0 & \sigma^2_{\tilde{a}_1}
+\sigma^2_{\tilde{s}_{1}} & 0 & 0 & 0 \\ 
+0 & \sigma^2_{\tilde{a}_1} & 0 & 0\\ 
+0 & 0 & \sigma^2_{\tilde{a}_1} & 0 \\ 
+0 & 0 & 0 & \sigma^2_{\tilde{a}_1}
 \end{bmatrix} 
 \end{alignat*}
-where $\sigma^2_s$ is the variance of observations (common across time) and
-$\sigma^2_a$ is the trend variance. Letting the subscripts $b$ and $c$ denote
-the blood donor and commercial datasets, $w_{t,c}$ and $w_{t,b}$ are the
+where $\sigma^2_o$ is the variance of observations,
+$\sigma^2_s$ is the variance of the seroprevalence estimates (in terms of smoothness), and
+$\sigma^2_a$ is the trend variance. Since we expect the inverse ratios to be more variable 
+than the seroprevalence estimates, we enforce that the estimate of $\sigma^2_a$ is a multiple of 
+$\sigma^2_s$. Letting the subscripts $b$ and $c$ denote
+the blood donor and commercial datasets, $w_{m,c}$ and $w_{m,b}$ are the
 time-varying inverse variance weights computed from the commercial and blood
 donor datasets, respectively. 
 
@@ -1089,22 +1092,19 @@ of the average observed weights for the sources is used as a multiplier to scale
 all of the weights for one source. For example, if the average weight of the
 commercial source is double the average weight of the blood donor source (for an
 arbitrary state), then we scale all of the weights in the commercial source
-(including the ones) by two. The main purpose of this step is to to ensure that
+(including the ones) by two. The main purpose of this step is to ensure that
 the source with a greater sample size contributes more weight in the model on
 average. % Is the red sentence quite right or is it just that the source with larger
 %weights on average will have more weight? 
 
 The prior distribution for $\alpha_1$ is estimated using both data-driven constraints 
-and externally sourced information. The initial values of the two seroprevalence 
-components are expected to be close to
-but smaller than the first observed value from the sources. Hence, we
-extract the first observed seroprevalence measurement from each source, round
-those down to two decimal places, and take those to be the estimated initial
-values $\tilde{s}_{1,c}$ and $\tilde{s}_{1,b}$. The corresponding initial
-variance estimates of $\sigma^2_{\tilde{s}_{1,c}}$ and
-$\sigma^2_{\tilde{s}_{1,b}}$ are obtained from the formula for the standard
-error of a proportion. For all of the initial values of the trend components, 
- we use the inverse of the ascertainment ratio estimate as of June 1, 2020 for each state
+and externally sourced information. To obtain the initial value of the seroprevalence 
+component, $\tilde{s}_{1}$, we extract the first observed seroprevalence measurement from 
+each source, round down to two decimal places, and take the average to be the
+estimated initial value $\tilde{s}_{1}$. The corresponding initial
+variance estimate, $\sigma^2_{\tilde{s}_{1}}$, is taken to be the mean of the standard
+errors of the two seroprevalence estimates. For all of the initial values of the trend components, 
+we use the inverse of the ascertainment ratio estimate as of June 1, 2020 for each state
 from Table 1 in \citet{unwin2020state} and denote this by $\tilde{a}_1$. The
 initial variance estimate of $\sigma^2_{\tilde{a}_1}$ is based on the variance implied 
 by the given inverse ascertainment ratio distribution.
@@ -1112,18 +1112,20 @@ by the given inverse ascertainment ratio distribution.
 % Update this last sentence if end up going with the standard deviation implied by the interval in Table 1
 % instead of the variance implied by u_m ~ Beta(12,5) from the unwin2020state paper
 
-The initial $\sigma^2_s$ is taken to be the average of the estimated variances
+The initial $\sigma^2_o$ is taken to be the average of the estimated variances
 from the linear models for the sources where the observed seroprevalence
-measurements are regressed on the enumerated dates. The initial value of
-$\lambda$ is taken to be $100$ and is based on inspection.  
+measurements are regressed on the enumerated dates. The initial value of 
+the multiplier is set to be $100$ for all states. The $\sigma^2_s$ and $\gamma$ 
+values are fixed and obtained by averaging the final values for all states on the real line. 
 
-Following the maximum likelihood estimation of the unknown parameters, $\gamma$,
-$\lambda$, and $\sigma^2_s$, we use the Kalman filtering and smoothing to obtain the
-smoothed estimates of the states (which are the inverse reporting ratios) and
+Following the maximum likelihood estimation of the two non-fixed parameters
+we use the Kalman filtering and smoothing to obtain the
+smoothed estimates of the weekly inverse reporting ratios and
 their covariance matrices as shown in Equations \ref{eq:hatat} and \ref{eq:Vt}.
-Forwards and backwards extrapolation is used to estimate the ratios outside of the 
-observed seroprevalence range \citet{durbin2012time}. After we obtain one vector of 
-inverse reporting ratios for each state in this
+Forwards and backwards extrapolation is then used to estimate the ratios and covariance
+outside of the observed seroprevalence range \citet{durbin2012time}, followed by linear 
+interpolation to fill-in estimates for each day in our considered time period. 
+After we obtain one vector of inverse reporting ratios for each state in this
 way, we take each inverse reporting ratio and multiply it by the corresponding
 unadjusted estimate to obtain an adjusted estimate of new infections for each
 state at each time. We are able to convert these numbers of infections to
