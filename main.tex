@@ -5,15 +5,15 @@
 \graphicspath{{gfx/}}
 
 \newcommand{\beginsupplement}{
-  \setcounter{table}{1}  
+  \setcounter{table}{0}  
   \renewcommand{\thetable}{S\arabic{table}} 
-  \setcounter{figure}{1} 
+  \setcounter{figure}{0} 
   \renewcommand{\thefigure}{S\arabic{figure}}
   \setcounter{section}{0} 
   \renewcommand{\thesection}{S\arabic{section}}
 }
+\font\supptitlefont=cmr12 at 16pt 
 \newcommand{\attn }[1]{\textcolor{red}{ATTN: #1}}
-
      
 \begin{document}
 \title{Retrospective estimation of latent COVID-19 infections over the pandemic in US states}
@@ -118,7 +118,6 @@ our work will prove an important benchmark for others to undertake retrospective
 
 \section{Results}
 
-% May decide to include figure for inverse reporting ratios in the appendix!
 \begin{landscape}
 \thispagestyle{empty}
 \begin{figure}[!tb]
@@ -146,7 +145,7 @@ and point out instances where cases largely fail to capture surges in infections
 By reconstructing the time series of COVID-19 infections per $100,000$
 population for each US state from June 1, 2020 to January 31, 2022, we observe
 rates of infections that vary in intensity and disease burden across space and
-time (\autoref{fig:state_nia_est_faceted} and \autoref{fig:chloro_inf_rates}). 
+time (\autoref{fig:state_nia_est_faceted},  \autoref{supp:state_nia_est_faceted_log10}, and \autoref{fig:chloro_inf_rates}). 
 The largest observed outbreaks are at the beginning of the Omicron era (January 2022) 
 in Nevada and Arizona, which suggests a similar spread of the virus in states that
 are in close geographic proximity. During this time, the state that has the highest rate
@@ -157,7 +156,7 @@ Utah with $2203$ on January 8, 2022 (95\% confidence interval: $[377, 6964]$). F
 these and most other states, smaller surges in infections
 can be observed in November 2020 to January 2021, late summer to fall of 2021 and
 leading up to the major surge in early 2022, which likely represent well-known waves 
-driven by the Alpha and Delta variants. During the Delta wave in the summer of 2021,
+driven by the Ancestral and Delta variants. During the Delta wave in the summer of 2021,
 the state that has the highest rate of infections per 100,000 on single day is Louisiana 
 with about $551$ infections per $100,000$ on July 30, 2021 ($95\%$ confidence 
 interval: $[435, 667]$), followed by Georgia with $478$ on August 8, 2021 
@@ -213,25 +212,30 @@ which lead to lower infection rates.
 
 \subsection{Impact of analyzing infections rather than cases}
 Naturally, outbreaks in infections precipitate those in cases and are reliably larger in
-magnitude (\autoref{fig:state_niauc_est_faceted}). Hence, our infection estimates indicate
+magnitude (\autoref{fig:state_niauc_est_faceted} and \autoref{supp:state_niauc_est_faceted_log10}).
+Hence, our infection estimates indicate
 that the pandemic had a differential impact across states earlier and at a larger scale
-than is suggested by cases. While the major Alpha, Delta, and Omicron waves tend to be
+than is suggested by cases. While the major Ancestral, Delta, and Omicron waves tend to be
 visible for most states, there are
 clear outbreaks in unreported infections that are not easily detectable from cases alone in the 
-falls of 2020 and 2021. An example of each is the Alpha wave in 
-early 2020 in Oregon, or the Delta wave in the fall of 2021 in the east coast states of Connecticut, 
+falls of 2020 and 2021. For example, take the Alpha wave in 
+mid-2021 in Wisconsin and Iowa or the Delta wave in the fall of 2021 in the east coast states of Connecticut, 
 Rhode Island, and Massachusetts. Earlier on in the pandemic, such
 discrepancies may be more attributable to failures in the reporting pipeline, while
 later on in the pandemic, they more likely due to the rise in asymptomatic infections
 across variants \citep{oph2022covid, garrett2022high}. 
+
 Finally, while the January 2022 Omicron wave is evident from the case counts for all states 
 (\autoref{fig:state_niauc_est_faceted}), our estimates suggest that case counts tend to severely 
-underestimate infections during this time for many states. For example, based on our infection estimates, 
-we found that cases account for about $9.1\%$ of the reported infections over January 2022 in Nevada, 
-and $12.4\%$ in Arizona. More broadly, cases account for at least at least $50\%$ of infections in 
-only $46\%$ of states, and at least $75\%$ of infections in just $20\%$ of states (that is, in the 
-ten states of Florida, New York, Colorado, New Jersey, South Dakota, Delaware, Alabama, 
-Arkansas, North Carolina, and Maryland).
+underestimate infections during this time for many states. The lowest of all states was in Nevada, 
+where about $9.1\%$ the infections were reported over January 2022. This was 
+followed by Arizona with $12.4\%$ and Minnesota with $13.9\%$. More broadly, in $27$ states
+less than $50\%$ of infections were reported. Only $10$ states of Florida, New York, Colorado, New Jersey, 
+South Dakota, Delaware, Alabama, Arkansas, North Carolina, and Maryland reported at least $70\%$ 
+infections over this time. 
+% Could add more observations here
+% Ex. In NY over some time, the total number of reported cases is 20% of the population, whereas the estimated infections is about 70%.
+% The Alpha, Delta, and Omicron spikes would be good to explore more
 
 \begin{landscape}
 \thispagestyle{empty}
@@ -316,7 +320,6 @@ for each state using the optimal lag for the adjusted infection and hospitalizat
      The dashed lines indicate the lags for which the highest average correlation is attained.}
     \label{fig:adj_unadj_sym_hosp_lag_corr}
 \end{figure}
-%% 0.1 or 0.2 hospitalizations per infection
 The IHRs that are obtained using this lag tend to be less than $0.1$ hospitalizations per infection 
 and they exhibit similar geospatial and temporal trends as are noted for infections. Namely, states
 that are close in proximity (such as Pennsylvania and Virginia) tend to exhibit similar patterns in
@@ -376,13 +379,13 @@ average in both states for the pre-pandemic year of 2018 \citep{radley2020}. In 
 healthcare professionals means a lack of medical guidance at the level of the individual and a lack 
 of opportunity for early testing/detection and treatment during the pandemic. This coupled with the 
 milder symptoms of Omicron in comparison to previous variants may have made it more difficult for 
-individuals to identify they were infected with the virus and contributed to the increase in spread in 
+individuals to identify that they were infected with the virus and contributed to the increase in spread in 
 those states. Furthermore, a lack of health insurance and the fear of having to pay costly out-of-pocket 
 medical expenses may have deterred people from seeking testing \citep{embrett2022barriers} and 
 denied opportunities to get tested when visiting a medical professional for reasons unrelated to 
 COVID-19. In contrast, Hawaii, Vermont and New Hampshire, which are reported to be top 
 performers in healthcare for the domains of access and affordability, prevention and treatment, 
-avoidable use and cost, healthy lives, and income disparity in \citet{radley2020}, exhibited the 
+avoidable use and cost, healthy lives, and income disparity in \citet{radley2020}, exhibit the 
 lowest rates of infections during the pandemic and were routinely subject to surges that were 
 lower in intensity.
 %That said, as this link to healthcare performance is largely speculative, a more in-depth analysis that takes into account others' assessments of healthcare performance is necessary to explore the plausible connection between state healthcare performance and infection rates during the height of the pandemic. 
@@ -393,8 +396,8 @@ based on the annual estimates of the resident state
 populations from the US Census Bureau \citep{uscensus2022annual}, suggesting that there may be a 
 connection between states that are among the fastest growing and increased infection rates during that 
 outbreak. Considering the larger time frame of 2010 to 2020 leading up to the pandemic, the US Census 
-Bureau reports that Utah holds the greatest percent change in population at about 18.4\%, Nevada is 
-ranked fifth at 15\%, and Arizona is ranked 9th at 11.9\% \citep{censusbureau2020}. It is reasonable 
+Bureau reports that Utah holds the greatest percent change in population at about $18.4\%$, Nevada is 
+ranked fifth at $15\%$, and Arizona is ranked 9th at $11.9\%$ \citep{censusbureau2020}. It is reasonable 
 that the faster growing states place more strain on the healthcare system than states that grow at a 
 slower pace, limiting access to medical professionals and to resources for diagnosing and testing. 
 To elucidate this possible connection, further exploration into the impact of state population growth on 
@@ -826,7 +829,8 @@ suspected reinfections by all new PCR-identified cases during the same week.
 For each state at each time over June 1, 2020 to January 31, 2022, we estimate
 the incubation period distribution from a finite and countable mixture of gamma
 distributions to account for the gradual decline in the incubation period across
-variants. The variants considered are Alpha, Beta, Gamma, Delta and Omicron,
+variants. The variants we consider are Ancestral (for our purposes, 
+all 2020 variants observed in the US), as well as Alpha, Beta, Gamma, Delta and Omicron,
 which are designated as variants of concern by WHO based on their potential to
 cause new waves, dethrone the dominant variant, and lead to changes in public
 health policy \citep{who2021tracking}. In addition, we include the Epsilon
@@ -1245,15 +1249,49 @@ is based.
 \newpage
 \bibliography{bibliography.bib}
 
+
 \newpage
 % Eventually make the supplement a separate document with its own title page 
 \beginsupplement
-\title{Online Supplement} 
+\title{\supptitlefont Online Supplement}
 \maketitle
-\section{Text}  
-\subsection{Models}
-\subsubsection{Bayesian specification of the leaky immunity
-model}\label{supp:bayesleaky} In brief, the leaky immunity model where we let
+\section{Figures}  
+\subsection{Adjusted infections per 100,000 using a base-10 log scale on the y-axis}
+\begin{landscape}
+\thispagestyle{empty}
+\begin{figure}[!tb]
+     \hspace*{-1.5cm}\includegraphics[width=1.5\textwidth]{state_nia_est_faceted_Oct2_log10.pdf} 
+    \caption{Estimates of the number of daily new (adjusted) infections per 
+    $100,000$ for each US state from June 1, 2020 to January 31, 2022 (dark blue 
+    line) when the y-axis has undergone a base-10 logarithmic transformation.
+     The shaded regions depict the 50, 80, and 95\% confidence intervals.}
+    \label{supp:state_nia_est_faceted_log10}
+\fillandplacepagenumber
+\end{figure}
+\end{landscape}
+
+\begin{landscape}
+\thispagestyle{empty}
+\begin{figure}[!tb]
+     \hspace*{-1.5cm}\includegraphics[width=1.55\textwidth]{state_niauc_est_faceted_Oct2_log10.pdf} 
+    \caption{Estimates of the number of daily new (adjusted) infections per
+     $100,000$ population for each US state from June 1, 2020 to January 31, 2022
+      (dark blue line) when the y-axis has undergone a base-10 logarithmic transformation. 
+      The shaded regions depict the 50, 80, and 95\% confidence 
+      intervals for those adjusted estimates, while the teal line represents the 
+      number of new daily new unadjusted infections per $100,000$, and the dotted 
+      orange line represents the 7-day average of the new cases per $100,000$ as 
+      of the same date.}
+    \label{supp:state_niauc_est_faceted_log10}
+\fillandplacepagenumber
+\end{figure}
+\end{landscape}
+
+
+\section{Models}
+\subsection{Bayesian specification of the leaky immunity
+model}\label{supp:bayesleaky} 
+In brief, the leaky immunity model where we let
 $\beta = \left \{  \gamma, a_1,\dots, a_t \right \}$ and $X$ be the design
 matrix, corresponds to a Bayesian model with prior 
 \begin{align*}
