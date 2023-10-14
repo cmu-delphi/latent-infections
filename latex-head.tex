@@ -18,6 +18,7 @@
 \usepackage{booktabs}       % professional-quality tables
 \usepackage{nicefrac}         % compact symbols for 1/2, etc.
 \usepackage{microtype}      % microtypography
+\usepackage{pdflscape}
 
 \ifdefined\TimesFont 
 \usepackage{times} % use times font
@@ -27,6 +28,16 @@
 \usepackage{parskip} % use par skip
 \fi
 
+% Place page number
+\def\fillandplacepagenumber{%
+ \par\pagestyle{empty}%
+ \vbox to 0pt{\vss}\vfill
+ \vbox to 0pt{\baselineskip0pt
+   \hbox to\linewidth{\hss}%
+   \baselineskip\footskip
+   \hbox to\linewidth{%
+     \hfil\thepage\hfil}\vss}}
+     
 % Theorems and such
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
