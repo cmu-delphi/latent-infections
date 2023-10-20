@@ -156,10 +156,15 @@ it to compute time-varying IHRs for each state.
 
 
 The variant-specific incubation periods are taken to be the same for all states.
-They are built using literature estimates of the gamma distribution parameters
-or, if those are not readily available, the mean and standard deviation of the
-number of days of incubation. Since the literature is lacking on reliable
-estimates for the incubation period of Epsilon and Iota, we decided to use the
+For the Ancestral variants, we build this using
+literature estimates of the gamma distribution parameters \citep{tindale2020evidence}. 
+For the Alpha, Beta, Gamma, Delta and Omicron variants, we use the
+mean and standard deviation of the number of days of incubation as reported in
+\citet{tanaka2022shorter, grant2022impact, ogata2022shorter}\footnote{To clarify, 
+we use the estimates for Alpha and Omicron from \citet{tanaka2022shorter}, those for
+Beta and Gamma from \citet{grant2022impact}, and those for Omicron from
+\citet{ogata2022shorter}.}. Since the literature is lacking on reliable estimates for the incubation
+period of the Epsilon and Iota variants, we decided to use the
 incubation period for Beta for both because Epsilon, Iota, and Beta are all
 children from the same parent in the phylogenetic tree of the Nextstrain Clades
 (as depicted in \citet{hodcroft2021covariants}).
@@ -169,7 +174,7 @@ obtain the GISAID genomic sequencing data counts from CoVariants.org
 \citep{hodcroft2021covariants, elbe2017data}\footnote{The complete list of
 EPI\_SET Identifiers that were used to produce the CoVariants data are provided
 in the Acknowledgements section of their website
-\citep{hodcroft2021covariants}}. Since these counts are biweekly totals, we use
+\citep{hodcroft2021covariants}.}. Since these counts are biweekly totals, we use
 a simple convex optimization approach to interpolate daily numbers, where we
 enforce that the counts in each interval must sum to the right boundary (the
 biweekly total) and linear growth between the pairs of adjacent days. 
@@ -505,7 +510,7 @@ change in reported infections at time $t$ by the corresponding fraction
 - a_t\Delta R_t n_t  \right )^2 + \frac{\lambda}{2} \|D^{(3)}a\|_2^2 \label{eq:leakypr}
 \end{align}
 where $D^{(3)}$ is the discrete derivative matrix of
-order $3$, lambda is the tuning parameter, and $\gamma$ is the percentage of
+order $3$, $\lambda$ is the tuning parameter, and $\gamma$ is the percentage of
  people who lose immunity between time $t$ and time $t+1$. 
 
 We refer to $\gamma$ as the leaky parameter and we call this model leaky 
@@ -732,8 +737,8 @@ correlation analysis, we carry out a brief ablation study in which we recalculat
 lagged correlation using the following infection estimates: 1. those from the
 deconvolution procedure under the assumption that the report date is the 
 same as the symptom onset date (ie. excluding
-the reporting delay data) 2. those from the deconvolution procedure when only the
-reporting delay data is used (ie. excluding the incubation period data) 3. those from
+the reporting delay data); 2. those from the deconvolution procedure when only the
+reporting delay data is used (ie. excluding the incubation period data); 3. those from
 the deconvolution procedure that utilizes both the incubation period and delay data 
 (ie. the unadjusted estimates); 4. those from applying the leaky model to produce
 estimates for both the reported and the unreported cases (ie. the adjusted estimates).
