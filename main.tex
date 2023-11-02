@@ -107,11 +107,12 @@ delay distributions to deconvolve daily reported COVID-19 cases to infection ons
 The resulting infection estimates are adjusted to
 account for the unreported infections by using seroprevalence data in a novel leaky 
 immunity model that is defined by its ability to account for the waning of detectable immunity.  
-We examine some features of the adjusted estimates and the implications of
+We examine some features of the infection estimates and the implications of
 using them rather than reported cases in assessing the impact of the pandemic.
-We then demonstrate how to use our infection
-estimates to compute time-varying infection-hospitalization ratios (IHRs) for each state,
-and find major spikes that correspond to the introduction of prominent new variants. 
+We apply our infection estimates to get time-varying infection-hospitalization 
+ratios (IHRs) for each state and compare those to similarly derived case-hospitalization ratios (CHRs).
+% finding major spikes that correspond to the introduction of prominent new variants in both, but 
+% higher ratios overall for cases.
 While these analyses provide a glimpse into the utility of our
 infection estimates, we believe that there is much more to be explored, and we hope that
 our work will prove an important benchmark for others to undertake retrospective
@@ -147,7 +148,8 @@ it to compute time-varying IHRs for each state.
     \caption{Flowchart of the inputted data and major analysis steps required 
     to get from reported cases to incident infection estimates for each day 
     over June 1, 2020 to January 31, 2022 for a state. Data sources are coloured 
-    in yellow, while data analysis steps are coloured in blue.}
+    in yellow, while data analysis steps are coloured in blue. The data sources that
+    do not stem from an analysis step are literature estimates.}
     \label{fig:cases_to_infect_flowchart}
 \end{figure}
 
@@ -483,15 +485,15 @@ smallest sum of squared residuals is ultimately chosen.
 \subsection{Inverse reporting ratio and the leaky immunity model} 
 
 The infection estimates from retrospective deconvolution are
-derived solely from the infection onset dates of the reported cases. Hence,
-to capture the unreported infections, it is necessary to adjust those estimates by 
+derived solely from the infection onset dates of the reported cases. 
+To capture the unreported infections, it is necessary to adjust the estimates by 
 a scaling factor that approximates the ratio of the true number of new infections
 to the new reported infections. We refer to this quantity as the
 inverse reporting ratio and denote it by $a_t$ for time $t$. Our new goal is
 to estimate this quantity for every state at every time under consideration. 
 
-Now, we already acquired the new number of reported infections from our
-unadjusted estimates (produced by deconvolution). As for the new true
+Note that we already acquired the new number of reported infections from our
+deconvolved case estimates. As for the new true
 infections, since seroprevalence of anti-nucleocapsid antibodies is used to
 estimate the percentage of people who have at least one resolving or past
 infection \citep{cdc2020data}, we can use the change in subsequent
@@ -684,34 +686,35 @@ we use the Kalman filtering and smoothing to obtain the
 smoothed estimates of the weekly inverse reporting ratios and
 their covariance matrices as shown in Equations \ref{eq:hatat} and \ref{eq:Vt}.
 Forwards and backwards extrapolation is then used to estimate the ratios and covariance
-outside of the observed seroprevalence range \citet{durbin2012time}, followed by linear 
+outside of the observed seroprevalence range \citep{durbin2012time}, followed by linear 
 interpolation to fill-in estimates for each day in our considered time period. 
 After we obtain one vector of inverse reporting ratios for each state in this
 way, we take each inverse reporting ratio and multiply it by the corresponding
-unadjusted estimate to obtain an adjusted estimate of new infections for each
-state at each time. We are able to convert these numbers of infections to
+deconvolved case estimate (that has undergone linear interpolation to correct
+instances of $0$ reported infections) to obtain an estimate of new infections.
+We are able to convert these numbers of infections to
 infections per $100,000$ population by simple re-scaling (enabled by the fact
 that normality is preserved under linear transformations).
 
 The $50$, $80$, and $95\%$ confidence intervals are constructed by taking a
 Bayesian view of the leaky immunity model (refer to the Online
-Supplement~\ref{supp:bayesleaky} for the Bayesian specification of the leaky
-immunity model). That is, for each time, $t$, we obtain an estimate of the
-posterior variance of $a_t$, apply the unadjusted estimate as a constant
+Supplement~\ref{supp:bayesleaky} for the Bayesian specification of the model). 
+That is, for each time, $t$, we obtain an estimate of the
+posterior variance of $a_t$, apply the deconvolved case estimate as a constant
 multiplier, and then use resulting variance to build a normal confidence
-interval about the adjusted estimate. We additionally enforce that the lower
-bound must be at least the unadjusted estimate for the time under consideration.
+interval about the infection estimate. We additionally enforce that the lower
+bound must be at least the deconvolved case estimate for the time under consideration.
 
 \subsection{Lagged correlation to hospitalizations and time-varying IHRs} 
 
-We use our adjusted infection estimates in a lagged correlation analysis with
+We use our infection estimates in a lagged correlation analysis with
 confirmed COVID-19 hospitalizations. Our primary goal of this analysis is to
 find the lag between infection and hospitalization rates that gives the highest
 average rank-based correlation across US states. To that end, we consider a wide
 range of possible lag values ranging from $1$ to $50$ days. Zero and negative
 lags are not considered because COVID-19 infection onset must precede
 hospitalization due to the virus. To remove day of the week effects, both the
-adjusted infections and hospitalization signals are subject to a $7$-day moving
+infection and hospitalization signals are subject to a $7$-day moving
 average (center-aligned) before their conversion to rates.
 
 For each state and over all days in the June 1, 2020 to January 31, 2022 time
@@ -740,104 +743,23 @@ same as the symptom onset date (ie. excluding
 the reporting delay data); 2. those from the deconvolution procedure when only the
 reporting delay data is used (ie. excluding the incubation period data); 3. those from
 the deconvolution procedure that utilizes both the incubation period and delay data 
-(ie. the unadjusted estimates); 4. those from applying the leaky model to produce
-estimates for both the reported and the unreported cases (ie. the adjusted estimates).
+(ie. the deconvolved case estimates); 4. those from applying the leaky model to produce
+estimates for both the reported and the unreported cases (ie. the infection estimates).
 
 \section{Results}
-
-\begin{landscape}
-\thispagestyle{empty}
-\begin{figure}[!tb]
-     \hspace*{-1.5cm}\includegraphics[width=1.5\textwidth]{state_nia_est_faceted_Oct2.pdf} 
-    \caption{Estimates of the number of daily new (adjusted) infections per 
-    $100,000$ for each US state from June 1, 2020 to January 31, 2022 (dark blue 
-    line). The shaded regions depict the 50, 80, and 95\% confidence intervals.}
-    \label{fig:state_nia_est_faceted}
-\fillandplacepagenumber
-\end{figure}
-\end{landscape}
 
 This work estimates incident infections for each US state over June 1,
 2020 to January 31, 2022 and to illustrate the disease burden and viral
 transmission dynamics at the level of the state across time. After converting the number
-of infections to rates (infections per $100,000$ population), we look at
-patterns in infections across the states and postulate what may be contributing
-to these trends based on defining characteristics such as state healthcare performance 
-and geographical contiguity. Finally, we perform a
+of infections to rates (infections per $100,000$ population), we perform a
 brief comparison between infection and case estimates within each state to see
 to what extent that surges in infections are apparent in cases
 and point out instances where cases largely fail to capture surges in infections.
+Then, we look at patterns in infections across the states and postulate what may be 
+contributing to these trends based on defining characteristics such as state 
+healthcare performance and geographical contiguity. 
 
-\subsection{Disease burden and viral transmission}
-By reconstructing the time series of COVID-19 infections per $100,000$
-population for each US state from June 1, 2020 to January 31, 2022, we observe
-rates of infections that vary in intensity and disease burden across space and
-time (\autoref{fig:state_nia_est_faceted},  \autoref{supp:state_nia_est_faceted_log10}, and \autoref{fig:chloro_inf_rates}). 
-The largest observed outbreaks are at the beginning of the Omicron era (January 2022) 
-in Nevada and Arizona, which suggests a similar spread of the virus in states that
-are in close geographic proximity. During this time, the state that has the highest rate
-of infections per 100,000 on single day is Nevada with about $3306$ infections per 
-$100,000$ on January 9, 2022 ($95\%$ confidence interval: $[293, 7442]$), followed by 
- Arizona with $2890$ on January 11, 2022 (95\% confidence interval: $[369, 7324]$), and
-Utah with $2203$ on January 8, 2022 (95\% confidence interval: $[377, 6964]$). For 
-these and most other states, smaller surges in infections
-can be observed in November 2020 to January 2021, late summer to fall of 2021 and
-leading up to the major surge in early 2022, which likely represent well-known waves 
-driven by the Ancestral and Delta variants. During the Delta wave in the summer of 2021,
-the state that has the highest rate of infections per 100,000 on single day is Louisiana 
-with about $551$ infections per $100,000$ on July 30, 2021 ($95\%$ confidence 
-interval: $[435, 667]$), followed by Georgia with $478$ on August 8, 2021 
-($95\%$ confidence interval: $[408, 548]$). These also represent the highest rates of 
-infections per $100,000$ for any state prior to the domination of the Omicron variants.
-Similar patterns in the major surges of infections are observed in nearly all states,
-though to varying degrees. In general, greater similarities in the strength and magnitude of 
-outbreaks are observed in the clusters of states that border each other and in those that have
-similar state health system performance (in terms of indicators for the
-access, cost and the quality of the state's healthcare as well as the health-related 
-outcomes as noted in \citet{radley2020}). 
-% Maybe note the large confidence intervals for Omicron and much smaller for Delta
-
-\begin{figure}[!tb]
-\centering
-    \includegraphics[width=.99\textwidth]{chloro_inf_rates_Oct2.pdf}
-    \caption{Chloropleth maps of the state-level estimates of the number of 
-    daily new (adjusted) infections per $100,000$ population for various times 
-    over June 1, 2020 to January 31, 2022. These maps are generated from the \texttt{usmap} 
-    package in R \citep{lorenzo2023usmap}.} 
-    \label{fig:chloro_inf_rates}
-\end{figure}
-
-The period of lowest viral transmission is observed over June 2021,
-where the neighbouring states of Vermont and New Hampshire achieve the lowest rate of infections 
-over the month of $24.1$ and $25.7$ infections per $100,000$, respectively. In the summer of 
-2020, Vermont maintains a rate under $10$ infections per $100,000$ from June 21, 2020 to 
-September 27, 2020. The states that consistently achieve the lowest rates
-of infections are those that demonstrate better pre-pandemic healthcare performance such as 
-Vermont, New Hampshire, and Hawaii \citep{radley2020}.
-
-From a brief inspection of the geo-contiguous states, we can observe similar patterns in
-surges and periods of waning over time, suggesting that states who share similarities in
-climate and topography performed similarly to each other. More precisely, we can observe
-neighboring states such as New Hampshire and Massachusetts or Washington and Oregon that
-present waves that mirror each other in amplitude and timing. 
-
-Interestingly, the two states that are geographically removed from the contiguous United States, Alaska
-and Hawaii, tend to perform quite differently from each other in that Alaska generally presents significantly
-greater rates of infections than Hawaii, especially later on in the pandemic. This suggests that it is not 
-so much the non-contiguity aspect as it is other distinguishing factors (such as healthcare performance) 
-which lead to lower infection rates.
-
-
-%\subsection{Sensitivity analysis}
-% This section is under construction
-%The infection estimates exhibit modest changes under different assumptions about the
-%variant-specific incubation periods, the construction of the delay distribution (the
-%window size for the considered onset dates), the fraction of new infections over time, and
-%the population estimates (see Supplementary Materials Section X). 
-% \attn {Add a sentence or two about what is meant by modest changes... Did any of these result in noticeably higher or lower (biased) estimates of infections? To what extent (ie. an additional X infections)? For what states?}
-% Do these sensitivity analyses + update this link accordingly.
-
-\subsection{Impact of analyzing infections rather than cases}
+\subsection{Infection estimates compared to reported cases}
 Naturally, outbreaks in infections precipitate those in cases and are reliably larger in
 magnitude (\autoref{fig:state_niauc_est_faceted} and \autoref{supp:state_niauc_est_faceted_log10}).
 Hence, our infection estimates indicate
@@ -868,11 +790,11 @@ infections over this time.
 \thispagestyle{empty}
 \begin{figure}[!tb]
      \hspace*{-1.5cm}\includegraphics[width=1.55\textwidth]{state_niauc_est_faceted_Oct2.pdf} 
-    \caption{Estimates of the number of daily new (adjusted) infections per
+    \caption{Estimates of the number of daily new infections per
      $100,000$ population for each US state from June 1, 2020 to January 31, 2022
-      (dark blue line). The shaded regions depict the 50, 80, and 95\% confidence 
-      intervals for those adjusted estimates, while the teal line represents the 
-      number of new daily new unadjusted infections per $100,000$, and the dotted 
+      (dark blue line). The blue shaded regions depict the 50, 80, and 95\% confidence 
+      intervals for the estimates, while the teal line represents the 
+      number of new daily new deconvolved cases per $100,000$, and the dotted 
       orange line represents the 7-day average of the new cases per $100,000$ as 
       of the same date.}
     \label{fig:state_niauc_est_faceted}
@@ -897,21 +819,21 @@ step are all leading indicators of hospitalizations. However, the degree that ea
 lead hospitalizations depend on its location in the sequence of steps and how close the estimates 
 are to infection onset. For example, 
 the reported infections by symptom onset tend to precede hospitalizations by about $12$
-days, while those for the subsequent step indicate that the unadjusted estimates by infection onset
+days, while those for the subsequent step indicate that the deconvolved case estimates by infection onset
 precede hospitalizations by about $15$ days. When we solely rely on incubation period data 
 in the deconvolution (ie. under the assumption that the date of symptom
 onset is the same as the date of report), we can see that the reported infections tend to precede
 hospitalizations by about $6$ days. 
 
-In terms of average correlation, the unadjusted infections provide similar
+In terms of average correlation, the deconvolved case estimates provide similar
 information indicative to hospitalizations as reported infections by symptom onset
 about $3$ days before the latter tends to occur, which highlights a time-based benefit of opting for
 infection estimates by the date of infection onset over symptom onset. 
 
-Unsurprisingly, the unadjusted and adjusted estimates achieve their maximum correlation
+Unsurprisingly, the deconvolved case and infection estimates achieve their maximum correlation
 at nearly the same lag. And yet, the average correlation to hospitalizations
-tends to be greater for the unadjusted estimates than for the adjusted estimates (and
-the reported infections by symptom onset). This indicates that the production of the unadjusted 
+tends to be greater for the deconvolved case estimates than for the infection estimates (and
+the reported infections by symptom onset). This indicates that the production of the deconvolved case
 estimates is the more informative step in the process and
 these estimates are perhaps the most meaningful signal for future hospitalizations.
 This finding could indicate that the infections that 
@@ -920,7 +842,8 @@ that are reported.
 %% Maybe move the second last last sentence to the discussion
 
 As a counterpart to our lagged correlation analysis, we compute the time-varying IHRs 
-for each state using the optimal lag for the adjusted infection and hospitalization rates 
+for each state using the optimal lag for infection and hospitalization rates. We also included
+the CHRs that were computed using the optimal lag for cases and hospitalizations for comparison.
 (\autoref{fig:IHR_7dav}). 
 
 \begin{figure}[!tb]
@@ -940,16 +863,18 @@ for each state using the optimal lag for the adjusted infection and hospitalizat
     \includegraphics[width=.8\textwidth]{adj_unadj_sym_inc_hosp_lag_corr_Oct2.pdf} 
     \caption{Average rank-based correlation across US states between the infection 
     and the hospitalization rates per $100,000$ for a broad range of non-negative lag values. 
-    The infection rates are based on the counts for the unadjusted and adjusted estimates as 
+    The infection rates are based on the counts for the deconvolved case and infection estimates as 
     well as the reported infections by symptom onset and when the report is symptom onset. 
     Note that each such set of infection counts 
     is subject to a center-aligned 7-day averaging to remove spurious day of the week effects. 
      The dashed lines indicate the lags for which the highest average correlation is attained.}
     \label{fig:adj_unadj_sym_hosp_lag_corr}
 \end{figure}
-The IHRs that are obtained using this lag tend to be less than $0.1$ hospitalizations per infection 
-and they exhibit similar geospatial and temporal trends as are noted for infections. Namely, states
-that are close in proximity (such as Pennsylvania and Virginia) tend to exhibit similar patterns in
+While the IHRs tend to be less than $0.1$ hospitalizations per infection, the CHRs tend to be less constrained and
+more amplified. This supports our claim that the reported infections are more likely to require hospitalization
+than the unreported infections. Both the IHRs and CHRs exhibit similar geospatial and 
+temporal trends as are noted for infections. 
+Namely, states that are close in proximity (such as Pennsylvania and Virginia) tend to exhibit similar patterns in
 the IHRs over time. In addition, there are similar spikes observed across many states during 
 waves of infections that are driven by prominent new variants. For example, many
 states exhibit a striking spike in hospitalizations in mid-2021, which coincides with the rapid takeover 
@@ -958,10 +883,11 @@ previous studies that found an increased risk in hospitalizations with Delta in 
 variants \citep{twohig2022hospital, nyberg2022comparative}. Similarly, during the beginning of the
 wave driven by the new Omicron variant in early 2022, there tends to be another spike in the IHRs
 for a number of states, though typically this peak is not as substantial as that observed during the
-time of Delta domination. Overall, there appears to be a waning pattern over time whereby the
-IHR is greater earlier than later in the pandemic over which time the virus mutates to variants that 
+time of Delta domination. For many states, there appears to be a waning pattern over time where the
+IHR is generally greater earlier than later in the pandemic over which time the virus mutates to variants that 
 are generally more infectious, but that pose less of a risk to 
 hospitalization \citep{lorenzo2022covid, blauer2022compare}.
+
 
 %% Are the IHRs greater in states with poorer healthcare system performance?
 %States such as _____ that are reputed to have lower healthcare performance leading up to the pandemic tended to 
@@ -970,10 +896,10 @@ hospitalization \citep{lorenzo2022covid, blauer2022compare}.
 \begin{landscape}
 \thispagestyle{empty}
 \begin{figure}[!tb]
-   \hspace*{-1.5cm}\includegraphics[width=1.5\textwidth]{IHR_7dav_Oct2.pdf} 
-    \caption{Time-varying IHR estimates for each state from June 1, 2020 to January 31, 2022
-    that are obtained using the optimal lag from the systematic lag analysis. 
-    Note that the infection and hospitalization counts are subject to a 
+   \hspace*{-1.5cm}\includegraphics[width=1.5\textwidth]{IHR_7dav_Oct23.pdf} 
+    \caption{Time-varying IHR and CHR estimates for each state from June 1, 2020 to 
+    January 31, 2022, obtained using the corresponding optimal lag from the systematic lag analysis. 
+    Note that the infection, case, and hospitalization counts are subject to a 
     center-aligned 7-day average to remove spurious day of the week effects. 
     Also note that the different starting points across states are due to the 
     availability of the hospitalization data.}
@@ -982,9 +908,88 @@ hospitalization \citep{lorenzo2022covid, blauer2022compare}.
 \end{figure}
 \end{landscape}
 
+\subsection{Disease burden and viral transmission}
 
+\begin{figure}[!tb]
+\centering
+     \hspace*{-1.5cm}\includegraphics[width=1.07\textwidth]{state_niauc_est_6states_Oct25.pdf} 
+    \caption{Estimates of the number of daily new infections per 
+    $100,000$ for a sample of six US states from June 1, 2020 to January 31, 2022 (dark blue 
+    line). The blue shaded regions depict the 50, 80, and 95\% confidence intervals. The
+    background is shaded to indicate the top variant in circulation that is at least
+    $60\%$ of all variants in circulation at the time.}
+    \label{fig:six_state_niauc_est_faceted}
+\end{figure}
 
+By reconstructing the time series of COVID-19 infections per $100,000$
+population for each US state from June 1, 2020 to January 31, 2022, we observe
+rates of infections that vary in intensity and disease burden across space and
+time (\autoref{fig:state_niauc_est_faceted}, \autoref{supp:state_niauc_est_faceted_log10}, 
+\autoref{fig:six_state_niauc_est_faceted}, \autoref{fig:chloro_inf_rates}). 
+The largest observed outbreaks are at the beginning of the Omicron era (January 2022) 
+in Nevada and Arizona, which suggests a similar spread of the virus in states that
+are in close geographic proximity. During this time, the state that has the highest rate
+of infections per 100,000 on single day is Nevada with about $3306$ infections per 
+$100,000$ on January 9, 2022 ($95\%$ confidence interval: $[293, 7442]$), followed by 
+ Arizona with $2890$ on January 11, 2022 (95\% confidence interval: $[369, 7324]$), and
+Utah with $2203$ on January 8, 2022 (95\% confidence interval: $[377, 6964]$). For 
+these and most other states, smaller surges in infections
+can be observed in November 2020 to January 2021, late summer to fall of 2021 and
+leading up to the major surge in early 2022, which likely represent well-known waves 
+driven by the Ancestral and Delta variants. During the Delta wave in the summer of 2021,
+the state that has the highest rate of infections per 100,000 on single day is Louisiana 
+with about $551$ infections per $100,000$ on July 30, 2021 ($95\%$ confidence 
+interval: $[435, 667]$), followed by Georgia with $478$ on August 8, 2021 
+($95\%$ confidence interval: $[408, 548]$). These also represent the highest rates of 
+infections per $100,000$ for any state prior to the domination of the Omicron variants.
+Similar patterns in the major surges of infections are observed in nearly all states,
+though to varying degrees. In general, greater similarities in the strength and magnitude of 
+outbreaks are observed in the clusters of states that border each other and in those that have
+similar state health system performance (in terms of indicators for the
+access, cost and the quality of the state's healthcare as well as the health-related 
+outcomes as noted in \citet{radley2020}). 
+% Maybe note the large confidence intervals for Omicron and much smaller for Delta
 
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=.99\textwidth]{chloro_inf_rates_Oct2.pdf}
+    \caption{Chloropleth maps of the state-level estimates of the number of 
+    daily new infections per $100,000$ population for various times 
+    over June 1, 2020 to January 31, 2022. These maps are generated from the \texttt{usmap} 
+    package in R \citep{lorenzo2023usmap}.} 
+    \label{fig:chloro_inf_rates}
+\end{figure}
+
+The period of lowest viral transmission is observed over June 2021,
+where the neighbouring states of Vermont and New Hampshire achieve the lowest rate of infections 
+over the month of $24.1$ and $25.7$ infections per $100,000$, respectively. In the summer of 
+2020, Vermont maintains a rate under $10$ infections per $100,000$ from June 21, 2020 to 
+September 27, 2020. The states that consistently achieve the lowest rates
+of infections are those that demonstrate better pre-pandemic healthcare performance such as 
+Vermont, New Hampshire, and Hawaii \citep{radley2020}.
+
+From a brief inspection of the geo-contiguous states, we can observe similar patterns in
+surges and periods of waning over time, suggesting that states who share similarities in
+climate and topography performed similarly to each other. More precisely, we can observe
+neighboring states such as New Hampshire and Massachusetts or Washington and Oregon that
+present waves that mirror each other in amplitude and timing. 
+
+Interestingly, the two states that are geographically removed from the contiguous United States, Alaska
+and Hawaii, tend to perform quite differently from each other in that Alaska generally presents significantly
+greater rates of infections than Hawaii, especially later on in the pandemic. This suggests that it is not 
+so much the non-contiguity aspect as it is other distinguishing factors (such as healthcare performance) 
+which lead to lower infection rates.
+
+%\subsection{Sensitivity analysis}
+% This section is under construction
+%The infection estimates exhibit modest changes under different assumptions about the
+%variant-specific incubation periods, the construction of the delay distribution (the
+%window size for the considered onset dates), the fraction of new infections over time, and
+%the population estimates (see Supplementary Materials Section X). 
+% Potentially compare ww a_t ratios over the time period as well (ie. do they fall in the confidence bands for a_t estimates
+% from the ss model)?
+% \attn {Add a sentence or two about what is meant by modest changes... Did any of these result in noticeably higher or lower (biased) estimates of infections? To what extent (ie. an additional X infections)? For what states?}
+% Do these sensitivity analyses + update this link accordingly.
 
 \section{Discussion}
 
@@ -1268,30 +1273,18 @@ is based.
 \title{\supptitlefont Online Supplement}
 \maketitle
 \section{Figures}  
-\subsection{Adjusted infections per 100,000 using a base-10 log scale on the y-axis}
-\begin{landscape}
-\thispagestyle{empty}
-\begin{figure}[!tb]
-     \hspace*{-1.5cm}\includegraphics[width=1.5\textwidth]{state_nia_est_faceted_Oct2_log10.pdf} 
-    \caption{Estimates of the number of daily new (adjusted) infections per 
-    $100,000$ for each US state from June 1, 2020 to January 31, 2022 (dark blue 
-    line) when the y-axis has undergone a base-10 logarithmic transformation.
-     The shaded regions depict the 50, 80, and 95\% confidence intervals.}
-    \label{supp:state_nia_est_faceted_log10}
-\fillandplacepagenumber
-\end{figure}
-\end{landscape}
+%\subsection{Estimates of infections per 100,000 using a base-10 log scale on the y-axis}
 
 \begin{landscape}
 \thispagestyle{empty}
 \begin{figure}[!tb]
      \hspace*{-1.5cm}\includegraphics[width=1.55\textwidth]{state_niauc_est_faceted_Oct2_log10.pdf} 
-    \caption{Estimates of the number of daily new (adjusted) infections per
+    \caption{Estimates of the number of daily new infections per
      $100,000$ population for each US state from June 1, 2020 to January 31, 2022
       (dark blue line) when the y-axis has undergone a base-10 logarithmic transformation. 
-      The shaded regions depict the 50, 80, and 95\% confidence 
-      intervals for those adjusted estimates, while the teal line represents the 
-      number of new daily new unadjusted infections per $100,000$, and the dotted 
+      The blue shaded regions depict the 50, 80, and 95\% confidence 
+      intervals for the estimates, while the teal line represents the 
+      number of new daily new deconvolved cases per $100,000$, and the dotted 
       orange line represents the 7-day average of the new cases per $100,000$ as 
       of the same date.}
     \label{supp:state_niauc_est_faceted_log10}
