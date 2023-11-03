@@ -138,8 +138,8 @@ unreported infections by using state-specific, time-varying seroprevalence data
 in a leaky immunity model to reach our ultimate goal of obtaining daily incident
 infection estimates for each state. Then, we can apply these estimates in a
 lagged correlation to hospitalizations to find the ``best'' lag between
-infection and hospitalization rates according to rank-based correlation and use
-it to compute time-varying IHRs for each state. 
+infection and hospitalization rates according to Spearman's rank-based correlation 
+and use this to compute time-varying IHRs for each state. 
 
 
 \begin{figure}[!tb]
@@ -153,6 +153,10 @@ it to compute time-varying IHRs for each state.
     \label{fig:cases_to_infect_flowchart}
 \end{figure}
 
+
+% Consider changing time period of consideration. Currently from June 1, 2020 
+% to January 31, 2022, but could extend to some extent in either direction.
+% March 1, 2020 to March 1, 2022 would be ideal.
 
 \subsection{Data} 
 
@@ -711,32 +715,28 @@ We use our infection estimates in a lagged correlation analysis with
 confirmed COVID-19 hospitalizations. Our primary goal of this analysis is to
 find the lag between infection and hospitalization rates that gives the highest
 average rank-based correlation across US states. To that end, we consider a wide
-range of possible lag values ranging from $1$ to $50$ days. Zero and negative
+range of possible lag values ranging from $1$ to $25$ days. Zero and negative
 lags are not considered because COVID-19 infection onset must precede
 hospitalization due to the virus. To remove day of the week effects, both the
 infection and hospitalization signals are subject to a $7$-day moving
 average (center-aligned) before their conversion to rates.
 
-For each state and over all days in the June 1, 2020 to January 31, 2022 time
-period, we compute the (Spearman’s) correlation between the infection and
-hospitalization rates for each lag using the epi\_cor function from the
-epiprocess package \citep{brooks2023epiprocess}. We then calculate the average
-correlation across all states for each lag. The lag that led to the highest
-average correlation is then used to estimate the time-varying IHRs for each
+For each considered lag, we calculate the Spearman’s correlation between the 
+state infection and hospitalization rates for each day over the June 1, 2020 
+to January 31, 2022
+time period, and use the epi\_slide function \citep{mcdonald2023epipredict} to 
+enforce a center-aligned rolling window of $61$ days for each such computation.
+We then calculate the average correlation across all states and times for each lag. 
+The lag that leads to the highest average correlation is used to estimate 
+the time-varying IHRs for each
 state. To compute this for a given day, the number of individuals who are
 hospitalized due to COVID-19 on a day are divided by the estimated total number
 who were infected on the lagged number of days before.
 
-%#%% Question for Ryan and Maria: In the Figure 3.16 caption from Maria’s
-%thesis, she says that she computes The correlation is taken over a rolling
-%window of d = 45 days. Should we be doing something similar (instead of
-%computing the correlation For each state over all days)? Is that a lot more
-%suitable than what we're currently doing?
-
 \subsection{Ablation study for the lagged correlation analysis} 
 
 To better understand the contribution of the intermediate steps to the lagged 
-correlation analysis, we carry out a brief ablation study in which we recalculate the 
+correlation analysis, we carry out a brief ablation study in which we calculate the 
 lagged correlation using the following infection estimates: 1. those from the
 deconvolution procedure under the assumption that the report date is the 
 same as the symptom onset date (ie. excluding
@@ -806,7 +806,7 @@ We perform a lagged correlation analysis where we systematically investigate the
 rank-based (ie. Spearman's) correlation between our infection and confirmed
 hospitalization rates per $100,000$ population over a broad range of lag values
 (\autoref{fig:infect_case_hosp_lag_corr}). Examining the correlation between infections and
-hospitalizations shows that the maximum average correlation across states of $0.86$ is 
+hospitalizations shows that the maximum average correlation across states of $0.625$ is 
 observed at a lag of $14$ days. In contrast, we find that the greatest average
 rank-based correlations for cases with confirmed hospitalizations is achieved at a lag of
 $1$. That is, we find that case report rates are nearly contemporaneous to
@@ -818,20 +818,20 @@ infection estimates from each intermediate
 step are all leading indicators of hospitalizations. However, the degree that each such set of estimates
 lead hospitalizations depend on its location in the sequence of steps and how close the estimates 
 are to infection onset. For example, 
-the reported infections by symptom onset tend to precede hospitalizations by about $12$
+the reported infections by symptom onset tend to precede hospitalizations by about $10$
 days, while those for the subsequent step indicate that the deconvolved case estimates by infection onset
-precede hospitalizations by about $15$ days. When we solely rely on incubation period data 
+precede hospitalizations by about $14$ days. When we solely rely on incubation period data 
 in the deconvolution (ie. under the assumption that the date of symptom
 onset is the same as the date of report), we can see that the reported infections tend to precede
 hospitalizations by about $6$ days. 
 
 In terms of average correlation, the deconvolved case estimates provide similar
 information indicative to hospitalizations as reported infections by symptom onset
-about $3$ days before the latter tends to occur, which highlights a time-based benefit of opting for
+about $4$ days before the latter tends to occur, which highlights a time-based benefit of opting for
 infection estimates by the date of infection onset over symptom onset. 
 
 Unsurprisingly, the deconvolved case and infection estimates achieve their maximum correlation
-at nearly the same lag. And yet, the average correlation to hospitalizations
+at the same lag. And yet, the average correlation to hospitalizations
 tends to be greater for the deconvolved case estimates than for the infection estimates (and
 the reported infections by symptom onset). This indicates that the production of the deconvolved case
 estimates is the more informative step in the process and
@@ -849,10 +849,10 @@ the CHRs that were computed using the optimal lag for cases and hospitalizations
 \begin{figure}[!tb]
 \centering
     \includegraphics[width=.8\textwidth]{infect_case_hosp_lag_corr_Oct2.pdf} 
-    \caption{Average rank-based correlation across US states between the infection and 
-    hospitalization rates per $100,000$ as well as between case and 
-    hospitalization rates per $100,000$ for a broad range of non-negative
-     lag values. Note that the infections, cases, and hospitalization counts are subject 
+    \caption{Lagged Spearman's correlation between infection and hospitalization rates per $100,000$ as
+    well as between case and hospitalization rates per $100,000$. The averages shown are for each lag, across
+     US states and days over June 1, 2020 to January 31, 2022, and taken over a rolling window of $61$ days. 
+     Note that the infections, cases, and hospitalization counts are subject 
      to a center-aligned 7-day averaging to remove spurious day of the week effects. 
      The dashed lines indicate the lags for which the highest average correlation is attained.}
     \label{fig:infect_case_hosp_lag_corr}
@@ -860,9 +860,10 @@ the CHRs that were computed using the optimal lag for cases and hospitalizations
 
 \begin{figure}[!tb]
 \centering
-    \includegraphics[width=.8\textwidth]{adj_unadj_sym_inc_hosp_lag_corr_Oct2.pdf} 
-    \caption{Average rank-based correlation across US states between the infection 
-    and the hospitalization rates per $100,000$ for a broad range of non-negative lag values. 
+    \includegraphics[width=.8\textwidth]{adj_unadj_sym_inc_hosp_lag_corr_Nov2.pdf} 
+    \caption{Lagged Spearman's correlation between the infection and hospitalization rates per $100,000$
+    averaged for each lag across US states and days over June 1, 2020 to January 31, 2022, 
+    and taken over a rolling window of $61$ days.
     The infection rates are based on the counts for the deconvolved case and infection estimates as 
     well as the reported infections by symptom onset and when the report is symptom onset. 
     Note that each such set of infection counts 
@@ -1077,7 +1078,8 @@ population structure, amongst other things \citep{ward2021understanding}.
 Nevertheless, their relative agreement with our estimate of $14$ days for the US
 states lends some credence to of our results. 
 
-Although we computed IHRs for all states, the IHR is also likely to vary within
+While we computed IHRs for all states, it is important to note that
+ the IHR is also likely to vary within
 states and depend on additional variables such as age and the presence of major
 comorbidities \citep{russell2023comorbidities}. Therefore, it would be
 beneficial to account for such variables in the IHR calculations by, for
