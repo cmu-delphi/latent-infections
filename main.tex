@@ -86,7 +86,7 @@ reliably tracked symptom onset, let alone infection onset.
 Explaining the course of the pandemic and investigating the effects of
 interventions, the burden facing various subgroups, and drawing insights for
 future pandemics is challenging because the true spatial and temporal behaviour
-is unknown. So while reported cases provide some understanding of the disease
+is unknown. While reported cases provide some understanding of the disease
 burden in a population, it is incomplete, delayed, and understates the true size
 of the pandemic. Regardless of these difficulties, it is important to the public
 and public health to perform a pandemic post-mortem and try to better estimate the
@@ -191,7 +191,7 @@ the John Hopkins Center for Systems Science and Engineering (JHU CSSE)
 \citep{dong2020interactive}. From the same API, we also retrieve the daily
 number of confirmed COVID-19 hospital admissions for each state that are
 collected by the U.S. Department of Health and Human Services (HHS). Both
-datasets are as of June 6, 2022.
+datasets are updated as of June 6, 2022.
 
 We obtain de-identified patient-level line list data on COVID-19 cases from the
 CDC. Although there are both public and restricted versions of the dataset
@@ -242,32 +242,33 @@ analysis due to a lack of alternative line list sources.
 \centering
     \includegraphics[width=0.99\textwidth]{prop_cc_cdc_vs_jhu.pdf} 
     \caption{Complete case counts by state in the CDC line list versus the 
-    cumulative complete case counts from JHU CSSE as of June 6, 2022.}
+    cumulative complete case counts from JHU CSSE as of June 6, 2022.
+    All counts have been scaled by the 2022 state populations as of
+    July 1, 2022 from \citep{uscensus2022annual}.}
     \label{fig:prop_cc_cdc_vs_jhu}
 \end{figure}
 
-In the line list, we observe unusual jarring spikes in reporting in 2020 in comparison %%
-to 2021. When plotting by report date, we find that a few states are
+In the line list, we observe unusual and striking spikes in reporting in 2020
+in comparison to 2021. When we plot by report date, we find that a few states are
 contributing unusually large case counts on isolated days very late in the
 reporting process (usually well beyond $50$ days). We strongly suspect that
 these large accumulations of cases over time are due breakdowns of the reporting
 pipeline (which may be expected to occur more frequently in the year following
-its instantiation than later on). Such anomalies are not likely to be reliable
+its instantiation than later in time). Such anomalies are not likely to be reliable
 indicators of the delay from symptom onset to case report. Therefore, we devise
 a simple, ad hoc approach to detect and prune these reporting backlogs. 
 
-For each of three considered dates, June 1, 2020, September 1, 2020, and
-December 1, 2020 (which are chosen so that we do not include a case more often
-than is necessary in the pruning process), we bin the reporting delays occurring
+For each of three considered dates, June 1, September 1, and
+December 1, 2020, we bin the reporting delays occurring
 from $50$ days up to the maximum observed delay. Then, for each bin, we obtain
-the total delay count for each state. We then check whether each count on the
+the total delay count for each state. We check whether each count on the
 log scale is at least the median (for the bin) plus $1.5$ times the
-interquartile range and retain only those that met this criterion as potential
+interquartile range and retain only those that exceed the upper bound as potential
 candidates for pruning. Next, we compute the counts by report date for each
 candidate state. If there is a report date with a count greater than or equal to
 the pre-specified threshold, then we remove those cases from the line list.
-Based on inspection and intuition, we set the threshold to be $2000$ for the
-first two bins, and then $500$ for all remaining bins. A similar trial and error
+Based on inspection and intuition, we set the threshold to $2000$ for the
+first two bins, and then lower at $500$ for all remaining bins. A similar trial and error
 approach is used to set the bin size (to $50$ days). % Area for sensitivity
 % analysis? Also, could discuss the choice of using only 3 dates 
 
@@ -420,7 +421,7 @@ p_t(k) = P(\text{case report at }t | \text{infection onset at }t-k).
 \end{align*}
 
 For each state, we estimate the delay distribution (ie. the probabilities for
-$1$ to $60$ days of delay) at each $t$ by using the empirical distribution of
+$1$ to d days of delay) at each $t$ by using the empirical distribution of
 all non-zero lags between the complete cases whose onset dates fall in the
 center-aligned interval about $t$ designated by $\left[ t - 1.25d + 1, t + d
 \right]$). 
@@ -440,7 +441,7 @@ allows for more reliance on the state's distribution when there are more CDC
 cases relative to JHU (and vice versa). After implementing the shrinkage method,
 we fit a gamma density to the resulting empirical distribution by the method of
 moments. Finally, we discretize the resulting density to the support set of $1$
-to $d = 60$ days.
+to $60$ days.
  
 \subsection{Convolution} 
 
@@ -500,30 +501,37 @@ to the new reported infections. We refer to this quantity as the
 inverse reporting ratio and denote it by $a_t$ for time $t$. Our new goal is
 to estimate this quantity for every state at every time under consideration. 
 
-Note that we already acquired the new number of reported infections from our
+The number of new reported infections is obtained from our
 deconvolved case estimates. As for the new true
 infections, since seroprevalence of anti-nucleocapsid antibodies is used to
 estimate the percentage of people who have at least one resolving or past
-infection \citep{cdc2020data}, we can use the change in subsequent
-seroprevalence measurements to estimate this quantity. Hence, we adjust the 
-retrospective deconvolution estimates using a model that is based on the 
-seroprevalence. With the subscript for the state suppressed (to avoid 
-cluttering the notation), let $s_t$ be a seroprevalence estimate at time $t$, $w_t$ be
- the inverse variance weights derived from those
-estimates, and $\Delta R_t$ be the change in cumulative reported infections 
+infection \citep{cdc2020data}, we can estimate that quantity by using 
+the change in subsequent seroprevalence measurements, accounting for
+those who lose enough immunity to go below detection threshold.
+Thus, we adjust the retrospective deconvolution estimates using a model that is 
+based on such seroprevalence estimates. 
+With the subscript for the state suppressed (to avoid 
+cluttering the notation), let $s_t$ be a seroprevalence estimate at time $t$, 
+$w_t$ be the inverse variance weights derived from those estimates,
+$\Delta R_t$ be the change in cumulative reported infections 
 scaled by the state’s population. To account for reinfections, we multiply the 
 change in reported infections at time $t$ by the corresponding fraction
- of new infections, $n_t$. Using these components, we construct the 
- following objective function separately for each state
+of new infections, $n_t$. Using these components, we may construct the basic
+time series model separately for each state
+%\begin{align}
+%\min_{a, \gamma}\frac{1}{2}\sum_{t \in T}w_t\left (s_t - (1 -\gamma)s_{t-1} 
+%- a_t\Delta R_t n_t  \right )^2 + \frac{\lambda}{2} \|D^{(3)}a\|_2^2 \label{eq:leakypr}
+%\end{align}
+%  $w_t$ be the inverse variance weights derived from those estimates,
 \begin{align}
-\min_{a, \gamma}\frac{1}{2}\sum_{t \in T}w_t\left (s_t - (1 -\gamma)s_{t-1} 
-- a_t\Delta R_t n_t  \right )^2 + \frac{\lambda}{2} \|D^{(3)}a\|_2^2 \label{eq:leakypr}
+s_t = (1 -\gamma)s_{t-1} + a_t\Delta R_t n_t + \epsilon_t \label{eq:leakypr}
 \end{align}
-where $D^{(3)}$ is the discrete derivative matrix of
-order $3$, $\lambda$ is the tuning parameter, and $\gamma$ is the percentage of
- people who lose immunity between time $t$ and time $t+1$. 
+where $\epsilon \sim N(0, H_t)$ with weighted variance $H_t = w_{t}\sigma^2_\epsilon$,
+and the $a_t$ are subject to third-order smoothing in the form of a
+discrete derivative matrix of order $3$. 
 
-We refer to $\gamma$ as the leaky parameter and we call this model leaky 
+$\gamma$ is the percentage of people who lose immunity between time $t$ and time $t+1$.
+Informally, we refer to $\gamma$ as the leaky parameter and we call this model leaky 
 immunity model. By ``leaky'' we mean the decrease in detectability of antibodies 
 due to the natural degradation of infection-induced
 immunity over time. Since the true course of immunity over time is unknown
@@ -533,7 +541,7 @@ avoid making gratuitous or overly restrictive assumptions.
 
 \subsection{State space representation of the leaky immunity model}
 
-To estimate the leaky immunity model in \autoref{eq:leakypr}, we express it as a 
+To estimate the leaky immunity model, \autoref{eq:leakypr}, we express it as a 
 Gaussian state space model (as in \citet{durbin2012time} and \citet{helske2017kfas}).
 
 In general, for $t = 1, \dots, n$, we let $\alpha_t$ be the $m \times 1$ vector of latent
@@ -544,7 +552,7 @@ form of the linear Gaussian state space model is
 y_t &= Z\alpha_t + \epsilon_t  \text{     (observation equation)} \label{eq:ss1}\\
 \alpha_{t+1} &= T_t\alpha_t + R_t\eta_t  \text{     (state equation) \label{eq:ss2}}
 \end{align}
-where $\epsilon \sim N(0, H_t)$, $\eta \sim N(0, Q_t)$, and $\alpha_1 \sim
+where $\epsilon_t \sim N(0, H_t)$, $\eta_t \sim N(0, Q_t)$, and $\alpha_1 \sim
 N(a_1, P_1)$ independently of each other \citep{helske2017kfas}. For notational
 compactness, we let $\alpha = \left ( \alpha_1^\top, \dots, \alpha_n^\top \right )$
 and $y = \left ( y_1^\top, \dots, y_n^\top \right )$.
@@ -743,12 +751,12 @@ To better understand the contribution of the intermediate steps to the lagged
 correlation analysis, we carry out a brief ablation study in which we calculate the 
 lagged correlation using the following infection estimates: 1. those from the
 deconvolution procedure under the assumption that the report date is the 
-same as the symptom onset date (ie. excluding
+same as the symptom onset date (i.e., excluding
 the reporting delay data); 2. those from the deconvolution procedure when only the
-reporting delay data is used (ie. excluding the incubation period data); 3. those from
+reporting delay data is used (excluding the incubation period data); 3. those from
 the deconvolution procedure that utilizes both the incubation period and delay data 
-(ie. the deconvolved case estimates); 4. those from applying the leaky model to produce
-estimates for both the reported and the unreported cases (ie. the infection estimates).
+(the deconvolved case estimates); 4. those from applying the leaky model to produce
+estimates for both the reported and the unreported cases (the infection estimates).
 
 \section{Results}
 
@@ -765,13 +773,14 @@ healthcare performance and geographical contiguity.
 
 \subsection{Infection estimates compared to reported cases}
 Naturally, outbreaks in infections precipitate those in cases and are reliably larger in
-magnitude (\autoref{fig:state_niauc_est_faceted} and \autoref{supp:state_niauc_est_faceted_log10}).
+magnitude (\autoref{fig:state_est_upto_dec1121} and
+\autoref{fig:state_est_after_dec1121}.
 Hence, our infection estimates indicate
 that the pandemic had a differential impact across states earlier and at a larger scale
 than is suggested by cases. While the major Ancestral, Delta, and Omicron waves tend to be
 visible for most states, there are
 clear outbreaks in unreported infections that are not easily detectable from cases alone in the 
-falls of 2020 and 2021. For example, take the Alpha wave in 
+fall of 2020 and 2021. For example, take the Alpha wave in 
 mid-2021 in Wisconsin and Iowa or the Delta wave in the fall of 2021 in the east coast states of Connecticut, 
 Rhode Island, and Massachusetts. Earlier on in the pandemic, such
 discrepancies may be more attributable to failures in the reporting pipeline, while
@@ -779,10 +788,11 @@ later on in the pandemic, they more likely due to the rise in asymptomatic infec
 across variants \citep{oph2022covid, garrett2022high}. 
 
 Finally, while the January 2022 Omicron wave is evident from the case counts for all states 
-(\autoref{fig:state_niauc_est_faceted}), our estimates suggest that case counts tend to severely 
+(\autoref{fig:state_est_after_dec1121}), our estimates suggest that case counts tend to severely 
 underestimate infections during this time for many states. The lowest of all states was in Nevada, 
-where about $9.1\%$ the infections were reported over January 2022. This was 
-followed by Arizona with $12.4\%$ and Minnesota with $13.9\%$. More broadly, in $27$ states
+where about $9.0\%$ (95\% confidence interval: $[3.9, 100]$) of the infections were reported over January 2022. 
+This was followed by Arizona with $12.4\%$ $[9.4, 97.9]$, and Minnesota with $13.9\%$  $[8.0, 53.4]$. 
+More broadly, in $27$ states
 less than $50\%$ of infections were reported. Only $10$ states of Florida, New York, Colorado, New Jersey, 
 South Dakota, Delaware, Alabama, Arkansas, North Carolina, and Maryland reported at least $70\%$ 
 infections over this time. 
@@ -793,15 +803,31 @@ infections over this time.
 \begin{landscape}
 \thispagestyle{empty}
 \begin{figure}[!tb]
-     \hspace*{-1.5cm}\includegraphics[width=1.55\textwidth]{state_niauc_est_faceted_Oct2.pdf} 
+     \hspace*{-1.5cm}\includegraphics[width=1.55\textwidth]{state_niauc_before_dec11.pdf} 
     \caption{Estimates of the number of daily new infections per
-     $100,000$ population for each US state from June 1, 2020 to January 31, 2022
+     $100,000$ population for each US state from June 1, 2020 to December 11, 2021
       (dark blue line). The blue shaded regions depict the 50, 80, and 95\% confidence 
       intervals for the estimates, while the teal line represents the 
       number of new daily new deconvolved cases per $100,000$, and the dotted 
       orange line represents the 7-day average of the new cases per $100,000$ as 
       of the same date.}
-    \label{fig:state_niauc_est_faceted}
+    \label{fig:state_est_upto_dec1121}
+\fillandplacepagenumber
+\end{figure}
+\end{landscape}
+
+\begin{landscape}
+\thispagestyle{empty}
+\begin{figure}[!tb]
+     \hspace*{-1.5cm}\includegraphics[width=1.55\textwidth]{state_niauc_after_dec11.pdf} 
+    \caption{Estimates of the number of daily new infections per
+     $100,000$ population for each US state from December 11, 2021 to January 31, 2022
+      (dark blue line). The blue shaded regions depict the 50, 80, and 95\% confidence 
+      intervals for the estimates, while the teal line represents the 
+      number of new daily new deconvolved cases per $100,000$, and the dotted 
+      orange line represents the 7-day average of the new cases per $100,000$ as 
+      of the same date.}
+    \label{fig:state_est_after_dec1121}
 \fillandplacepagenumber
 \end{figure}
 \end{landscape}
@@ -917,20 +943,20 @@ hospitalization \citep{lorenzo2022covid, blauer2022compare}.
 
 \begin{figure}[!tb]
 \centering
-     \hspace*{-1.5cm}\includegraphics[width=1.07\textwidth]{state_niauc_est_6states_Oct25.pdf} 
+     \hspace*{-1.5cm}\includegraphics[width=1.07\textwidth]{state_niauc_est_6states.pdf} 
     \caption{Estimates of the number of daily new infections per 
     $100,000$ for a sample of six US states from June 1, 2020 to January 31, 2022 (dark blue 
     line). The blue shaded regions depict the 50, 80, and 95\% confidence intervals. The
     background is shaded to indicate the top variant in circulation that is at least
     $60\%$ of all variants in circulation at the time.}
-    \label{fig:six_state_niauc_est_faceted}
+    \label{fig:six_state_est}
 \end{figure}
 
 By reconstructing the time series of COVID-19 infections per $100,000$
 population for each US state from June 1, 2020 to January 31, 2022, we observe
 rates of infections that vary in intensity and disease burden across space and
-time (\autoref{fig:state_niauc_est_faceted}, \autoref{supp:state_niauc_est_faceted_log10}, 
-\autoref{fig:six_state_niauc_est_faceted}, \autoref{fig:chloro_inf_rates}). 
+time (\autoref{fig:state_est_upto_dec1121}, \autoref{fig:state_est_after_dec1121},
+ \autoref{fig:six_state_est}, \autoref{fig:chloro_inf_rates}). 
 The largest observed outbreaks are at the beginning of the Omicron era (January 2022) 
 in Nevada and Arizona, which suggests a similar spread of the virus in states that
 are in close geographic proximity. During this time, the state that has the highest rate
@@ -1278,26 +1304,6 @@ is based.
 \beginsupplement
 \title{\supptitlefont Online Supplement}
 \maketitle
-\section{Figures}  
-%\subsection{Estimates of infections per 100,000 using a base-10 log scale on the y-axis}
-
-\begin{landscape}
-\thispagestyle{empty}
-\begin{figure}[!tb]
-     \hspace*{-1.5cm}\includegraphics[width=1.55\textwidth]{state_niauc_est_faceted_Oct2_log10.pdf} 
-    \caption{Estimates of the number of daily new infections per
-     $100,000$ population for each US state from June 1, 2020 to January 31, 2022
-      (dark blue line) when the y-axis has undergone a base-10 logarithmic transformation. 
-      The blue shaded regions depict the 50, 80, and 95\% confidence 
-      intervals for the estimates, while the teal line represents the 
-      number of new daily new deconvolved cases per $100,000$, and the dotted 
-      orange line represents the 7-day average of the new cases per $100,000$ as 
-      of the same date.}
-    \label{supp:state_niauc_est_faceted_log10}
-\fillandplacepagenumber
-\end{figure}
-\end{landscape}
-
 
 \section{Models}
 \subsection{Bayesian specification of the leaky immunity
