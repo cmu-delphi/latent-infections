@@ -176,7 +176,7 @@ Beta and Gamma from \citet{grant2022impact}, and those for Omicron from
 period of the Epsilon and Iota variants, we use the
 incubation period for Beta because Epsilon, Iota, and Beta are all
 children from the same parent in the phylogenetic tree of the Nextstrain Clades
-(as depicted in \citealt{hodcroft2021covariants}).
+(as depicted in \citealp{hodcroft2021covariants}).
 
 To estimate the daily proportions of the variants circulating in each state, we
 obtain the GISAID genomic sequencing data counts from CoVariants.org
@@ -191,7 +191,7 @@ biweekly total) and linear growth between the pairs of adjacent days.
 The COVIDcast API \citep{reinhart2021open} is used to retrieve the daily number
 of new confirmed COVID-19 cases for each state that are based on reports from
 the John Hopkins Center for Systems Science and Engineering (JHU CSSE,
-\citealt{dong2020interactive}). From the same API, we also retrieve the daily
+\citealp{dong2020interactive}). From the same API, we also retrieve the daily
 number of confirmed COVID-19 hospital admissions for each state that are
 collected by the U.S.\ Department of Health and Human Services (HHS). Both
 datasets are as of June 6, 2022.
@@ -285,7 +285,7 @@ seroprevalence estimates for nearly all states from July 2020 to December 2021
 \citep{jones2021estimated}. In the latter survey, the CDC collaborated with two
 private commercial laboratories and used blood samples to test for the
 antibodies to the virus from people that were in for routine or clinical
-management (presumably unrelated to COVID-19, \citealt{bajema2021estimated}). The
+management (presumably unrelated to COVID-19, \citealp{bajema2021estimated}). The
 resulting dataset contains seroprevalence estimates for a number of multi-week
 collection periods starting in July 2020 to February 2022. 
 
@@ -377,8 +377,8 @@ assumption for the lower bound is that there must be at least one day between
 infection and symptom onset (which follows the convention given in
 \citealp{phcan2021covid}). The assumption underlying the upper bound is that 21
 days is the maximum number of days that the virus could be incubating in someone
-(which is reasonable based on \citealt{zaki2021estimations} and
-\citealt{cortes2022sars}).
+(which is reasonable based on \citealp{zaki2021estimations} and
+\citealp{cortes2022sars}).
 
 \subsection{Delay distribution estimation} 
 
@@ -389,7 +389,7 @@ formally, let $y_t$ denote the count of new cases reported at time $t$ and $x_t$
 denote the count of new infections with onset at $t$ for a state. Solely from
 knowing that each case had both an onset and a report date (i.e., is a complete
 case), we can count the cases that are reported at time $t$ by enumerating
-them according to onset (as in \citealt{jahja2022real}):
+them according to onset (as in \citealp{jahja2022real}):
 \begin{align*}
 y_t = \sum_{s=1}^{t} \sum_{i=1}^{x_s}1 \left ( \text{the }i\th\text{ infection at }
  s \text{ gets reported at }t \right )
@@ -541,7 +541,7 @@ avoid making gratuitous or overly restrictive assumptions.
 \subsection{State space representation of the leaky immunity model}
 
 To estimate the leaky immunity model in \autoref{eq:leakypr}, we express it as a 
-Gaussian state space model (as in \citealt{durbin2012time, helske2017kfas}).
+Gaussian state space model (as in \citealp{durbin2012time, helske2017kfas}).
 
 In general, for $t = 1, \dots, n$, we let $\alpha_t$ be the $m \times 1$ vector of latent
 state processes at time $t$ and $y_t$ be the $p \times 1$ vector of observations
@@ -590,7 +590,7 @@ For our situation, the Kalman filter and smoothing approach offers a number of
 advantages over the penalized regression approach. Perhaps most notably,
  the parameters are estimated all at once (so cross validating for model
 parameter tuning is not necessary). In addition, it can handle unevenly spaced
-time series and (refer to \citealt{durbin2012time} for further details).
+time series and (refer to \citealp{durbin2012time} for further details).
 
 To help manage the sparseness in the seroprevalence data, we convert our data 
 to weekly by summing the reported infections and shifting the observed 
@@ -1115,7 +1115,7 @@ While we computed IHRs for all states, it is important to note that the IHR is
  Therefore, it would be beneficial to account for such variables in the IHR
  calculations by, for example, stratifying infections and hospitalizations by
  age to produce age-specific estimates of the IHRs for each state (similar to
- \citealt{fox2023disproportionate} though with the additional element of being
+ \citealp{fox2023disproportionate} though with the additional element of being
  time-varying). We strongly believe this would be a worthwhile direction to
  pursue in future work should the necessary information be available. 
 
