@@ -1203,8 +1203,8 @@ our model.
 For our situation, the Kalman filter and smoothing approach offers a number of
 advantages over the penalized regression approach. Perhaps most notably,
  the parameters are estimated all at once (so cross validating for model
-parameter tuning is not necessary). In addition, it can handle unevenly spaced
-time series and (refer to \citealp{durbin2012time} for further details).
+parameter tuning is not necessary). Another major benefit is that it can handle 
+unevenly spaced time series (refer to \citealp{durbin2012time} for further details).
 
 To help manage the sparseness in the seroprevalence data, we convert our data 
 to weekly by summing the reported infections and shifting the observed 
