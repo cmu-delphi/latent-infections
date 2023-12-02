@@ -424,7 +424,7 @@ p_t(k) = \P(\text{case report at }t \mid \text{infection onset at }t-k).
 
 For each state, we estimate the delay distribution at each $t$ by using the empirical distribution of
 all non-zero lags between the complete cases whose onset dates fall in the
-center-aligned interval about $t$ designated by $[ t - 75 + 1,\ t + 60
+center-aligned interval about $t$ designated by $[ t - 75 + 1, t + 60
 ]$). 
 
 Now, the task of estimating the delay distribution for each state at each time
@@ -434,7 +434,7 @@ falling in the center-aligned interval. Next, we weight the state-specific
 empirical distribution by the proportion of CDC cases to JHU cases. That is, we
 compare the number of CDC cases used to create the empirical distribution to the
 number of cases reported by JHU in the time window of $\left[t - 60 + 2, t +
-75\right]$ (to correspond appropriately to the center aligned interval for
+75\right]$ (to correspond appropriately to the center-aligned interval for
 the CDC cases). This proportion is used as the weight for the state's empirical
 distribution, while the complement is used to weight the overall empirical
 distribution that is formed from the data for all states. This construction
@@ -780,8 +780,7 @@ hospitalization \citep{lorenzo2022covid, blauer2022compare}.
     sample of six US states from June 1, 2020 to January 31, 2022 (dark blue
     line). The blue shaded regions depict the 50, 80, and 95\% confidence
     intervals. The background is shaded to indicate the top variant in
-    circulation that is at least 60\% of all variants in circulation at the
-    time.}
+    circulation at the time.}
     \label{fig:six_state_est}
 \end{figure}
 
