@@ -53,7 +53,7 @@ with trend filtering smoothing;
 * `13_Adj_infections.R` Adjusts the deconvolved estimates using the inverse reporting ratios and
   creates figures of the resulting infection estimates;
 
-## Part 3: Ablation study and correlation of infections to hospitalizations
+### Part 3: Ablation study and correlation of infections to hospitalizations
 * `14_deconvolve_delay.py` and `14_deconvolve_inc.py` produces deconvolved estimates assuming that
   the cases are reported by symptom onset (delay) and that the report date is the symptom onset date (inc);
 * `15_correlation_analysis.R` performs the lagged correlation analysis of the infection estimates with
