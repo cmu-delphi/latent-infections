@@ -1,4 +1,4 @@
-# Data information
+# Data description
 
 * This subsection contains the sequence data used in `06_load_covariants_prop_var_data.py` and
   the seroprevalence data used in `10_sero_blood_comm_compar.R` and `11_Ready_sero_for_ssmod.R`.
