@@ -312,10 +312,12 @@ September 2020. In the blood donor dataset, Arkansas does not have estimates
 available until October 2020. In addition, this blood donor dataset lacks
 measurements for any states in 2022 (as the corresponding survey ended in
 December 2021). Finally, as can be seen from \autoref{fig:sero_blood_comm_compar},
-the final commercial seroprevalence measurement in 2022 shows a large
+the final commercial seroprevalence measurement from 2022 shows a large
 increase relative to the immediately preceding measurement for each state. Since
 such an increase may signal unreliability or instability of the final estimates,
-we decided to remove them from our analysis. 
+we decided to remove them from our analysis. Note that North Dakota is the only
+state to which this exclusion does not apply as there are no commercial seroprevalence
+measurements beyond 2020.
 
 \begin{figure}[!tb]
 \centering
@@ -573,7 +575,7 @@ average (center-aligned) before their conversion to rates.
 For each considered lag, we calculate the Spearman's correlation between the 
 state infection and hospitalization rates for each observed day 
 over the March 9, 2020 to February 28, 2022
-time period%, and use the epi\_slide function \citep{mcdonald2023epipredict} to 
+time period %, and use the epi\_slide function \citep{mcdonald2023epipredict} to 
 with a center-aligned rolling window of 61 days for each such computation.
 We then calculate the average correlation across all states and times for each lag. 
 The lag that leads to the highest average correlation is used to estimate 
@@ -1192,19 +1194,21 @@ is based.
 
 \subsection{State space representation of the leaky immunity model}
 
-To estimate the leaky immunity model, \autoref{eq:leakypr}, we express it as a 
-Gaussian state space model (as in \citealp{durbin2012time, helske2017kfas}).
+We express the leaky immunity model from \autoref{eq:leakypr}
+as a Gaussian state space model (as in \citealp{durbin2012time, helske2017kfas})
+for its estimation.
 
-In general, for $t = 1, \dots, n$, we let $\alpha_t$ be the $m \times 1$ vector of latent
+In general, for $t = 1, \dots, n$, let $\alpha_t$ be the $m \times 1$ vector of latent
 state processes at time $t$ and $y_t$ be the $p \times 1$ vector of observations
 at time $t$. Under the assumption that $\eta$ is a $k \times 1$ vector, the
 form of the linear Gaussian state space model is 
 \begin{align}
-y_t &= Z\alpha_t + \epsilon_t  \text{     (observation equation)} \label{eq:ss1}\\
-\alpha_{t+1} &= T_t\alpha_t + R_t\eta_t  \text{     (state equation) \label{eq:ss2}}
+y_t &= Z\alpha_t + \epsilon_t, & \epsilon_t \sim N(0, H_t) \label{eq:ss1}\\
+\alpha_{t+1} &= T_t\alpha_t + R_t\eta_t, & \eta_t \sim N(0, Q_t) \label{eq:ss2}
 \end{align}
-where $\epsilon_t \sim N(0, H_t)$, $\eta_t \sim N(0, Q_t)$, and $\alpha_1 \sim
-N(a_1, P_1)$ independently of each other \citep{helske2017kfas}. For notational
+where $\alpha_1 \sim N(a_1, P_1)$ and 
+there is independence amongst $\alpha_1$, $\epsilon_t$ and $\eta_t$
+\citep{helske2017kfas, durbin2012time}. For notational
 compactness, we let $\alpha = \left ( \alpha_1^\top, \dots, \alpha_n^\top \right )$
 and $y = \left ( y_1^\top, \dots, y_n^\top \right )$.
 
@@ -1212,24 +1216,23 @@ The observation equation can be viewed as a linear regression model with the
 time-varying coefficient $\alpha_t$, while the second equation is a first-order
 autoregressive model, which is Markovian in nature \citep{durbin2012time}. 
 
-The main idea of the two equations is that the system evolves over time
-according to $\alpha_t$ (as in the second equation), but since those states are
+The underlying idea behind the two equations is that we are assuming that the
+system evolves according to $\alpha_t$ (as in the second equation), 
+but since those states are
 not directly observed, we turn to the observations $y_t$ and use their
 relationship with $\alpha_t$ (as in the first equation) to drive the system
 forward \citep{durbin2012time}. So the objective of state space modeling is to
 obtain the latent states $\alpha$ based on the observations $y$ and this is
 achieved through Kalman filtering and smoothing. 
 
-Kalman filtering gives the one-step-ahead predictions and prediction errors:
+Kalman filtering gives the following one-step-ahead predictions of the states
 \begin{align*}
-a_{t+1} &= \E[\alpha_{t+1}\given y_t, \dots, y_1] \\
-v_t &= y_t - Za_t
-\end{align*} with covariance, 
+a_{t+1} &= \E[\alpha_{t+1}\given y_t, \dots, y_1] 
+\end{align*} with covariance,
 \begin{align*}
-P_{t+1} &= \Var(\alpha_{t+1} \given y_t, \dots, y_1) \\
-\Var(v_t) &= ZP_tZ^\top + H_t.
+P_{t+1} &= \Var(\alpha_{t+1} \given y_t, \dots, y_1).
 \end{align*}
-Then, the state smoothing equations are run back in time to give
+Then, the Kalman smoother works backwards to the first time to give
 \begin{align}
 \hat{a}_t &= \E[\alpha_{t}\given y_n, \dots, y_1] \label{eq:hatat}\\
 V_t &= \Var(\alpha_{t}\given y_n, \dots, y_1). \label{eq:Vt}
@@ -1304,8 +1307,8 @@ P_{1} &= \begin{bmatrix}
 \end{bmatrix} 
 \end{alignat*}
 where $\sigma^2_o$ is the variance of observations,
-$\sigma^2_s$ is the variance of the seroprevalence estimates (in terms of 
-smoothness), and $\sigma^2_a$ is the trend variance. Since we expect the 
+$\sigma^2_s$ is the variance of the seroprevalence estimates, 
+and $\sigma^2_a$ is the trend variance. Since we expect the 
 inverse ratios to be more variable than the seroprevalence estimates, 
 we enforce that the estimate of $\sigma^2_a$ is a multiple of 
 $\sigma^2_s$. Letting the subscripts $b$ and $c$ denote
@@ -1330,8 +1333,8 @@ average. % Last sentence - Or is it simply that the source with larger
 The prior distribution for $\alpha_1$ is estimated using both data-driven constraints 
 and externally sourced information. To obtain the initial value of the seroprevalence 
 component, $\tilde{s}_{1}$, we extract the first observed seroprevalence measurement from 
-each source, round down to two decimal places, and take the average to be the
-estimated initial value $\tilde{s}_{1}$. The corresponding initial
+each source, round down to two decimal places, and take the average to be $\tilde{s}_{1}$. 
+The corresponding initial
 variance estimate, $\sigma^2_{\tilde{s}_{1}}$, is taken to be the mean of the standard
 errors of the two seroprevalence estimates. For all of the initial values of the trend 
 components, we use the inverse of the ascertainment ratio estimate as of June 1, 2020 
@@ -1346,7 +1349,9 @@ The initial $\sigma^2_o$ is taken to be the average of the estimated variances
 from the linear models for the sources where the observed seroprevalence
 measurements are regressed on the enumerated dates. The initial value of 
 the multiplier is set to be $100$ for all states. The $\sigma^2_s$ and $\gamma$ 
-values are fixed and obtained by averaging the final values for all states on the real line. 
+values are fixed and from averaging the estimated values for all states on the real line
+(obtained under the starting conditions $\sigma^2_s = 0.00003$, $\gamma = 0.99$,
+and $\sigma^2_o$ as described).
 
 Following the maximum likelihood estimation of the two non-fixed parameters
 we use the Kalman filtering and smoothing to obtain the
@@ -1364,8 +1369,8 @@ infections per $100,000$ population by simple re-scaling (enabled by the fact
 that normality is preserved under linear transformations).
 
 The $50$, $80$, and $95\%$ confidence intervals are constructed by taking a
-Bayesian view of the leaky immunity model (refer to the Online
-Supplement~\ref{supp:bayesleaky} for the Bayesian specification of the model). 
+Bayesian view of the leaky immunity model (refer to \ref{supp:bayesleaky} 
+for the Bayesian specification of the model). 
 That is, for each time, $t$, we obtain an estimate of the
 posterior variance of $a_t$, apply the deconvolved case estimate as a constant
 multiplier, and then use resulting variance to build a normal confidence
