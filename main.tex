@@ -533,7 +533,7 @@ time $t$ by the corresponding fraction of new infections, $n_t$. Using these
 components, we construct a model separately for each state
 %\begin{align}
 %\min_{a, \gamma}\frac{1}{2}\sum_{t \in T}w_t\left (s_t - (1 -\gamma)s_{t-1} 
-%- a_t\Delta C_t n_t  \right )^2 + \frac{\lambda}{2} \|D^{(3)}a\|_2^2 \label{eq:leakypr}
+%- a_t \Delta C_t n_t  \right )^2 + \frac{\lambda}{2} \|D^{(3)}a\|_2^2 \label{eq:leakypr}
 %\end{align}
 %  $w_t$ be the inverse variance weights derived from those estimates,
 \begin{align}
@@ -545,9 +545,9 @@ Informally, we refer to $\gamma$ as the leaky parameter and we call this model l
 immunity model. By ``leaky'' we mean the decrease in detectability of antibodies 
 due to the natural degradation of infection-induced
 immunity over time. Since the true course of immunity over time is unknown
-\citep{goldberg2022protection}, we take this rather straightforward approach 
-and simply model a singular $\gamma$ to try
-avoid making gratuitous or overly restrictive assumptions. 
+\citep{goldberg2022protection}, we take the straightforward approach 
+and model one $\gamma$ to try avoid making gratuitous
+ or overly restrictive assumptions. 
 
 To estimate this
 model, we will express it as a state-space model with weekly observations and
@@ -1284,7 +1284,7 @@ a_{m-1}\\
 a_{m-2}
 \end{bmatrix} & 
 T_m &= \begin{bmatrix}
- \gamma & \Delta C_mn_m & 0 & 0\\ 
+ \gamma & \Delta C_m n_m & 0 & 0\\ 
  0 & 3 & -3 & 1 \\ 
  0 & 1 & 0 & 0\\ 
  0 & 0 & 1 & 0
