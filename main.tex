@@ -526,18 +526,18 @@ accounting for those who lose enough immunity to fall below the detection thresh
 % Thus, we adjust the retrospective deconvolution estimates using a model that is 
 % based on such seroprevalence estimates. 
 For each state, let $s_t$ be a seroprevalence estimate at time $t$, $w_t$ be the
-inverse variance weights corresponding to those estimates, and $\Delta R_t$ be
+inverse variance weights corresponding to those estimates, and $\Delta C_t$ be
 the change in cumulative reported infections scaled by the state's population.
 To account for reinfections, we multiply the change in reported infections at
 time $t$ by the corresponding fraction of new infections, $n_t$. Using these
 components, we construct a model separately for each state
 %\begin{align}
 %\min_{a, \gamma}\frac{1}{2}\sum_{t \in T}w_t\left (s_t - (1 -\gamma)s_{t-1} 
-%- a_t\Delta R_t n_t  \right )^2 + \frac{\lambda}{2} \|D^{(3)}a\|_2^2 \label{eq:leakypr}
+%- a_t\Delta C_t n_t  \right )^2 + \frac{\lambda}{2} \|D^{(3)}a\|_2^2 \label{eq:leakypr}
 %\end{align}
 %  $w_t$ be the inverse variance weights derived from those estimates,
 \begin{align}
-s_t = (1 -\gamma)s_{t-1} + a_t\Delta R_t n_t + \epsilon_t \label{eq:leakypr}
+s_t = (1 -\gamma)s_{t-1} + a_t\Delta C_t n_t + \epsilon_t \label{eq:leakypr}
 \end{align}
 where $\epsilon \sim N(0, w_t\sigma^2_\epsilon)$, and $\gamma$ is the percentage
 of people who lose immunity between time $t$ and time $t+1$.
@@ -1253,7 +1253,7 @@ seroprevalence measurements to the nearest Monday. If there are multiple
 measurements in a week from a source, then the average of those 
 measurements is used (and similarly for the weights). We denote these changes by 
 changing the time-based subscript from $t$ to $m$ where $m$ indicates the Monday 
-relative to our March 9, 2020 start date and $\Delta R_m$ is the change in weekly 
+relative to our March 9, 2020 start date and $\Delta C_m$ is the change in weekly 
 reported infections.
 
 The leaky immunity model on weekly data can be written in state space form by 
@@ -1284,7 +1284,7 @@ a_{m-1}\\
 a_{m-2}
 \end{bmatrix} & 
 T_m &= \begin{bmatrix}
- \gamma & \Delta R_mn_m & 0 & 0\\ 
+ \gamma & \Delta C_mn_m & 0 & 0\\ 
  0 & 3 & -3 & 1 \\ 
  0 & 1 & 0 & 0\\ 
  0 & 0 & 1 & 0
