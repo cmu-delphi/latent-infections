@@ -477,8 +477,8 @@ achieve this goal by solving the an optimization problem.
 Let $\cT$ represent the deconvolution period from June
 1, 2020 to February 28, 2022. Let $\hat{p}_t$ be probabilities from the estimated
 infection-to-report distribution for $t \in \cT$, $y_t$ the number of new cases
-reported, and $D^{(4)}x$ yields all $4\th$-order differences of the vector $x$
-(by using the discrete derivative matrix of order 4, $D^{(4)}$). From these,
+reported, and where $D^{(4)}$ is the discrete derivative matrix of order 4
+such that $D^{(4)}x$ yields all $4\th$-order differences of the vector $x$. From these,
 we estimate the latent infection counts for the reported cases across time by
 solving for the vector $x$ in
 \begin{align*}
@@ -537,17 +537,19 @@ components, we construct a model separately for each state
 %\end{align}
 %  $w_t$ be the inverse variance weights derived from those estimates,
 \begin{align}
-s_t = (1 -\gamma)s_{t-1} + a_t\Delta C_t n_t + \epsilon_t \label{eq:leakypr}
+s_t = (1 -\gamma)s_{t-1} + a_t\Delta C_t n_t + \epsilon_t, \qquad \epsilon \sim N(0, w_t\sigma^2_\epsilon) \label{eq:leakypr}
 \end{align}
-where $\epsilon \sim N(0, w_t\sigma^2_\epsilon)$, and $\gamma$ is the percentage
+where the vector $a$ is subject to a discrete derivative matrix of order $3$, 
+and $\gamma$ is the percentage
 of people who lose immunity between time $t$ and time $t+1$.
 Informally, we refer to $\gamma$ as the leaky parameter and we call this model leaky 
 immunity model. By ``leaky'' we mean the decrease in detectability of antibodies 
 due to the natural degradation of infection-induced
-immunity over time. Since the true course of immunity over time is unknown
-\citep{goldberg2022protection}, we take the straightforward approach 
-and model one $\gamma$ to try avoid making gratuitous
- or overly restrictive assumptions. 
+immunity over time. 
+%Since the true course of immunity over time is unknown
+% \citep{goldberg2022protection}, we take the straightforward approach 
+% and model one $\gamma$ to try avoid making gratuitous
+% or overly restrictive assumptions. 
 
 To estimate this
 model, we will express it as a state-space model with weekly observations and
@@ -1203,8 +1205,8 @@ state processes at time $t$ and $y_t$ be the $p \times 1$ vector of observations
 at time $t$. Under the assumption that $\eta$ is a $k \times 1$ vector, the
 form of the linear Gaussian state space model is 
 \begin{align}
-y_t &= Z\alpha_t + \epsilon_t, & \epsilon_t \sim N(0, H_t) \label{eq:ss1}\\
-\alpha_{t+1} &= T_t\alpha_t + R_t\eta_t, & \eta_t \sim N(0, Q_t) \label{eq:ss2}
+y_t &= Z\alpha_t + \epsilon_t, \qquad \epsilon_t \sim N(0, H_t) \label{eq:ss1}\\
+\alpha_{t+1} &= T_t\alpha_t + R_t\eta_t, \quad \eta_t \sim N(0, Q_t) \label{eq:ss2}
 \end{align}
 where $\alpha_1 \sim N(a_1, P_1)$ and 
 there is independence amongst $\alpha_1$, $\epsilon_t$ and $\eta_t$
