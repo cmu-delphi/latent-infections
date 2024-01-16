@@ -539,11 +539,11 @@ components, we construct a model separately for each state
 \begin{align}
 s_t = (1 -\gamma)s_{t-1} + a_t\Delta C_t n_t + \epsilon_t, \qquad \epsilon \sim N(0, w_t\sigma^2_\epsilon) \label{eq:leakypr}
 \end{align}
-where the vector $a$ is subject to a discrete derivative matrix of order $3$, 
+where the vector $a$ is subject to a discrete derivative matrix of order $3$ 
 and $\gamma$ is the percentage
 of people who lose immunity between time $t$ and time $t+1$.
 Informally, we refer to $\gamma$ as the leaky parameter and we call this model leaky 
-immunity model. By ``leaky'' we mean the decrease in detectability of antibodies 
+immunity model. By ``leaky'' we mean the natural waning decrease in detectability of antibodies 
 due to the natural degradation of infection-induced
 immunity over time. 
 %Since the true course of immunity over time is unknown
