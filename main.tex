@@ -1037,16 +1037,16 @@ Another major limitation is that these models do not to account for
 reinfections. Now, it may be contended that reinfections do not account for a
 substantial fraction of the infections until later in the pandemic, so they are
 not absolutely necessary to include in the earlier stages of the pandemic.
-Still, at no stage did infection with the COVID-19 virus confer lifelong
-immunity. Rather immunity is transient and wanes over time. And we believe it is
-important to account for such defining characteristics of the virus when
+Still, at no stage did infection confer lifelong immunity.
+Rather antibody levels and immunity are known to wane over time. 
+And we believe it is important to account for such defining characteristics of the virus when
 tracking infections over time. Therefore, we account for reinfections and the waning
-of detectable immunity in our custom antibody prevalence model. However, we 
+of detectable antibody levels in our custom antibody prevalence model. However, we 
 acknowledge that the extent to which each of these are accounted for could be
 improved upon in future work. 
 
 Since the waning of immunity is likely to be variant-dependent
-\citep{pooley2023durability}, it follows that the model waning parameter may be better
+\citep{pooley2023durability}, it follows that our model waning parameter may be better
 posed as a mixture of parameters for different variants with weights determined
 by the proportion of the variants circulating at the time in the state. Related
 to this is the issue of how newer variants may escape detection
@@ -1134,8 +1134,8 @@ indication of the disease intensity over time \citep{ecdc2020strategies}.
 
 Overall, we adopt a relatively simple deconvolution-based approach and devote
 much of our efforts to tailoring our approach to the available data. A
-major result of this was the development of a way of to model detectable immunity and
-space-time-specific reporting ratios based on seroprevalence data.
+major result of this was the development of a way of to model the waning
+of detectable antibody levels and space-time-specific reporting ratios based on seroprevalence data.
 In a way, our approach is built for the data rather than trying to force the data to fit
 to an existing approach. However, our model is only as good as the quantity and 
 the quality of the data provided to it. In our case, the lack of data is both a barrier to entry
