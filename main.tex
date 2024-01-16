@@ -541,7 +541,7 @@ s_t = (1 -\gamma)s_{t-1} + a_t\Delta C_t n_t + \epsilon_t, \qquad \epsilon \sim 
 \end{align}
 where the vector $a$ is subject to a discrete derivative matrix of order $3$ 
 and $\gamma$ is the percentage
-of people who lose enough infection-induced antibodies to fall below the detection 
+of people whose level of infection-induced antibodies falls below the detection 
 threshold between time $t$ and time $t+1$.
 Informally, we refer to $\gamma$ as the waning parameter and we call this model the population 
 antibody prevalence model. 
@@ -1040,13 +1040,13 @@ not absolutely necessary to include in the earlier stages of the pandemic.
 Still, at no stage did infection with the COVID-19 virus confer lifelong
 immunity. Rather immunity is transient and wanes over time. And we believe it is
 important to account for such defining characteristics of the virus when
-tracking infections over time. Therefore, we account for reinfections and waning
+tracking infections over time. Therefore, we account for reinfections and the waning
 of detectable immunity in our custom antibody prevalence model. However, we 
 acknowledge that the extent to which each of these are accounted for could be
 improved upon in future work. 
 
-Since the waning of detectable immunity is likely to be variant-dependent
-\citep{pooley2023durability}, it follows that the waning parameter may be better
+Since the waning of immunity is likely to be variant-dependent
+\citep{pooley2023durability}, it follows that the model waning parameter may be better
 posed as a mixture of parameters for different variants with weights determined
 by the proportion of the variants circulating at the time in the state. Related
 to this is the issue of how newer variants may escape detection
