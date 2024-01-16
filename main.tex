@@ -106,8 +106,8 @@ symptom-onset-to-case report delay distributions. We then use these estimated
 incubation period distributions in conjunction with their delay distributions to
 deconvolve daily reported COVID-19 cases to infection onset. The resulting
 infection estimates are adjusted to account for unreported infections by
-using seroprevalence data in a novel leaky immunity model that is defined by its
-ability to account for the waning of detectable immunity.  
+using seroprevalence data in a novel antibody prevalence model that is defined by its
+ability to account for the waning of antibody detectability over time.  
 We examine some features of the infection estimates and the implications of
 using them rather than reported cases in assessing the impact of the pandemic.
 We apply our infection estimates to get time-varying infection-hospitalization
@@ -137,7 +137,7 @@ each time. We use the resulting probability estimates along with daily reported
 cases in retrospective deconvolution to estimate the infection onset dates for
 the reported cases. We adjust these infection estimates to account for the
 unreported infections by using state-specific, time-varying seroprevalence data
-in a leaky immunity model to reach our ultimate goal of obtaining daily incident
+in an antibody prevalence model to reach our ultimate goal of obtaining daily incident
 infection estimates for each state. 
 % Then, we can apply these estimates in a
 % lagged correlation to hospitalizations to find the ``best'' lag between
@@ -506,7 +506,7 @@ reserved for testing and imputed with the average of the two surrounding counts.
 The tuning parameter that results in the
 smallest sum of squared errors is ultimately chosen.
 
-\subsection{Inverse reporting ratio and the leaky immunity model} 
+\subsection{Inverse reporting ratio and the antibody prevalence model} 
 
 The infection estimates from retrospective deconvolution are
 derived solely from the infection onset dates of the reported cases. 
@@ -522,7 +522,7 @@ infections, since seroprevalence of anti-nucleocapsid antibodies is used to
 estimate the percentage of people who have at least one resolving or past
 infection \citep{cdc2020data}, we can use
 the change in subsequent seroprevalence measurements to capture new infections, 
-accounting for those who lose enough immunity to fall below the detection threshold.
+accounting for those whose antibody levels fall below the detection threshold.
 % Thus, we adjust the retrospective deconvolution estimates using a model that is 
 % based on such seroprevalence estimates. 
 For each state, let $s_t$ be a seroprevalence estimate at time $t$, $w_t$ be the
@@ -533,26 +533,25 @@ time $t$ by the corresponding fraction of new infections, $n_t$. Using these
 components, we construct a model separately for each state
 %\begin{align}
 %\min_{a, \gamma}\frac{1}{2}\sum_{t \in T}w_t\left (s_t - (1 -\gamma)s_{t-1} 
-%- a_t \Delta C_t n_t  \right )^2 + \frac{\lambda}{2} \|D^{(3)}a\|_2^2 \label{eq:leakypr}
+%- a_t \Delta C_t n_t  \right )^2 + \frac{\lambda}{2} \|D^{(3)}a\|_2^2 \label{eq:waningpr}
 %\end{align}
 %  $w_t$ be the inverse variance weights derived from those estimates,
 \begin{align}
-s_t = (1 -\gamma)s_{t-1} + a_t\Delta C_t n_t + \epsilon_t, \qquad \epsilon \sim N(0, w_t\sigma^2_\epsilon) \label{eq:leakypr}
+s_t = (1 -\gamma)s_{t-1} + a_t\Delta C_t n_t + \epsilon_t, \qquad \epsilon \sim N(0, w_t\sigma^2_\epsilon) \label{eq:waningpr}
 \end{align}
 where the vector $a$ is subject to a discrete derivative matrix of order $3$ 
 and $\gamma$ is the percentage
-of people who lose immunity between time $t$ and time $t+1$.
-Informally, we refer to $\gamma$ as the leaky parameter and we call this model leaky 
-immunity model. By ``leaky'' we mean the natural waning decrease in detectability of antibodies 
-due to the natural degradation of infection-induced
-immunity over time. 
+of people who lose enough infection-induced antibodies to fall below the detection 
+threshold between time $t$ and time $t+1$.
+Informally, we refer to $\gamma$ as the waning parameter and we call this model the population 
+antibody prevalence model. 
+By ``waning'' we are referring to the natural decline in the infection-induced antibodies over time. 
 %Since the true course of immunity over time is unknown
 % \citep{goldberg2022protection}, we take the straightforward approach 
 % and model one $\gamma$ to try avoid making gratuitous
 % or overly restrictive assumptions. 
 
-To estimate this
-model, we will express it as a state-space model with weekly observations and
+We express the antibody prevalence model as a state-space model with weekly observations and
 enforce $a_t$ to follow a second-order autoregressive model. This representation
 allows for convenient handling of missing data, extrapolation before and after
 the period of observed seroprevalence measurements, and maximum likelihood
@@ -596,8 +595,9 @@ same as the symptom onset date (i.e., excluding
 the reporting delay data); 2. those from the deconvolution procedure when only the
 reporting delay data is used (excluding the incubation period data); 3. those from
 the deconvolution procedure when utilizing both the incubation period and delay data 
-(the deconvolved case estimates); 4. those from applying the leaky model to produce
-estimates for both the reported and the unreported cases (the infection estimates).
+(the deconvolved case estimates); 4. those from applying the antibody prevalence 
+model to produce estimates for both the reported and the unreported 
+cases (the infection estimates).
 
 \section{Results}
 
@@ -1041,12 +1041,12 @@ Still, at no stage did infection with the COVID-19 virus confer lifelong
 immunity. Rather immunity is transient and wanes over time. And we believe it is
 important to account for such defining characteristics of the virus when
 tracking infections over time. Therefore, we account for reinfections and waning
-of detectable immunity in our custom leaky immunity model. However, we 
+of detectable immunity in our custom antibody prevalence model. However, we 
 acknowledge that the extent to which each of these are accounted for could be
 improved upon in future work. 
 
 Since the waning of detectable immunity is likely to be variant-dependent
-\citep{pooley2023durability}, it follows that the leaky parameter may be better
+\citep{pooley2023durability}, it follows that the waning parameter may be better
 posed as a mixture of parameters for different variants with weights determined
 by the proportion of the variants circulating at the time in the state. Related
 to this is the issue of how newer variants may escape detection
@@ -1096,7 +1096,7 @@ the blood test and whether it was used as a proactive or reactive medical tool.
 Since such information is unavailable to us, all we can conclude is that
 participant-driven sources of bias impact the seroprevalence samples to an
 undetermined extent. There are additional concerns about the performance of
-antibody testing for individuals with mild or asymptomatic disease as well as
+antibody testing for individuals with mild or asymptomatic disease as well as about
 the loss of immunity over time \citep{kaku2021performance, seow2020longitudinal,
 ibarrondo2020rapid}.
 
@@ -1134,7 +1134,7 @@ indication of the disease intensity over time \citep{ecdc2020strategies}.
 
 Overall, we adopt a relatively simple deconvolution-based approach and devote
 much of our efforts to tailoring our approach to the available data. A
-major result of this was the development of a way of to model immunity and
+major result of this was the development of a way of to model detectable immunity and
 space-time-specific reporting ratios based on seroprevalence data.
 In a way, our approach is built for the data rather than trying to force the data to fit
 to an existing approach. However, our model is only as good as the quantity and 
@@ -1194,9 +1194,9 @@ is based.
 
 \section{Additional information about estimation methodology}
 
-\subsection{State space representation of the leaky immunity model}
+\subsection{State space representation of the antibody prevalence model}
 
-We express the leaky immunity model from \autoref{eq:leakypr}
+We express the antibody prevalence model from \autoref{eq:waningpr}
 as a Gaussian state space model (as in \citealp{durbin2012time, helske2017kfas})
 for its estimation.
 
@@ -1258,7 +1258,7 @@ changing the time-based subscript from $t$ to $m$ where $m$ indicates the Monday
 relative to our March 9, 2020 start date and $\Delta C_m$ is the change in weekly 
 reported infections.
 
-The leaky immunity model on weekly data can be written in state space form by 
+The antibody prevalence model on weekly data can be written in state space form by 
 defining the corresponding components in Equations \ref{eq:ss1} and 
 \ref{eq:ss2} as follows:
 
@@ -1371,7 +1371,7 @@ infections per $100,000$ population by simple re-scaling (enabled by the fact
 that normality is preserved under linear transformations).
 
 The $50$, $80$, and $95\%$ confidence intervals are constructed by taking a
-Bayesian view of the leaky immunity model (refer to \ref{supp:bayesleaky} 
+Bayesian view of the antibody prevalence model (refer to \ref{supp:bayeswaning} 
 for the Bayesian specification of the model). 
 That is, for each time, $t$, we obtain an estimate of the
 posterior variance of $a_t$, apply the deconvolved case estimate as a constant
@@ -1380,9 +1380,9 @@ interval about the infection estimate. We additionally enforce that the lower
 bound must be at least the deconvolved case estimate for the time under consideration.
 
 
-\subsection{Bayesian specification of the leaky immunity
-model}\label{supp:bayesleaky} 
-In brief, the leaky immunity model where we let
+\subsection{Bayesian specification of the antibody prevalence
+model}\label{supp:bayeswaning} 
+In brief, the antibody prevalence model where we let
 $\beta = \left \{  \gamma, a_1,\dots, a_t \right \}$ and $X$ be the design
 matrix, corresponds to a Bayesian model with prior 
 \begin{align*}
