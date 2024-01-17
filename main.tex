@@ -26,7 +26,7 @@ The true timing and magnitude of infections from the COVID-19 pandemic are of
 interest to both the public and public health, but these are challenging to pin
 down for a variety of data-driven and methodological reasons. Nonetheless, 
 accurate estimates
-of all latent infections can improve our understanding of the true size and
+of latent infections can improve our understanding of the true size and
 scope of the pandemic and provide an indication of disease patterns and burden
 over time. In this work, we estimate the true daily incident infections for each
 \US\ state by deconvolving reported COVID-19 cases using estimated
@@ -402,8 +402,9 @@ onset and report for each state at each time. We refer to this as the ``delay
 distribution'' \citep[see
 \autoref{fig:cases_to_infect_flowchart} or][]{jahja2022real}. More formally, let
 $y_t$ denote the count of new cases reported at time $t$ and $x_t$ denote the
-count of new infections with onset at $t$ for a state. For all cases in the line
-list that had both an onset and a report date, we can count the those that are
+count of deconvolved cases with onset at $t$. 
+For all cases in the line list that had both an onset and a report date, 
+we can count the those that are
 reported at time $t$ by enumerating them according to onset (as in
 \citealp{jahja2022real}):
 \begin{align*}
@@ -479,8 +480,7 @@ Let $\cT$ represent the deconvolution period from June
 infection-to-report distribution for $t \in \cT$, $y_t$ the number of new cases
 reported, and where $D^{(4)}$ is the discrete derivative matrix of order 4
 such that $D^{(4)}x$ yields all $4\th$-order differences of the vector $x$. From these,
-we estimate the latent infection counts for the reported cases across time by
-solving for the vector $x$ in
+we estimate the deconvolved case counts across time by solving for the vector $x$ in
 \begin{align*}
 \minimize_{x}\ \sum_{t \in \cT} \left ( y_t -  \sum_{k = 1}^{d} \hat{p}_t(k)x_{t-k} 
 \right )^2 + \lambda \|D^{(4)}x\|_1. 
@@ -510,10 +510,11 @@ smallest sum of squared errors is ultimately chosen.
 
 The infection estimates from retrospective deconvolution are
 derived solely from the infection onset dates of the reported cases. 
-To capture the unreported infections, it is necessary to adjust the estimates by 
+To capture the unreported infections, it is necessary to adjust these
+deconvolved case estimates by 
 a scaling factor that approximates the ratio of the true number of new infections
 to the new reported infections. We refer to this quantity as the
-inverse reporting ratio and denote it by $a_t$ for time $t$. Our new goal is
+inverse reporting ratio and denote it by $a_t$ for day $t$. Our new goal is
 to estimate this quantity for every state at every time under consideration. 
 
 The number of new reported infections is obtained from our
@@ -523,42 +524,51 @@ estimate the percentage of people who have at least one resolving or past
 infection \citep{cdc2020data}, we can use
 the change in subsequent seroprevalence measurements to capture new infections, 
 accounting for those whose antibody levels fall below the detection threshold.
-% Thus, we adjust the retrospective deconvolution estimates using a model that is 
-% based on such seroprevalence estimates. 
-For each state, let $s_t$ be a seroprevalence estimate at time $t$, $w_t$ be the
-inverse variance weights corresponding to those estimates, and $\Delta C_t$ be
-the change in cumulative reported infections scaled by the state's population.
-To account for reinfections, we multiply the change in reported infections at
-time $t$ by the corresponding fraction of new infections, $n_t$. Using these
-components, we construct a model separately for each state
+We can adjust the retrospective deconvolution estimates using a model that is 
+based on such seroprevalence estimates.
+ 
+To adapt to the sparseness in the seroprevalence data, we convert our daily data 
+to weekly by summing the reported infections and shifting the observed 
+seroprevalence measurements to the nearest Monday. If there are multiple 
+measurements in a week from a seroprevalence source, then the average is used. 
+We denote these changes by changing the time-based subscript 
+from $t$ to $m$ where $m$ indicates the Monday 
+relative to our March 9, 2020 start date.
+
+For each state, let $s_m$ be the seroprevalence estimate on $m$, $w_m$ be the
+corresponding inverse variance weight, and
+ $\sum_{t = m-1}^{m} C_t$ is the change in weekly reported infections 
+scaled by the state's population. 
+To account for reinfections, we multiply the change in reported infections for $m$
+by the corresponding fraction of new infections, $z_m$. 
+
+Using these components, we construct the following model separately for each state
 %\begin{align}
 %\min_{a, \gamma}\frac{1}{2}\sum_{t \in T}w_t\left (s_t - (1 -\gamma)s_{t-1} 
-%- a_t \Delta C_t n_t  \right )^2 + \frac{\lambda}{2} \|D^{(3)}a\|_2^2 \label{eq:waningpr}
+%- a_t \Delta C_t z_t  \right )^2 + \frac{\lambda}{2} \|D^{(3)}a\|_2^2 \label{eq:waningpr}
 %\end{align}
 %  $w_t$ be the inverse variance weights derived from those estimates,
 \begin{align}
-s_t = (1 -\gamma)s_{t-1} + a_t\Delta C_t n_t + \epsilon_t, \qquad \epsilon \sim N(0, w_t\sigma^2_\epsilon) \label{eq:waningpr}
+s_m = (1 -\gamma)s_{m-1} + a_m \sum_{t = m - 1}^{m} C_t z_m + \epsilon_m, \qquad \epsilon_m \sim N(0, w_m \sigma^2_\epsilon) \label{eq:waningpr}
 \end{align}
-where the vector $a$ is subject to a discrete derivative matrix of order $3$ 
-and $\gamma$ is the percentage
+where $\gamma$ is the percentage
 of people whose level of infection-induced antibodies falls below the detection 
-threshold between time $t$ and time $t+1$.
+threshold between time $m$ and time $m+1$.
 Informally, we refer to $\gamma$ as the waning parameter and we call this model the population 
 antibody prevalence model. 
-By ``waning'' we are referring to the natural decline in the infection-induced antibodies over time. 
+% By ``waning'' we are referring to the natural decline in the infection-induced antibodies over time. 
 %Since the true course of immunity over time is unknown
 % \citep{goldberg2022protection}, we take the straightforward approach 
 % and model one $\gamma$ to try avoid making gratuitous
 % or overly restrictive assumptions. 
 
-We express the antibody prevalence model as a state-space model with weekly observations and
-enforce $a_t$ to follow a second-order autoregressive model. This representation
+We express the antibody prevalence model as a state-space model and
+enforce $a_m$ to follow a third-order autoregressive model. This representation
 allows for convenient handling of missing data, extrapolation before and after
 the period of observed seroprevalence measurements, and maximum likelihood
 estimates of $\gamma$ and $\sigma^2_\epsilon$. Details of this methodology and
 the computation of the associated uncertainty measurements are deferred to the
 Appendix. 
-
 
 
 \subsection{Lagged correlation to hospitalizations and time-varying IHRs} 
@@ -1196,9 +1206,8 @@ is based.
 
 \subsection{State space representation of the antibody prevalence model}
 
-We express the antibody prevalence model from \autoref{eq:waningpr}
-as a Gaussian state space model (as in \citealp{durbin2012time, helske2017kfas})
-for its estimation.
+The antibody prevalence model from \autoref{eq:waningpr} is conceptualized
+as a Gaussian state space model (as in \citealp{durbin2012time, helske2017kfas}).
 
 In general, for $t = 1, \dots, n$, let $\alpha_t$ be the $m \times 1$ vector of latent
 state processes at time $t$ and $y_t$ be the $p \times 1$ vector of observations
@@ -1243,24 +1252,14 @@ The filtering and smoothing steps are based on recursions that are described in
 Appendix A of \citet{helske2017kfas} as we use the R package KFAS to estimate
 our model.
 
-For our situation, the Kalman filter and smoothing approach offers a number of
-advantages over the penalized regression approach. Perhaps most notably,
- the parameters are estimated all at once (so cross validating for model
-parameter tuning is not necessary). Another major benefit is that it can handle 
-unevenly spaced time series (refer to \citealp{durbin2012time} for further details).
+% For our situation, the Kalman filter and smoothing approach offers a number of
+% advantages over the penalized regression approach. Perhaps most notably,
+% the parameters are estimated all at once (so cross validating for model
+% parameter tuning is not necessary). Another major benefit is that it can handle 
+% unevenly spaced time series (refer to \citealp{durbin2012time} for further details).
 
-To help manage the sparseness in the seroprevalence data, we convert our data 
-to weekly by summing the reported infections and shifting the observed 
-seroprevalence measurements to the nearest Monday. If there are multiple 
-measurements in a week from a source, then the average of those 
-measurements is used (and similarly for the weights). We denote these changes by 
-changing the time-based subscript from $t$ to $m$ where $m$ indicates the Monday 
-relative to our March 9, 2020 start date and $\Delta C_m$ is the change in weekly 
-reported infections.
-
-The antibody prevalence model on weekly data can be written in state space form by 
-defining the corresponding components in Equations \ref{eq:ss1} and 
-\ref{eq:ss2} as follows:
+To express the antibody prevalence model in state space form, we define
+ the components in Equations \ref{eq:ss1} and \ref{eq:ss2} as follows:
 
 % Probably move the below specification to the appendix
 
@@ -1286,7 +1285,7 @@ a_{m-1}\\
 a_{m-2}
 \end{bmatrix} & 
 T_m &= \begin{bmatrix}
- \gamma & \Delta C_m n_m & 0 & 0\\ 
+ \gamma & \sum_{t = m-1}^{m} C_t z_m & 0 & 0\\ 
  0 & 3 & -3 & 1 \\ 
  0 & 1 & 0 & 0\\ 
  0 & 0 & 1 & 0
