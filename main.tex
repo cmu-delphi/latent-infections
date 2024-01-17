@@ -549,7 +549,7 @@ Using these components, we construct the following model separately for each sta
 %\end{align}
 %  $w_t$ be the inverse variance weights derived from those estimates,
 \begin{align}
-s_m = (1 -\gamma)s_{m-1} + a_m \sum_{t = m - 1}^{m} C_t z_m + \epsilon_m, \qquad \epsilon_m \sim N(0, w_m \sigma^2_\epsilon) \label{eq:waningpr}
+s_m = (1 -\gamma)s_{m-1} + a_m \sum_{t = m - 1}^{m} C_t z_m + \epsilon_m, \qquad \epsilon_m \sim N(0, w_m \sigma^2_\epsilon) \label{eq:waningpr} 
 \end{align}
 where $\gamma$ is the percentage
 of people whose level of infection-induced antibodies falls below the detection 
@@ -568,7 +568,7 @@ allows for convenient handling of missing data, extrapolation before and after
 the period of observed seroprevalence measurements, and maximum likelihood
 estimates of $\gamma$ and $\sigma^2_\epsilon$. Details of this methodology and
 the computation of the associated uncertainty measurements are deferred to the
-Appendix. 
+Supplementary Materials \ref{supp:ssapm}.
 
 
 \subsection{Lagged correlation to hospitalizations and time-varying IHRs} 
@@ -1204,7 +1204,7 @@ is based.
 
 \section{Additional information about estimation methodology}
 
-\subsection{State space representation of the antibody prevalence model}
+\subsection{State space representation of the antibody prevalence model}\label{supp:ssapm} 
 
 The antibody prevalence model from \autoref{eq:waningpr} is conceptualized
 as a Gaussian state space model (as in \citealp{durbin2012time, helske2017kfas}).
