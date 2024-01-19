@@ -170,9 +170,10 @@ infection estimates for each state.
 
 \subsection{Data} 
 
-
-The variant-specific incubation periods are taken to be the same for all states.
-For the Ancestral variants, we build this using
+We obtain literature estimates of the variant-specific incubation periods
+for the following eight variant categories: Ancestral, Alpha, Beta, Epsilon, Iota, 
+Gamma, Delta, and Omicron.
+For the Ancestral variants, we use the
 literature estimates of the gamma distribution parameters \citep{tindale2020evidence}. 
 For the Alpha, Beta, Gamma, Delta and Omicron variants, we use the
 mean and standard deviation of the number of days of incubation as reported in
@@ -183,17 +184,22 @@ Beta and Gamma from \citet{grant2022impact}, and those for Omicron from
 period of the Epsilon and Iota variants, we use the
 incubation period for Beta because Epsilon, Iota, and Beta are all
 children from the same parent in the phylogenetic tree of the Nextstrain Clades
-(as depicted in \citealp{hodcroft2021covariants}).
+(as depicted in \citealp{hodcroft2021covariants}). 
 
 To estimate the daily proportions of the variants circulating in each state, we
 obtain the GISAID genomic sequencing data counts from CoVariants.org
 \citep{hodcroft2021covariants, elbe2017data}.\footnote{The complete list of
 EPI\_SET Identifiers that were used to produce the CoVariants data are provided
 in the Acknowledgements section of their website
-\citep{hodcroft2021covariants}.} Since these counts are biweekly totals, we use
-a simple convex optimization approach to interpolate daily numbers, where we
-enforce that the counts in each interval must sum to the right boundary (the
-biweekly total) and linear growth between the pairs of adjacent days. 
+\citep{hodcroft2021covariants}.} Since these counts are biweekly totals, we turn to
+multinomial logistic regression using a third-order polynomial in time to get 
+estimates of the daily proportions for the eight variant categories separately for each state.
+ This relatively simple model was selected because it allows for exponential growth 
+ and different rates by variant.
+% Since these counts are biweekly totals, we use
+% a simple convex optimization approach to interpolate daily numbers, where we
+% enforce that the counts in each interval must sum to the right boundary (the
+% biweekly total) and linear growth between the pairs of adjacent days. 
 
 The COVIDcast API \citep{reinhart2021open} is used to retrieve the daily number
 of new confirmed COVID-19 cases for each state that are based on reports from
