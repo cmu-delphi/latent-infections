@@ -191,11 +191,11 @@ obtain the GISAID genomic sequencing data counts from CoVariants.org
 \citep{hodcroft2021covariants, elbe2017data}.\footnote{The complete list of
 EPI\_SET Identifiers that were used to produce the CoVariants data are provided
 in the Acknowledgements section of their website
-\citep{hodcroft2021covariants}.} Since these counts are biweekly totals, we turn to
+\citep{hodcroft2021covariants}.} Since these counts are biweekly totals, we apply
 multinomial logistic regression using a third-order polynomial in time to get 
 estimates of the daily proportions for the eight variant categories separately for each state.
- This relatively simple model was selected because it allows for exponential growth 
- and different rates by variant.
+% This relatively simple model was selected because it allows for exponential growth 
+% and different rates by variant.
 % Since these counts are biweekly totals, we use
 % a simple convex optimization approach to interpolate daily numbers, where we
 % enforce that the counts in each interval must sum to the right boundary (the
