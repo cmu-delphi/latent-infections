@@ -22,20 +22,22 @@
 \maketitle
 
 \begin{abstract}
-The true timing and magnitude of infections from the COVID-19 pandemic are of
-interest to both the public and public health, but these are challenging to pin
-down for a variety of data-driven and methodological reasons. Nonetheless, 
-accurate estimates
-of latent infections can improve our understanding of the true size and
-scope of the pandemic and provide an indication of disease patterns and burden
-over time. In this work, we estimate the true daily incident infections for each
-\US\ state by deconvolving reported COVID-19 cases using estimated
-infection-onset-to-case-report distributions followed by a serology-based
-procedure to adjust for the unreported infections. We find clear
-variability in the timing and magnitude in the resulting estimates, indicating a
-differential impact of the pandemic across states and revealing a disease burden
-that appears earlier and more extensively than indicated by cases alone. Our
-findings help to better understand the impact of the pandemic in the \US\ at the state level.
+The true timing and magnitude of COVID-19 infections are of interest to both the public
+and to public health, but these are challenging to pin down for a variety of data-driven
+and methodological reasons. Nevertheless, accurate estimates of latent COVID-19 
+infections can improve our understanding 
+of the true size and scope of the pandemic and provide an indication of disease 
+patterns and burden over time. Therefore, we estimate daily incident infections 
+for each \US\ state. Our methods first deconvolve reported COVID-19 cases to 
+their infection onset. We then use a serology-driven model to scale these 
+deconvolved cases to unreported infections. Unlike existing approaches,
+our approach is state-specific, incorporates several variant-specific incubation
+periods, and accounts for reinfections. From its application to the gold standard case
+data, we find a disease burden that appears earlier and more extensively than indicated
+by cases alone. In addition, we observe similar epidemic patterns in surges and
+periods of waning observed in clusters of neighbouring states. Our findings help to 
+better understand the impact of the pandemic in the \US\ at the level of the state. 
+
 \end{abstract}
 
 \section{Introduction}
@@ -60,10 +62,10 @@ viral incubation period, the speed and severity of symptom onset, laboratory
 confirmation, test turnaround times, and submission to public health
 \citep{pellis2021challenges, wash2020dash}. For these reasons, reported cases
 are a lagging indicator of the course of the pandemic. Furthermore, they do not
-represent the actual number of new infections that occur on a given day, as
-indicated by exposure to the pathogen. Ascertaining infection onset is difficult
-because there was no large-scale surveillance effort in the United States that
-reliably tracked symptom onset, let alone infection onset.
+represent the actual number of new infections that occur on a given day as
+indicated by exposure to the pathogen. Since there is no large-scale surveillance
+effort in the United States that reliably tracked symptom onset, let alone infection onset,
+ascertaining the onset of infections is challenging.
 
 \begin{figure}[!tb]
 \centering
@@ -96,26 +98,27 @@ such way to measure this and can guide public and professional understanding of
 the pandemic burden over space and time.
 
 In this work, we provide a statistically justified reconstruction of
-daily incident infections for each U.S.\ state from March 9, 2020 to February 28, 2022.
-We achieve this by first breaking the task of estimating infection onset
+daily incident infections for each \US\ state from June 1, 2020 to November 29, 2021.
+We achieve this by breaking the task of estimating infection onset
 from report date into the more manageable parts of estimating the time from
-infection to symptom onset and the time from symptom onset to report date (as
-depicted in \autoref{fig:chain_events_onset_report}). Using state-level data, we
-construct state-time-specific incubation period and
-symptom-onset-to-case report delay distributions. We then use these estimated
-incubation period distributions in conjunction with their delay distributions to
-deconvolve daily reported COVID-19 cases to infection onset. The resulting
-infection estimates are adjusted to account for unreported infections by
+infection to symptom onset, symptom onset to positive specimen collection,
+and the time from positive specimen collection to report date (as
+depicted in \autoref{fig:chain_events_onset_report}). Using state-level line list data, 
+we construct time-varying delay distributions for the time from symptom onset to positive
+specimen date and positive specimen to case report date. We then use 
+variant-specific incubation period distributions in conjunction with these delay distributions to
+deconvolve daily reported COVID-19 cases back to their infection onset.
+The resulting infection estimates are adjusted to account for the unreported infections by
 using seroprevalence data in a novel antibody prevalence model that is defined by its
 ability to account for the waning of antibody detectability over time.  
-We examine some features of the infection estimates and the implications of
+We examine some features of our infection estimates and the implications of
 using them rather than reported cases in assessing the impact of the pandemic.
 We apply our infection estimates to get time-varying infection-hospitalization
 ratios (IHRs) for each state and compare those to similarly derived
 case-hospitalization ratios (CHRs).
 % finding major spikes that correspond to the introduction of prominent new variants in both, but 
 % higher ratios overall for cases.
-While these analyses provide a glimpse into the utility of our
+While these analyses provide a glimpse into the utility of these
 infection estimates, we believe that there is much more to be explored, and we hope that
 our work will prove an important benchmark for others to undertake retrospective
 analyses.
@@ -123,22 +126,13 @@ analyses.
 \section{Methods}
 
 In what follows, we provide details on how we estimate the daily incident
-infections for each state over the considered time period of March 9, 2020 to
-February 28, 2022 and the data we used to achieve this. We start with a brief
+infections for each state over the considered time period of June 1, 2020 to
+November 29, 2021 and the data we used to achieve this. We start with a brief
 introduction to each data source used and follow this with a description of each
 major analysis task in the order they are performed.
 \autoref{fig:cases_to_infect_flowchart} provides a visual summary of the data,
-analysis tasks, and the relationships between them. The five major analysis
-tasks this figure aims to convey are as follows: First, we estimate the
-incubation period and delay distribution for each day over the considered time
-period for a given state. Next, we join each of these two parts together using
-convolution to obtain a distribution from infection onset to case report for
-each time. We use the resulting probability estimates along with daily reported
-cases in retrospective deconvolution to estimate the infection onset dates for
-the reported cases. We adjust these infection estimates to account for the
-unreported infections by using state-specific, time-varying seroprevalence data
-in an antibody prevalence model to reach our ultimate goal of obtaining daily incident
-infection estimates for each state. 
+analysis tasks, and the relationships between them. The major analysis tasks this figure aims to convey are as follows: 
+First, we estimate variant-specific incubation periods and two types of delay distributions for each day over the considered time period. Next, each incubation period and symptom onset to positive specimen delay distribution are joined using convolution to obtain variant-specific infection onset to positive specimen distributions for each time. Then two types of deconvolution are performed. We first deconvolve from case report to positive specimen date. We then deconvolve from positive specimen to report date by variant. The resulting infection estimates are aggregated across the variant categories, and adjusted to account for the unreported infections by using state-specific, time-varying seroprevalence data in an antibody prevalence model. This lets us reach our ultimate goal of obtaining daily incident infection estimates.
 % Then, we can apply these estimates in a
 % lagged correlation to hospitalizations to find the ``best'' lag between
 % infection and hospitalization rates according to Spearman's rank-based correlation 
@@ -150,18 +144,17 @@ infection estimates for each state.
     \includegraphics[width=.99\textwidth]{Reported_cases_to_infect_flowchart.pdf} 
     \caption{Flowchart of the inputted data and major analysis steps required 
     to get from reported cases to incident infection estimates for each day 
-    over March 9, 2020 to February 28, 2022 for a state. Data sources are coloured 
+    over June 1, 2020 to November 29, 2021 for a state. Data sources are coloured 
     in yellow, while data analysis steps are coloured in blue. The data sources that
     do not stem from an analysis step are literature estimates.}
     \label{fig:cases_to_infect_flowchart}
 \end{figure}
 
 
-% Reasons why we should potentially go for a time period of June 1, 2020 to February 28, 2022. 
+% Reasons why we should start from June 1, 2020 
 % A list of reasons on why I settled on these start and end dates: 
 % 1. Reinfections officially started occurring 2020-06-01 according to the data we?re using
-% 2. sero measurements start about a month after in July, 2020 for most states and end 
-% usually in early Feb. 2022 for almost all states, 
+% 2. sero measurements start in July 2020 for most states or later
 % 3. the prior values for the inverse of the ascertainment ratio estimates are as of 2020-06-01
 % 4.  the earliest hospitalizations for each state (that we use in the correlation analysis) 
 % are also almost always in July, 2020. 
@@ -206,7 +199,7 @@ of new confirmed COVID-19 cases for each state that are based on reports from
 the John Hopkins Center for Systems Science and Engineering (JHU CSSE,
 \citealp{dong2020interactive}). From the same API, we also retrieve the daily
 number of confirmed COVID-19 hospital admissions for each state that are
-collected by the U.S.\ Department of Health and Human Services (HHS). Both
+collected by the \US\ Department of Health and Human Services (HHS). Both
 datasets are updated as of June 6, 2022.
 
 We obtain de-identified patient-level line list data on COVID-19 cases from the
@@ -220,25 +213,39 @@ state-specific delay distributions. Since the restricted dataset is updated
 monthly and cases may undergo revision, we use a single version of it that was
 released on June 6, 2022. We consider this version to be finalized in that it
 well-beyond our study end date such that the dataset is unlikely to be subject
-to significant revisions.
+to further significant revisions.
 
-In this dataset, the two key variables of interest are the dates of symptom
-onset and report to the CDC. However, we find that the line list is prone to
+In this dataset, the three key variables of interest are the dates of symptom
+onset, positive specimen date and report to the CDC. 
+Table~\ref{order_events_table} presents the percent of pairwise occurrences for the different possible permutations of events in the line list. 
+Essentially, most cases follow the idealized ordering shown by \autoref{fig:chain_events_onset_report} and so we adhere to this construction as much as possible. 
+
+We observe that the line list is prone to
 high percentages of missing data, notably with respect to our variables of
-interest. Nearly 60\% of cases are missing the symptom onset date, while about
-9\% of cases are missing the report date. In addition, we faced the
+interest. Approximately 62.3\% of cases are missing the symptom onset date, 55.4\% are missing
+positive specimen date, and 8.96\% of cases are missing the report date. Relatedly, we faced the
 fundamental issue that \citet{jahja2022real} described, in which cases with
-missing report dates may be filled with their symptom onset date.
-\autoref{fig:prop_cc_zero_delay} suggests that this impacts states differentially
-due to the inconsistent proportions of complete cases (those with
-both onset and report date) that have zero delay between onset and report across
-states. Due to this contamination in the zero delay cases (the true extent of
-which is unknown to us), we omit all such cases from our analysis.
+missing report dates may be filled with their symptom onset date. On top of this, we have the additional factor
+of positive specimen date to contend with. Previous correspondence with the CDC confirms that the imputation issue
+extends to this variable as well. So it is possible that all three variables may be imputed with the same date for a case. %%
+However, we only actually deal with select pairs of events; we do not use all three at once
+in our construction of the delay distributions or anywhere else in our analysis.
+Therefore, we restrict our investigation of missingness to the pairs of events. 
+\autoref{fig:prop_cc_zero_delay} suggests that this issue impacts states differentially
+due to the inconsistent proportions of zero delay between positive specimen and report date across states. 
+
+Due to the contamination in the zero delay cases (the true extent of
+which is unknown to us), we omit all such cases where the positive specimen and report dates have zero delay from our analysis.
+We choose to allow for zero and negative delay for symptom onset to report because 
+correspondence with the CDC confirms the distinct possibility that a person could 
+test positive before symptom onset and it is a reasonable ordering to expect if, for example, the individual is aware
+that they have been exposed to an infected individual. 
+We explain how we incorporated these variations in the ordering of events into our analysis in Section~\ref{delaystop}. 
 
 \begin{figure}[!tb]
 \centering
     \includegraphics[width=.99\textwidth]{prop_cc_zero_delay.pdf}
-    \caption{Proportion of complete cases with zero delay by state in the 
+    \caption{Proportions of complete cases with zero delay between positive specimen and report date in the 
     restricted CDC line list dataset.}
     \label{fig:prop_cc_zero_delay}
 \end{figure}
@@ -271,12 +278,14 @@ reporting process (usually well beyond 50 days). We strongly suspect that
 these large accumulations of cases over time are due breakdowns of the reporting
 pipeline (which may be expected to occur more frequently in the year following
 its instantiation than later in time). Such anomalies are not likely to be reliable
-indicators of the delay from symptom onset to case report. Therefore, we devise
-a simple, ad hoc approach to detect and prune these reporting backlogs. 
+indicators of the delay from positive specimen to case report. Therefore, we devise
+a simple, ad hoc approach to detect and prune these reporting backlogs.
 
-For each of the four dates of March 1, June 1, September 1, and %%%%%
+First, we obtain the part of the line list intended for the positive specimen to case report delay estimation,
+where both such dates are present and where zero and negative delay cases have been omitted. 
+Then, for each of the three dates of June 1, September 1, and
 December 1, 2020, we bin the reporting delays occurring
-from 50 days up to the maximum observed delay. Then, for each bin, we obtain
+from 50 days up to the maximum observed delay. For each bin, we obtain
 the total delay count for each state. We check whether each count on the
 log scale is at least the median (for the bin) plus 1.5 times the
 interquartile range and retain only those that exceed this criterion as potential
@@ -315,15 +324,17 @@ Such limitations indicate that reliance upon only one seroprevalence
 survey is inadvisable.
 For example, in the commercial dataset, the last estimate for North Dakota is in
 September 2020. In the blood donor dataset, Arkansas does not have estimates
-available until October 2020. In addition, this blood donor dataset lacks
-measurements for any states in 2022 (as the corresponding survey ended in
-December 2021). Finally, as can be seen from \autoref{fig:sero_blood_comm_compar},
-the final commercial seroprevalence measurement from 2022 shows a large
-increase relative to the immediately preceding measurement for each state. Since
-such an increase may signal unreliability or instability of the final estimates,
-we decided to remove them from our analysis. Note that North Dakota is the only
-state to which this exclusion does not apply as there are no commercial seroprevalence
-measurements beyond 2020.
+available until October 2020. 
+% In addition, this blood donor dataset lacks
+% measurements for any states in 2022 (as the corresponding survey ended in
+% December 2021). 
+% Finally, as can be seen from \autoref{fig:sero_blood_comm_compar},
+%the final commercial seroprevalence measurement from 2022 shows a large
+%increase relative to the immediately preceding measurement for each state. Since
+%such an increase may signal unreliability or instability of the final estimates,
+%we decided to remove them from our analysis. Note that North Dakota is the only
+%state to which this exclusion does not apply as there are no commercial seroprevalence
+%measurements beyond 2020.
 
 \begin{figure}[!tb]
 \centering
@@ -351,8 +362,9 @@ average (to account for the given sample sizes of the regions). The median of th
 median dates is taken to be the date for the weighted average.
 
 For adjusting our infection counts, annual estimates of the resident state
-populations as of July 1 of 2020, 2021, and 2022 are taken from the December
-2022 press release on the U.S.\ Census Bureau website \citep{uscensus2022annual}.
+populations as of July 1 of 2020 and 2021 are taken from the December
+2022 press release on the \US\ Census Bureau website \citep{uscensus2022annual}.
+Unless otherwise specified, we use the July 1, 2020 estimates.
 
 The daily fraction of new infections are estimated from the provided incidence
 of suspected reinfections over March 2020 to April 2022 in Clark County, which
@@ -367,71 +379,35 @@ suspected reinfections by all new PCR-identified cases during the same week.
 % Main contribution is the model, shows without reinfection 
 % & here's an extension that shows how to include reinfection data. 
 
-\subsection{Estimating the incubation period distribution} 
+\subsection{Estimating the delay from positive specimen to report date} 
 
-For each state at each time over March 9, 2020 to February 28, 2022, we estimate
-the incubation period distribution from a finite and countable mixture of gamma
-distributions to account for the gradual decline in the incubation period across
-variants. The variants we consider are Ancestral (for our purposes, 
-all 2020 variants observed in the U.S.), as well as Alpha, Beta, Gamma, Delta and Omicron,
-which are designated as variants of concern by WHO based on their potential to
-cause new waves, dethrone the dominant variant, and lead to changes in public
-health policy \citep{who2021tracking}. In addition, we include the Epsilon
-(California) and Iota (New York) variants because of their impact on those and
-the surrounding states \citep{yang2022investigation, duerr2021dominance}. We
-relegate all other variants to be in an Other category (so that the proportions
-circulating in a state at a time always sum to one). This decision is, in part,
-motivated by the lack of sequencing data for most states in 2020 as well as the
-presence of an others category in the sequencing data for that time. 
-% Perhaps include heatmap(s) from 
-% https://docs.google.com/document/d/1WSa_CN5gXsa-5Ozuj6xZt2-knflL507QdwiiRscaW2o/edit
-Then, for each variant in a state at a time, the proportion of the variant
-circulating (the mixture weight) is multiplied by the corresponding component
-gamma distribution for the incubation period. These distributions are the same
-for all states and based on literature estimates of the gamma parameters or the
-mean and standard deviation of the incubation period (in which case the method
-of moments is used to fit a gamma density). Finally, we discretized the
-resulting mixture density to the support set, which is taken to be from 1 and
-21 days. In other words, those are taken to be the lower and upper limits for
-the number of days that the virus could be incubating in someone. The implicit
-assumption for the lower bound is that there must be at least one day between
-infection and symptom onset (which follows the convention given in
-\citealp{phcan2021covid}). The assumption underlying the upper bound is that 21
-days is the maximum number of days that the virus could be incubating in someone
-(which is reasonable based on \citealp{zaki2021estimations} and
-\citealp{cortes2022sars}).
-
-\subsection{Estimating the delay from symptom onset to report date} 
-
-We use the restricted CDC line list to estimate the distribution between symptom
-onset and report for each state at each time. We refer to this as the ``delay
-distribution'' \citep[see
-\autoref{fig:cases_to_infect_flowchart} or][]{jahja2022real}. More formally, let
+We use the restricted CDC line list to estimate the distribution between positive specimen
+ and report for each state at each time. To formalize this, let
 $y_t$ denote the count of new cases reported at time $t$ and $x_t$ denote the
-count of deconvolved cases with onset at $t$. 
-For all cases in the line list that had both an onset and a report date, 
+count of deconvolved cases with positive specimen at $t$. 
+For all cases in the line list that had both a positive specimen and a report date, 
 we can count the those that are
-reported at time $t$ by enumerating them according to onset (as in
-\citealp{jahja2022real}):
+reported at time $t$ by enumerating them according to positive specimen date 
+(similar to how symptom onset date was used in \citealp{jahja2022real}):
 \begin{align*}
-y_t = \sum_{s=1}^{t} \sum_{i=1}^{x_s}\indicator \left ( \text{the }i\th\text{ infection at }
+y_t = \sum_{s=1}^{t} \sum_{i=1}^{x_s}\indicator \left ( \text{the }i\th\text{ positive specimen at }
  s \text{ gets reported at }t \right ).
 \end{align*}
 Taking the conditional expectation of the above yields
 \begin{align*}
 \E(y_t \mid x_s, s \leq t) = \sum_{s=1}^{t} \pi_t(s) x_s ,
 \end{align*}
-where $\pi_t(s) = \P(\text{case report at }t \mid \text{infection onset at }s)$ for
+where $\pi_t(s) = \P(\text{case report at }t \mid \text{positive specimen date at }s)$ for
 each $s \leq t$ are the delay probabilities and the $\{ \pi_t(s) : s \leq t
 \}$ sequence comprises the delay distribution at time $t$. Notice that
-there are no time restrictions placed on the infection onset, save that it must
+there are no time restrictions placed on the positive specimen date, except that it must
 have been between the start of the pandemic and the report date, inclusive. This is
 unlikely to be a realistic assumption to make as $t$ moves farther away from
 $s$. 
 
-Thus, we make two key assumptions about the delay distributions. First,
-infections that are reported to the CDC are always reported within $d = 60$
-days, which is true for the vast majority of reported cases. Second, the
+Thus, we make two key assumptions about these distributions. First,
+positive specimen tests that are reported to the CDC are always reported within $d = 60$
+days, which is true for the majority of the reported cases. Second, the
 probability of zero delay is zero, which stems from the contamination of
 zero-delay in the line list. As in \citet{jahja2022real}, we update the
 conditional expectation formula to reflect these two assumptions: 
@@ -440,22 +416,21 @@ conditional expectation formula to reflect these two assumptions:
 \end{align*}
 where for $k = 1, \dots, 60$,
 \begin{align*}
-p_t(k) = \P(\text{case report at }t \mid \text{infection onset at }t-k).
+p_t(k) = \P(\text{case report at }t \mid \text{positive specimen at }t-k).
 \end{align*}
 
-For each state, we estimate the delay distribution at each $t$ by using the empirical distribution of
-all non-zero lags between the complete cases whose onset dates fall in the
-center-aligned interval about $t$ designated by $[ t - 75 + 1, t + 60
-]$). 
+For each state, we estimate the positive specimen to report date distribution at each $t$ by using the empirical distribution of
+all non-zero lags between the complete cases whose positive specimen dates fall in the
+ interval around $t$ designated by $[ t - 75 + 1, t + 60]$). 
 
-Now, the task of estimating the delay distribution for each state at each time
+Now, the task of estimating the positive specimen to report date distribution for each state at each time
 requires four distinct steps. First, we obtain the empirical
-distribution of all lags (excluding zero) from all cases with onset dates
-falling in the center-aligned interval. Next, we weight the state-specific
+distribution of all lags (excluding zero) from all cases with positive specimen dates
+falling in the roughly center-aligned interval. Next, we weight the state-specific
 empirical distribution by the proportion of CDC cases to JHU cases. That is, we
 compare the number of CDC cases used to create the empirical distribution to the
 number of cases reported by JHU in the time window of $\left[t - 60 + 2, t +
-75\right]$ (to correspond appropriately to the center-aligned interval for
+75\right]$ (to correspond appropriately to the interval for
 the CDC cases). This proportion is used as the weight for the state's empirical
 distribution, while the complement is used to weight the overall empirical
 distribution that is formed from the data for all states. This construction
@@ -465,25 +440,63 @@ we fit a gamma density to the resulting empirical distribution by the method of
 moments. Finally, we discretize the resulting density to the support set of 1
 to 60 days.
  
-\subsection{Convolutional estimate of infection-to-report distributions} 
+\subsection{Estimating the delay from symptom onset to positive specimen date}  \label{delaystop} %% Maybe add appendix plots here?
 
-From the incubation period and delay distribution estimation, we acquire one
-delay and one incubation period distribution for each state at each time under
-consideration. We then convolve each pair of distributions to get the estimated
-infection-to-report distributions and, hence, the estimated probabilities for
-the delay from infection onset to case report. 
+The task of estimating the delay from symptom onset to positive specimen date follows the same procedure as for positive specimen to report date with a few key data-driven amendments. Firstly, we allow for negative delays to account for the possibility that an individual case tests positive before symptom onset. Under this assumption, the lower and upper bounds for the support of $-3$ and $21$ are chosen based on the largest delay values for the statewise 0.05 and 0.95 quantiles that are not outliers. Secondly, we allow for zero delay because the median statewise delay is very short at approximately 2 days. Thirdly, there are times where the empirical probability was observed to be precisely 1 at zero delay and the proportion of CDC relative to JHU cases used for the weight was also 1. Since we believe that having zero delay for all cases is unrealistic and unlikely to be representative of all cases for the state, we inject a small amount of variance manually by setting the the CDC-to-JHU proportion to be the minimum shrinkage proportion observed for the affected state (such instances were isolated to the state of New Hampshire). Aside from these modifications, the construction of the delay distribution proceeds in precisely the same manner as for positive specimen to report date. 
 
-\subsection{Retrospective deconvolution for reported cases}
+\subsection{Estimating the incubation period distributions} 
 
-The goal for retrospective deconvolution is to estimate the daily number of new
-infections that occurred at each time using the dates that those cases were eventually
-reported. For each state, we
-achieve this goal by solving the an optimization problem. 
+One incubation period distribution is estimated for each variant under consideration.
+The variants we consider are Alpha, Beta, Gamma, and Delta, which are
+ included because they are
+are designated to be variants of concern by WHO based on their potential to
+cause new waves, dethrone the dominant variant, and lead to changes in public
+health policy \citep{who2021tracking}. In addition, we include the Epsilon
+(California) and Iota (New York) variants because of their impact on those and
+the surrounding states \citep{yang2022investigation, duerr2021dominance}. We
+relegate all other variants to be in the Other category (which, for our purposes,
+is treated as a catch-all for all 2020 Ancestral variants observed in the U.S.)
+This decision to include an Other category is, in part,
+motivated by the lack of sequencing data for most states in 2020 as well as the
+presence of an Others category in the sequencing data for that time. 
+
+We construct the incubation period distributions for the variants as gamma distributions.
+These distributions are the same for all states and based on literature estimates of the gamma parameters or the
+mean and standard deviation of the incubation period (in which case the method
+of moments is used to fit a gamma density). Then, we discretize each
+resulting density to the support set, which is taken to be from 1 and
+21 days. In other words, those are taken to be the lower and upper limits for
+the number of days that the virus could be incubating in someone. The implicit
+assumption for the lower bound is that there must be at least one day between
+infection and symptom onset (which follows the convention given in
+\citealp{phcan2021covid}). The assumption underlying the upper bound is that 21
+days is the maximum number of days that the virus could be incubating in someone
+(which is reasonable based on \citealp{zaki2021estimations} and
+\citealp{cortes2022sars}).
+
+\subsection{Convolutional estimates of the infection to positive specimen distributions} 
+
+The previous two steps enabled us to estimate one incubation period per variant
+and one symptom onset to positive specimen distribution for each state at each time under
+consideration. We proceed to convolve each such pair of distributions to get estimated
+infection to positive specimen distributions and, hence, estimated time-varying probabilities for
+the delay from infection onset to positive test specimen date for each state.
+
+\subsection{Retrospective deconvolution}
+
+The main goal for the retrospective deconvolution stage is to estimate the daily number of new
+infections for each time using the dates that those cases were eventually
+reported. To this end, there are two types of deconvolution performed. The first is the deconvolution from report to positive specimen date and the second is from positive specimen date to infection onset date. We allocated the deconvolutions in this way to allow us to get the daily deconvolved case estimates by variant. The intermediate of positive specimen date was chosen because the variant proportion estimates are aligned to this date. So for each state at each time, nine deconvolutions are performed in total. The first is the deconvolution from report to positive specimen date, followed by the eight deconvolutions from positive specimen to infection onset for the eight different variant categories.
+
+We will start by describing the first type of deconvolution performed from report to positive specimen date in detail and
+then describe the second type in terms of the changes made with respect to the first.
+For each state, we achieve the first goal to estimate positive specimen dates for the cases by solving an optimization problem. 
 % Following the notation of \citet{jahja2022real} (save for suppressing the
 % state/location subscript), 
-Let $\cT$ represent the deconvolution period from June
-1, 2020 to February 28, 2022. Let $\hat{p}_t$ be probabilities from the estimated
-infection-to-report distribution for $t \in \cT$, $y_t$ the number of new cases
+For this problem, let $\cT$ represent the extended deconvolution period from March 1, 2020 to March 1, 2023,
+which was used to minimize the effect of boundary issues and to produce a sufficient deconvolved case estimates for further analysis.
+Let $\hat{p}_t$ be probabilities from the estimated
+positive specimen to report date distribution for $t \in \cT$, $y_t$ the number of new cases
 reported, and where $D^{(4)}$ is the discrete derivative matrix of order 4
 such that $D^{(4)}x$ yields all $4\th$-order differences of the vector $x$. From these,
 we estimate the deconvolved case counts across time by solving for the vector $x$ in
@@ -506,11 +519,13 @@ Appendix A of \citet{jahja2022real}. The solution to the problem is an adaptive
 piecewise cubic polynomial \citep{tibshirani2014adaptive,
 tibshirani2022divided}.
 
-We select the tuning parameter, $\lambda$, by using $3$-fold cross validation as
-in \citet{jahja2022real} in which every third infection count is
-reserved for testing and imputed with the average of the two surrounding counts.
-The tuning parameter that results in the
-smallest sum of squared errors is ultimately chosen.
+We select the tuning parameter, $\lambda$, by using $3$-fold cross validation similar to
+\citet{jahja2022real} in which every third infection count is
+reserved for testing. The tuning parameter that results in the smallest mean squared error is selected.
+
+From this first type of deconvolution, we obtain case estimates by positive specimen date for each state.
+The second type of deconvolution, where the goal is to get estimates of the infection onset date for these cases, follows the form of first type, save for two key modifications to the inputs. Firstly, we
+utilize the results from the first deconvolution and, secondly, we must update the probabilities to be the convolutional estimates of the infection to positive specimen distributions. Thus, for a fixed variant category, $y_t$ is the number of new cases deconvolved to positive specimen date multiplied by the estimated proportion of the variant in circulation in the state at $t$, and $\hat{p}_t$ are the probabilities from the estimated infection onset to positive specimen distribution for $t \in \cT$. With these modifications to the inputs, the deconvolution proceeds in the exact same way as before. Since this deconvolution is done separately for each variant category, we ultimately obtain deconvolved case estimates by the date of infection onset that are separated by variant.
 
 \subsection{Inverse reporting ratio and the antibody prevalence model} 
 
@@ -521,7 +536,8 @@ deconvolved case estimates by
 a scaling factor that approximates the ratio of the true number of new infections
 to the new reported infections. We refer to this quantity as the
 inverse reporting ratio and denote it by $a_t$ for day $t$. Our new goal is
-to estimate this quantity for every state at every time under consideration. 
+to estimate this quantity for every state at every time under consideration from
+June 1, 2020 to November 29, 2021.
 
 The number of new reported infections is obtained from our
 deconvolved case estimates. As for the true
@@ -539,11 +555,11 @@ seroprevalence measurements to the nearest Monday. If there are multiple
 measurements in a week from a seroprevalence source, then the average is used. 
 We denote these changes by changing the time-based subscript 
 from $t$ to $m$ where $m$ indicates the Monday 
-relative to our March 9, 2020 start date.
+relative to our June 1, 2020 start date.
 
 For each state, let $s_m$ be the seroprevalence estimate on $m$, $w_m$ be the
 corresponding inverse variance weight, and
- $\sum_{t = m-1}^{m} C_t$ is the change in weekly reported infections 
+ $C_{m-1}^m = \sum_{t = m-1}^{m} c_t$ be the total reported infections from $m-1$ to $m$
 scaled by the state's population. 
 To account for reinfections, we multiply the change in reported infections for $m$
 by the corresponding fraction of new infections, $z_m$. 
@@ -555,7 +571,8 @@ Using these components, we construct the following model separately for each sta
 %\end{align}
 %  $w_t$ be the inverse variance weights derived from those estimates,
 \begin{align}
-s_m = (1 -\gamma)s_{m-1} + a_m \sum_{t = m - 1}^{m} C_t z_m + \epsilon_m, \qquad \epsilon_m \sim N(0, w_m \sigma^2_\epsilon) \label{eq:waningpr} 
+s_m &= (1 -\gamma)s_{m-1} + a_m C_{m-1}^m z_m + \epsilon_m, \qquad \epsilon_m \sim N(0, w_m \sigma^2_\epsilon) \label{eq:waningpr}  \\
+a_{m+1} &= 3a_{m} - 3a_{m-1} + a_{m-2} + \eta_m,\qquad\qquad \eta_m \sim N(0, \sigma^2_{\eta})   \nonumber
 \end{align}
 where $\gamma$ is the percentage
 of people whose level of infection-induced antibodies falls below the detection 
@@ -568,8 +585,7 @@ antibody prevalence model.
 % and model one $\gamma$ to try avoid making gratuitous
 % or overly restrictive assumptions. 
 
-We express the antibody prevalence model as a state-space model and
-enforce $a_m$ to follow a third-order autoregressive model. This representation
+We express the antibody prevalence model as a state-space model. This representation
 allows for convenient handling of missing data, extrapolation before and after
 the period of observed seroprevalence measurements, and maximum likelihood
 estimates of $\gamma$ and $\sigma^2_\epsilon$. Details of this methodology and
@@ -582,7 +598,7 @@ Supplementary Materials \ref{supp:ssapm}.
 We use our infection estimates in a lagged correlation analysis with
 confirmed COVID-19 hospitalizations. Our primary goal of this analysis is to
 find the lag between infection and hospitalization rates that gives the highest
-average rank-based correlation across US states. To that end, we consider a wide
+average rank-based correlation across \US\ states. To that end, we consider a wide
 range of possible lag values ranging from 1 to 25 days. Zero and negative
 lags are not considered because COVID-19 infection onset must precede
 hospitalization due to the virus. To remove day of the week effects, both the
@@ -591,7 +607,7 @@ average (center-aligned) before their conversion to rates.
 
 For each considered lag, we calculate the Spearman's correlation between the 
 state infection and hospitalization rates for each observed day 
-over the March 9, 2020 to February 28, 2022
+over the June 1, 2020 to November 29, 2021
 time period %, and use the epi\_slide function \citep{mcdonald2023epipredict} to 
 with a center-aligned rolling window of 61 days for each such computation.
 We then calculate the average correlation across all states and times for each lag. 
@@ -606,143 +622,187 @@ who were infected on the lagged number of days before.
 To better understand the contribution of the intermediate steps to the lagged 
 correlation analysis, we carry out a brief ablation study in which we calculate the 
 lagged correlation using the following infection estimates: 1. those from the
-deconvolution procedure under the assumption that the report date is the 
-same as the symptom onset date (i.e., excluding
-the reporting delay data); 2. those from the deconvolution procedure when only the
-reporting delay data is used (excluding the incubation period data); 3. those from
-the deconvolution procedure when utilizing both the incubation period and delay data 
+deconvolution procedure under the assumption that the infection onset is the
+same as the positive specimen date (i.e., excluding the positive specimen to infection onset data and deconvolution); 
+2. those from the deconvolution procedure under the assumption that the infection onset is the
+same as the symptom onset date (excluding the incubation period data); 
+3. those from the deconvolution procedure when utilizing all incubation period and delay data 
 (the deconvolved case estimates); 4. those from applying the antibody prevalence 
 model to produce estimates for both the reported and the unreported 
 cases (the infection estimates).
 
 \section{Results}
 
-This work estimates incident infections for each U.S.\ state over March 9,
-2020 to February 28, 2022 and to illustrate the disease burden and viral
+This work estimates incident infections for each \US\ state over June 1,
+2020 to November 29, 2021 and to illustrate the disease burden and viral
 transmission dynamics at the level of the state across time. After converting the number
 of infections to rates (infections per 100,000 population), we perform a
 brief comparison between infection and case estimates within each state to see
 to what extent that surges in infections are evident in cases alone
 and point out instances where cases largely fail to capture surges in infections.
-Then, we look at patterns in infections across the states and postulate what may be 
-contributing to these trends based on defining characteristics such as state 
-healthcare performance and geographical contiguity. 
+To apply these infection estimates, we perform a lagged correlation analysis
+with hospitalizations and then compute the time-varying IHRs for each state.
+Finally, we look at infections within and across the states and point out patterns related to the major variants and geographical contiguity.
+% postulate what may be 
+% contributing to these trends based on defining characteristics such as geographical contiguity.  
 
 \subsection{Infection estimates compared to reported cases}
 
 Naturally, outbreaks in infections precipitate those in cases and are reliably larger in
-magnitude (\autoref{fig:state_est_upto_dec1121} and
-\autoref{fig:state_est_after_dec1121}).
+magnitude (\autoref{fig:state_infect_est}).
 Hence, our infection estimates indicate
 that the pandemic had a differential impact across states earlier and at a larger scale
-than is suggested by cases. While the major Ancestral, Delta, and Omicron waves tend to be
-visible for most states, there are
-clear outbreaks in unreported infections that are not easily detectable from cases alone in the 
-falls of 2020 and 2021. For example, take the Alpha wave from mid-2021 in the 
-midwestern states of Michigan, North Dakota, South Dakota, and Illinois
-or the Delta wave from the fall of 2021 in the east coast states 
-of Connecticut, Rhode Island, and Massachusetts. Earlier on in the pandemic, such
-discrepancies may be more attributable to failures in the reporting pipeline, while
-later on in the pandemic, they more likely due to the rise in asymptomatic infections
+than is suggested by cases. From the choropleth maps that compare the state-level rates 
+of daily new infections and cases per $100,000$, we can observe
+that for the earliest time of June 1, 2020, there is little discrepancy between case
+and infection rates, while for the later times there are immense differences in the
+rates, such that case rates tend to underrepresent infections to a great extent 
+(\autoref{fig:choro_inf_case_rates}).
+
+While the major Ancestral, Alpha, and Delta waves tend to be
+visible for most states, there are clear outbreaks in unreported infections 
+that are not easily detectable from cases alone in the 
+falls of 2020 and 2021. For example, take the wave in the spring of 2021 for North Dakota and
+South Dakota, where the relatively flat and steady case cadence fails to capture the major wave of infections.
+With respect to variants of concern, consider the late 2020 Ancestral wave for the midwestern states of Illinois, Indiana, and
+Ohio. For the major Delta wave, some of the greatest discrepancies between cases and infections are visible in the western states of Idaho and Montana, the southern states of Louisiana and Georgia, and the midwestern states of Iowa and Nebraska (\autoref{fig:state_infect_est}). Earlier on in the pandemic, such discrepancies between cases and infections may be more attributable to failures in the reporting pipeline, while later on in the pandemic, they more likely due to the rise in asymptomatic infections
 across variants \citep{oph2022covid, garrett2022high}. 
 
-Finally, while the January 2022 Omicron wave is evident from the case counts for all states 
-(\autoref{fig:state_est_after_dec1121}), our estimates suggest that case counts tend to severely 
-underestimate infections during this time for many states. The lowest of all states was in Nevada, 
-where about $9.1\%$ (95\% confidence interval: $[4.0, 100.0]$) of the infections were reported 
-over January 2022. This was followed by Arizona with $12.2\%$ ($[4.8, 98.4]$), and Minnesota 
-with $13.9\%$  ($[8.0, 53.5]$).  More broadly, in $25$ states
-less than $50\%$ of infections were reported. Only $11$ states of Florida, New York, Colorado, New Jersey, 
-South Dakota, Delaware, Alabama, Arkansas, North Carolina, New Hampshire, 
-and Maryland reported at least $70\%$ infections over this time. 
+Finally, while the main Delta wave is somewhat evident from the case counts for all states 
+(\autoref{fig:state_infect_est}), our estimates suggest that case counts tend to severely 
+underestimate infections during this time for many states. The lowest of all states was in New Jersey,
+where about $4.6\%$ (95\% confidence interval: $[1.9, 67.7]$) of the estimated infections were reported.
+This was followed by Maryland with $7.4\%$ ($[2.7, 83.8]$), Connecticut
+with $8.0\%$ ($[3.1, 25.8]$), and Florida with $8.7\%$ ($[4.8, 34.0]$). This underreporting issue extends to most states as in $39$ states less than $30\%$ of infections were reported during this time. Only $4$ states of Alaska, Maine, Vermont and Virginia reported at least $40\%$ infections. No states were found to surpass $50\%$ for reported infections for this time.
 
-% Could add more observations here
-% Ex. In NY over some time, the total number of reported cases is 20% of the population, whereas the estimated infections is about 70%.
-% The Alpha, Delta, and Omicron spikes would be good to explore more
+Similar patterns were observed during the earlier period of Alpha domination, where Louisiana had the lowest reported infections at 
+$11.7\%$ (95\% confidence interval: $[6.7, 31.5]$) and was followed by California at $14.4\%$ (95\% confidence interval: $[7.7, 68.2]$). There were $23$ states that reported at least $40\%$ and $22$ states that reported at least $50\%$ of their infections.
+
+Such patterns were comparatively less apparent during the earlier and larger period of Ancestral domination, where Ohio and Maryland held the lowest percentages of reported infections at $22.0\%$ (95\% confidence interval: $[16.2, 34.0]$) and $22.3\%$ (95\% confidence interval: $[14.8, 40.5]$), respectively. During this time, $28$ states that reported at least $40\%$ and $14$ states that reported at least $50\%$ of their infections. 
+
+\autoref{fig:six_state_est} zooms in on the infection estimates for the states that exhibit the most underreporting for each of the three variant-specific time periods to emphasize the marked differences between case and infection rates. To supplement this, \autoref{fig:six_state_decon_byvar_est} shows the division of infections in states by the proportions of variants in circulation specific to the state. 
+From these plots, it is clear that few variant categories tends to dominate and drive infections at a time. The general progression in terms of variant starts with the Ancestral category from 2020 up to early 2021, to the Alpha variant in mid 2021, which eventually gets eclipsed by the Delta variant in mid to late 2021. This supports our division of our results by the three main variant-driven time periods.
 
 \begin{landscape}
 \thispagestyle{empty}
 \begin{figure}[!tb]
     \centering
-    \includegraphics[width=.99\linewidth]{state_niauc_before_dec11.pdf} 
+    \includegraphics[width=.99\linewidth]{state_niauc_est_faceted_F24.pdf} 
     \caption{Estimates of the number of daily new infections per
-     100,000 population for each US state from March 9, 2020 to December 11, 2021
+     100,000 population for each \US\ state from June 1, 2020 to November 29, 2021
       (dark blue line). The blue shaded regions depict the 50, 80, and 95\% confidence 
       intervals for the estimates, while the teal line represents the 
       number of new daily new deconvolved cases per 100,000, and the dotted 
       orange line represents the 7-day average of the new cases per 100,000 as 
       of the same date.}
-    \label{fig:state_est_upto_dec1121}
+    \label{fig:state_infect_est}
 \fillandplacepagenumber
 \end{figure}
 \end{landscape}
 
-\begin{landscape}
-\thispagestyle{empty}
 \begin{figure}[!tb]
-    \includegraphics[width=.98\linewidth]{state_niauc_after_dec11.pdf} 
-    \caption{Estimates of the number of daily new infections per
-     $100,000$ population for each US state from December 11, 2021 to February 28, 2022
-      (dark blue line). The blue shaded regions depict the 50, 80, and 95\% confidence 
-      intervals for the estimates, while the teal line represents the 
-      number of new daily new deconvolved cases per $100,000$, and the dotted 
-      orange line represents the 7-day average of the new cases per $100,000$ as 
-      of the same date.}
-    \label{fig:state_est_after_dec1121}
-\fillandplacepagenumber
+\centering
+    \includegraphics[width=.99\textwidth]{choro_inf_case_rates_F24.pdf}
+    \caption{Choropleth maps of the state-level estimates of the number of 
+    daily new infections per $100,000$ population (top row) and the 
+    daily new cases per $100,000$ population (bottom row) for three times
+    over the June 1, 2020 to November 29, 2021 period. The first date was
+     chosen simply as a baseline, while the second and third 
+    dates were chosen based on the day that had the largest number of infections 
+    across the 50 states from each year. 
+    These maps are generated from the \texttt{usmap} 
+    package in R \citep{lorenzo2023usmap}.} 
+    \label{fig:choro_inf_case_rates}
 \end{figure}
-\end{landscape}
+
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=.9\linewidth]{state_niauc_est_6states_F24.pdf}
+    \caption{Estimates of the number of daily new infections per 100,000 for
+    six \US\ states from June 1, 2020 to November 29, 2021 (dark blue
+    line). The blue shaded regions depict the 50, 80, and 95\% confidence
+    intervals. The background is shaded to indicate the top variant in
+    circulation at the time.}
+    \label{fig:six_state_est}
+\end{figure}
+
+
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=.9\linewidth]{state_decon_byvar_est_6states_F24.pdf}
+    \caption{Estimates of the deconvolved case counts by variant for
+    six \US\ states from June 1, 2020 to November 29, 2021. 
+    The area under the curve is coloured to indicate the corresponding variant.}
+    \label{fig:six_state_decon_byvar_est}
+\end{figure}
 
 We perform a lagged correlation analysis where we systematically investigate the
 rank-based (i.e., Spearman's) correlation between our infection and confirmed
 hospitalization rates per 100,000 population over a broad range of lag values
 (\autoref{fig:infect_case_hosp_lag_corr}). Examining the correlation between infections and
-hospitalizations shows that the maximum average correlation across states of 0.651 is 
-observed at a lag of 14 days. In contrast, we find that the greatest average
-rank-based correlations for cases with confirmed hospitalizations is achieved at a lag of
-1. That is, we find that case report rates are nearly contemporaneous to
+hospitalizations shows that the maximum average correlation across states of $0.513$ is 
+first observed at a lag of $13$ days. In contrast, we find that the greatest average
+rank-based correlation for cases of $0.691$ is achieved at a lag of 
+$1$ day. That is, we find that case report rates are nearly contemporaneous to 
 hospitalizations, while infection estimates clearly precede them. 
 
 We undertake an ablation study for the lagged correlation of infections, the results of which 
 are shown in \autoref{fig:adj_unadj_sym_hosp_lag_corr}. From this, we can see that the 
-infection estimates from each intermediate 
-step are all leading indicators of hospitalizations. However, the degree that each such set of estimates
+deconvolved case or infection estimates from the intermediate 
+steps are all leading indicators of hospitalizations. However, the degree that each such set of estimates
 lead hospitalizations depend on its location in the sequence of steps and how close the estimates 
-are to infection onset. For example, the deconvolved cases by symptom onset 
+are to infection onset. For example, the deconvolved cases by positive specimen date
 tend to precede hospitalizations by about $11$ days, 
-while those for the subsequent step indicate that the deconvolved case estimates by infection onset
-precede hospitalizations by about $15$ days. When we solely rely on incubation period data 
-in the deconvolution (i.e., under the assumption that the report date is the same as the date 
-of symptom onset), we can see that the reported infections tend to precede
-hospitalizations by about $6$ days. 
+while those for the subsequent step indicate that the deconvolved cases by symptom onset tend to 
+precede hospitalizations by a longer time of about $13$ days. Finally, after adding the variant-specific 
+incubation period data into the deconvolution and obtaining the deconvolved case estimates, 
+we can observe that the reported infections precede
+hospitalizations by about $17$ days. 
 
-In terms of average correlation, the deconvolved case estimates by infection onset provide similar
-information indicative to hospitalizations as the deconvolved case estimates by symptom onset
-about $4$ days before the latter tends to occur, which highlights a time-based benefit of opting for
-infection estimates by the date of infection onset over symptom onset. 
+In terms of the average correlation produced, the deconvolved case estimates by infection onset and the
+deconvolved case estimates by positive specimen date reach almost the same maximum average correlation.
+While that is not a clear differentiator by itself, there is a clear time-based benefit of opting for
+the infection estimates by the date of infection onset over symptom onset because they provide similar information 
+on hospitalizations about $6$ days before the latter tends to occur.
 
 Unsurprisingly, the deconvolved case and infection estimates achieve their maximum correlation
-at nearly the same lag. And yet, the average correlation to hospitalizations
+at the same lag. And yet, the average correlation to hospitalizations
 tends to be greater for the deconvolved case estimates than for the infection estimates (and
 the reported infections by symptom onset). If the goal is to find the part of this process that is most informative to
  hospitalizations, then it is clear that producing the deconvolved case estimates is the more informative step
 and these estimates are potentially the most meaningful signal for future hospitalizations.
- This finding could indicate that the the unreported infections tend to be less severe and 
- less likely to lead to hospitalization than those that are reported.
-%% Maybe move the second last last sentence to the discussion
+The reason for this finding may stem from a difference in disease severity between the reported and unreported infections: 
+The unreported infections tend to be less severe and less likely to lead to hospitalization than those that are reported.
 
 As a counterpart to our lagged correlation analysis, we compute the time-varying IHRs 
 for each state using the optimal lag for infection and hospitalization rates. We also included
-the CHRs that are computed using the optimal lag for cases and hospitalizations for comparison.
+the CHRs that are computed using the optimal lag for cases and hospitalizations for comparison
 (\autoref{fig:IHR_7dav}). 
 
+For each state, the CHRs tend to show an amplified version of the course of the IHRs over time.
+This supports our claim that the reported infections are more likely to require hospitalization
+than the unreported infections. Both the IHRs and CHRs exhibit similar geospatial and 
+temporal trends as are noted for infections. 
+Namely, states that are close in proximity (such as Ohio, Pennsylvania, and Virginia) tend to exhibit similar patterns in
+the IHRs and CHRs over time. In addition, there are similar spikes observed across many states during 
+waves of infections that are driven by prominent new variants. For example, many
+states exhibit a striking spike in hospitalizations in mid-2021, which coincides with the rapid takeover 
+of the Delta variant during that time \citep{hodcroft2021covariants}. This finding aligns with 
+previous studies that found an increased risk in hospitalizations with Delta in comparison to other
+variants \citep{twohig2022hospital, nyberg2022comparative}. Similarly, during the fall of 2020 there tends to be another spike in the IHRs
+that rivals or surpasses that observed during the time of Delta (which is the case for states like New York or Wyoming). 
+
+There does not tend to be a strict upwards or downwards trajectory or even a mild waning pattern in the IHRSs (as one might expect if we were to tread further into the pandemic over which the virus mutates to variants that 
+are generally more infectious, but that pose less of a risk to hospitalization \citep{lorenzo2022covid, blauer2022compare}). Overall, we observe intermittent spikes that punctuate longer periods where the IHRs tend to be less than $0.2$ hospitalizations per infection. These spikes tend to align with the emergence of new variants.  % and seasonal changes.
+
+\clearpage
 \begin{figure}[!tb]
 \centering
-    \includegraphics[width=.8\textwidth]{infect_case_hosp_lag_corr_Nov2.pdf} 
+    \includegraphics[width=.8\textwidth]{infect_case_hosp_lag_corr_F24.pdf} 
     \caption{Lagged Spearman's correlation between infection and hospitalization
     rates per 100,000 as well as between case and hospitalization rates per
-    100,000. The averages shown are for each lag, across US states and days
-    over March 9, 2020 to February 28, 2022, and taken over a rolling window of
+    100,000. The averages shown are for each lag, across \US\ states and days
+    over June 1, 2020 to November 29, 2021, and taken over a rolling window of
     61 days. Note that the infections, cases, and hospitalization counts are
     subject to a center-aligned 7-day averaging to remove spurious day of the
     week effects. The dashed lines indicate the lags for which the highest
@@ -752,10 +812,10 @@ the CHRs that are computed using the optimal lag for cases and hospitalizations 
 
 \begin{figure}[!tb]
 \centering
-    \includegraphics[width=.8\textwidth]{adj_unadj_sym_inc_hosp_lag_corr_Nov2.pdf} 
+    \includegraphics[width=.8\textwidth]{adj_unadj_pi_no_inc_hosp_lag_corr_F24.pdf} 
     \caption{Lagged Spearman's correlation between the infection and
-    hospitalization rates per 100,000 averaged for each lag across US states
-    and days over March 9, 2020 to February 28, 2022, and taken over a rolling
+    hospitalization rates per 100,000 averaged for each lag across \US\ states
+    and days over June 1, 2020 to November 29, 2021, and taken over a rolling
     window of 61 days. The infection rates are based on the counts for the
     deconvolved case and infection estimates as well as the reported infections
     by symptom onset and when the report is symptom onset. Note that each such
@@ -764,37 +824,14 @@ the CHRs that are computed using the optimal lag for cases and hospitalizations 
     for which the highest average correlation is attained.}
     \label{fig:adj_unadj_sym_hosp_lag_corr}
 \end{figure}
-While the IHRs tend to be less than 0.1 hospitalizations per infection, the CHRs tend to 
-present a more amplified version of the CHRs for each state.
-This supports our claim that the reported infections are more likely to require hospitalization
-than the unreported infections. Both the IHRs and CHRs exhibit similar geospatial and 
-temporal trends as are noted for infections. 
-Namely, states that are close in proximity (such as Pennsylvania and Virginia) tend to exhibit similar patterns in
-the IHRs over time. In addition, there are similar spikes observed across many states during 
-waves of infections that are driven by prominent new variants. For example, many
-states exhibit a striking spike in hospitalizations in mid-2021, which coincides with the rapid takeover 
-of the Delta variant during that time \citep{hodcroft2021covariants}. This finding aligns with 
-previous studies that found an increased risk in hospitalizations with Delta in comparison to other
-variants \citep{twohig2022hospital, nyberg2022comparative}. Similarly, during the beginning of the
-wave driven by the new Omicron variant in early 2022, there tends to be another spike in the IHRs
-that rivals that observed during the time of Delta. However, this could be in part due to estimating near to the boundary.
-Aside from this, there appears to be a slight waning pattern over time for many states where the
-IHR is generally greater earlier than later in the pandemic over which time the virus mutates to variants that 
-are generally more infectious, but that pose less of a risk to 
-hospitalization \citep{lorenzo2022covid, blauer2022compare}.
-
-
-%% Are the IHRs greater in states with poorer healthcare system performance?
-%States such as _____ that are reputed to have lower healthcare performance leading up to the pandemic tended to 
-%result in higher IHR estimates, notably in _____.
 
 \begin{landscape}
 \thispagestyle{empty}
 \begin{figure}[!tb]
     \centering
-   \includegraphics[width=.99\linewidth]{IHR_7dav_Nov5.pdf}
-    \caption{Time-varying IHR and CHR estimates for each state from March 9, 2020
-    to February 28, 2022, obtained using the corresponding optimal lag from the
+   \includegraphics[width=.99\linewidth]{IHR_7dav_F24.pdf}
+    \caption{Time-varying IHR and CHR estimates for each state from June 1, 2020
+    to November 29, 2021, obtained using the corresponding optimal lag from the
     systematic lag analysis. Note that the infection, case, and hospitalization
     counts are subject to a center-aligned 7-day average to remove spurious day
     of the week effects. Also note that the different starting points across
@@ -806,87 +843,57 @@ hospitalization \citep{lorenzo2022covid, blauer2022compare}.
 
 \subsection{Disease burden and viral transmission}
 
-\begin{figure}[!tb]
-\centering
-    \includegraphics[width=.9\linewidth]{state_niauc_est_6states.pdf}
-    \caption{Estimates of the number of daily new infections per 100,000 for a
-    sample of six US states from March 9, 2020 to February 28, 2022 (dark blue
-    line). The blue shaded regions depict the 50, 80, and 95\% confidence
-    intervals. The background is shaded to indicate the top variant in
-    circulation at the time.}
-    \label{fig:six_state_est}
-\end{figure}
-
-By reconstructing the time series of COVID-19 infections per $100,000$
-population for each US state from March 9, 2020 to February 28, 2022, we observe
+From reconstructing the time series of COVID-19 infections per $100,000$
+population for each \US\ state from June 1, 2020 to November 29, 2021, we observe
 rates of infections that vary in intensity and disease burden across space and
-time (\autoref{fig:state_est_upto_dec1121}, \autoref{fig:state_est_after_dec1121},
- \autoref{fig:six_state_est}, \autoref{fig:choro_inf_rates}). The
-largest observed outbreaks at the beginning of the Omicron era (January
-2022) in Nevada, Arizona, and Utah which suggests a similar spread of the virus in
-states that are in close geographic proximity. During this time, the state that
-has the highest rate of infections per 100,000 on single day is Nevada with
-about $3289$ infections per 100,000 on January 9, 2022 (95\% confidence interval:
-$[296, 7431]$), followed by Arizona with $2718$ on January 10, 2022 (95\%
-confidence interval: $[346, 6748]$), and Utah with $2179$ on January 8, 2022
-(95\% confidence interval: $[383, 6955]$).
-Interestingly, Maine has a delayed major spike in mid-February 2022 relative to 
-the other states (which tend to present their major Omicron spikes in January 2022).
-On February 10, 2022, Maine presents the highest estimated infection rate on a day, 
-having about $4464$ infections per 100,000 (95\% confidence interval: $[718, 8211]$).
+time (\autoref{fig:state_infect_est},
+ \autoref{fig:six_state_est}).  
+ Most states present at least two major spikes in infections - the first starts in the fall of 2020 and extends into the winter season, while 
+ the second starts in the late summer of 2021 and proceeds into the mid-fall. These represent major waves driven by the Ancestral and Delta variants.
+Similar patterns in the major surges of infections are observed in nearly all states, though to varying degrees. In general, greater similarities
+in the strength and magnitude of outbreaks are found to emerge in the clusters of
+states that border each other.
 
-Aside from Omicron, most states present smaller surges in infections
-from around November 2020 to January 2021,
-the late summer to fall of 2021 and leading up to the major surge in early 2022,
-which likely represent well-known waves driven by the Ancestral and Delta
-variants. 
+To avoid encroaching upon possible boundary issues with ending the estimation during a time of volatility (the period of the Delta-Omicron transition), 
+we focus on the infection estimates prior to November 1, 2021.
+The largest observed outbreaks prior to this time were observed in the late summer or early fall of 2021
+in Georgia, Louisiana, Idaho, Montana, and Wyoming which suggests a similar spread of the virus in
+small clusters of states that are in close geographic proximity. During this time, the two states that
+have the attain the highest rate of infections per 100,000 on single day are Georgia with
+about $451$ infections per 100,000 on August 15, 2021 (95\% confidence interval:
+$[334, 567]$) and Idaho with $451$ on September 7, 2021 (95\%
+confidence interval: $[312, 590]$). These are closely followed by Montana with $432$ on September 8, 2021
+(95\% confidence interval: $[282, 581]$), Louisiana with $431$ on July 20, 2021
+(95\% confidence interval: $[252, 610]$), and Wyoming with $350$ on November 13, 2020
+(95\% confidence interval: $[256, 444]$).
 
-During the Delta wave in the summer of 2021, the state that has the
+Prior to the Delta wave, the state that has the
 highest rate of infections per 100,000 on single day is Louisiana with about
-600 infections per 100,000 on July 30, 2021 (95\% confidence interval:
-$[474, 728]$), followed by Georgia with 476 on August 8, 2021 (95\%
-confidence interval: $[407, 546]$). These also represent the highest rates of
-infections per 100,000 for any state prior to the domination of the Omicron
-variants. Similar patterns in the major surges of infections are observed in
-nearly all states, though to varying degrees. In general, greater similarities
-in the strength and magnitude of outbreaks are observed in the clusters of
-states that border each other and in those that have similar state health system
-performance (in terms of indicators for the access, cost and the quality of the
-state's healthcare as well as the health-related outcomes as noted in
-\citet{radley2020}). 
-% Maybe note the large confidence intervals for Omicron and much smaller for Delta
+358 infections per 100,000 on July 3, 2021 (95\% confidence interval:
+$[177, 539]$), followed by Wyoming with 349 on November 13, 2020 (95\%
+confidence interval: $[407, 546]$), South Dakota with 342 infections per 100,000 on July 3, 2021 (95\% confidence interval:
+$[177, 539]$), and Illinois with 340 infections per 100,000 on July 3, 2021 (95\% confidence interval:
+$[177, 539]$). During this time, 74\% of the top rates for each state were observed in the late fall or winter of 2020.
 
-\begin{figure}[!tb]
-\centering
-    \includegraphics[width=.99\textwidth]{choro_inf_rates_Nov5.pdf}
-    \caption{Choropleth maps of the state-level estimates of the number of 
-    daily new infections per $100,000$ population for various times 
-    over March 9, 2020 to February 28, 2022. These maps are generated from the \texttt{usmap} 
-    package in R \citep{lorenzo2023usmap}.} 
-    \label{fig:choro_inf_rates}
-\end{figure}
-
-The period of lowest viral transmission is observed in the spring of 2020. In April 2020,
-the states of Vermont and Hawaii achieve the lowest rate of infections 
-over the month of 5.67 and 6.72 infections per 100,000, respectively. These are followed by
-Montana which achieves a rate of 10.6 infections per 100,000 in May 2020. In the spring of
-2020, Montana maintains a rate under 10 infections per 100,000 from the week of April 12, 2020 to 
-May 24, 2020. The states that consistently achieve the lowest rates
-of infections tend to be those that demonstrate better pre-pandemic healthcare performance such as 
-Vermont, New Hampshire, and Hawaii \citep{radley2020}.
+The period of lowest viral transmission is observed in the summer and fall of 2020. 
+During this time, the state of New Hampshire achieves the lowest weekly rate of infections 
+of 0.01 infections per 100,000 for the week of September 13, 2020. In the summer of 
+2020, Vermont maintains a rate under 10 infections per 100,000 from the week of June 1, 2020 to 
+August 30, 2020, which is the longest continuous stretch observed for any state.
 
 From a brief inspection of the geo-contiguous states, we can observe similar patterns in
 surges and periods of waning over time, suggesting that states who share similarities in
 climate and topography performed similarly to each other. More precisely, we can observe
-neighboring states such as New Hampshire and Massachusetts or Washington and Oregon that
+neighboring states such as New Hampshire and Massachusetts or Idaho and Montana that
 present waves that mirror each other in amplitude and timing. 
 
 Interestingly, the two states that are geographically removed from the
 contiguous United States, Alaska and Hawaii, tend to perform quite differently
 from each other later in the pandemic. Alaska generally presents significantly greater rates of
-infections than Hawaii especially during the Omicron era. This suggests that
+infections than Hawaii especially during the Delta era. This suggests that
 it is not so much the non-contiguity aspect as it is other distinguishing
 factors that lead to lower infection rates.
+
 
 %\subsection{Sensitivity analysis}
 % This section is under construction
@@ -901,78 +908,8 @@ factors that lead to lower infection rates.
 
 \section{Discussion}
 
-We obtained retrospective estimates of daily incident infections for each US
-state for March 9, 2020 to February 28, 2022. While all states present waves that
-are associated with the major emerging variant of the time, the clear
-variability in the magnitude of our estimates indicate that the intensity and
-disease burden are heterogenous across states. Yet, there are similar epidemic
-patterns in surges and periods of waning observed in clusters of neighbouring
-states. As well, states with lower reputed healthcare performance tend toward
-higher infection rates during major surges in infections. For instance, Nevada
-and Arizona, which exhibited the highest rates of infections during the major
-Omicron outbreak in January 2022, are both firmly located in the bottom quartile
-in the assessment for access and affordability from the 2020 Scorecard on State
-Health System Performance \citep{radley2020} and in the government estimates of
-per capita personal health care spending by state for that year
-\citep{centers2020health}. So perhaps the apparent difficulty in containing the
-spread during the Omicron wave is at least in part due to the lack of healthcare
-support. As noted in the report, both such states have a notably higher
-proportion of people who are uninsured and adults without a usual source of
-care. For example, the well-documented shortage of healthcare professionals
-impacting these states \citep{do2023nevada, gong2019higher}. Indeed, the
-proportion of adults without a usual source of care is estimated to be well
-above the national average in both states for the pre-pandemic year of 2018
-\citep{radley2020}. In addition, a lack of healthcare professionals means a lack
-of medical guidance at the level of the individual and a lack of opportunity for
-early testing/detection and treatment during the pandemic. This coupled with the typically
-milder symptoms of Omicron in comparison to previous variants may have made it
-more difficult for individuals to identify that they were infected with the
-virus and contributed to the increase in spread in those states. Furthermore, a
-lack of health insurance and the prospect of having to pay costly out-of-pocket
-medical expenses may have deterred people from seeking testing
-\citep{embrett2022barriers} and denied opportunities to get tested when visiting
-a medical professional for reasons unrelated to COVID-19. In contrast, Hawaii,
-Vermont and New Hampshire, which are reported to be top performers in healthcare
-for the domains of access and affordability, prevention and treatment, avoidable
-use and cost, healthy lives, and income disparity in \citet{radley2020}, exhibit
-some of the lowest rates of infections during the pandemic and were routinely subject to
-surges that were lower in intensity.
-%That said, as this link to healthcare performance is largely speculative, a more in-depth analysis that takes into account others' assessments of healthcare performance is necessary to explore the plausible connection between state healthcare performance and infection rates during the height of the pandemic. 
-
-Interestingly, the states with the highest rate of infections during the January
-2022 Omicron wave, Utah, Arizona, and Nevada, are all in the top quartile for
-the percent change in population from 2020 to 2022 based on the annual estimates
-of the resident state populations from the US Census Bureau
-\citep{uscensus2022annual}, suggesting that there may be a connection between
-states that are among the fastest growing and increased infection rates during
-that outbreak. Considering the larger time frame of 2010 to 2020 leading up to
-the pandemic, the US Census Bureau reports that Utah holds the greatest percent
-change in population at about 18.4\%, Nevada is ranked fifth at 15\%, and
-Arizona is ranked $9\th$ at 11.9\% \citep{censusbureau2020}. It is reasonable
-that the faster growing states place more strain on the healthcare system than
-states that grow at a slower pace, limiting access to medical professionals and
-to resources for diagnosing and testing. To elucidate this possible connection,
-further exploration into the impact of state population growth on infection
-waves and healthcare system performance during the pandemic is warranted.
-
-It is reasonable that Montana experienced some of the lowest infection
-rates in the spring of 2020 due having a lower population and population density 
-as well as from having a larger area relative to other states. This combination of favourable
-conditions likely contributed to lower infection rates earlier on in the pandemic.
-Similarly, Hawaii and Alaska were both states that maintained rates of under 
-10 infections per 100,000 for at least three weeks in the spring of 2020. It is 
-plausible their geographic isolation in addition to the previous factors discussed for
-Montana contributed to such lower infections near to the beginning of the pandemic.
-Research by \citet{provenzano2020urban} and \citet{carozzi2022urban} on urban density and COVID-19 
-in US counties found that the geographic connectivity and social connectedness of denser areas 
-likely impacted the timing of outbreaks (so that denser locations were more likely to 
-have outbreaks earlier on), but by the end of 2020, density had little to no impact on time-adjusted 
- COVID-19 cases.
- However, investigation beyond the first year of the pandemic is warranted.
- As well, this study only looks relation between density and cases, not infections 
- Since the relationship between density and infections has remained relatively unexplored, 
- further research should be done to elucidate such connections and how they change over time.
-
+We obtained retrospective estimates of daily incident infections for each \US\
+state for June 1, 2020 to November 29, 2021. 
 Our infection estimates suggest that the pandemic has an impact
 in states earlier and at a larger scale than is indicated by cases. Since
 case reporting is not consistent across time and states, case counts
@@ -980,41 +917,52 @@ underestimate the true number of infections and, hence, the impact of the
 pandemic \citep{cdc2022estimated, simon2022inconsistent}. For example, some
 states report the number of individuals tested rather than the numbers of tests
 performed \citep{schechtman2020counting, chitwood2022reconstructing}.
+Additionally, while the definition of a confirmed COVID-19 case tends to be fairly
+uniform across the United States due to general adherence to the 
+CSTE case definitions, state reporting standards have been known to vary 
+\citep{cste2020, delphiepidata2020}. 
+For instance, there may be inconsistencies across locations if some cases
+are labelled as confirmed based on positive antigen tests instead of PCR
+tests \citep{covidtracking2021}. 
+% As well, the definition of a case and related terminology can change
+% or evolve over time as more information becomes available.  
 
 We observe outbreaks in infections that are difficult to detect from cases
-alone such as the Delta wave that prevailed from July to November 2021 in Connecticut, 
-Rhode Island, Massachusetts, and New Jersey. This suggests that cases paint an incomplete 
+alone such as the Delta wave in New Jersey, Connecticut, and Maryland. 
+This suggests that cases paint an incomplete 
 picture of the pandemic, especially when outbreaks are largely driven by 
-unreported infections. Furthermore, since case report dates follow symptom and infection
+unreported infections. Furthermore, since case report dates generally follow symptom and infection
 onset, cases are a fundamentally flawed indicator of disease burden because they
 have a built-in temporal bias. This is in addition to other biases from
 differences in reporting across states (such as temporary bottlenecks due
 influxes of data or more persistent processing issues that increase the average
-time from case detection to report \citep{wash2020dash, dunkel2020covid19}. So
-while reported cases provide an indication of the trajectory of the pandemic, it
+time from case detection to report \citep{wash2020dash, dunkel2020covid19}. 
+Furthermore, no indication of uncertainty is provided for even the gold standard case estimates
+\citep{delphiepidata2020}. 
+Thus, while reported cases provide an indication of the trajectory of the pandemic, it
 is a delayed and incomplete version. Estimating the new number of infections by
 symptom or infection onset date would more closely align with the definition of
 incidence as we know it \citep{jahja2022real}.
 
 From the correlation analysis between daily infection estimates and
-hospitalizations, a lag of 14 days gives the maximum average correlation 
+hospitalizations, a lag of 13 days gives the maximum average correlation 
 across states. This is in agreement with the early estimates of the average time from
 infection to hospitalization of 9.7 days (95\% CI: $[5.4, 17.0]$) for
 cases reported in January, 2020 in Wuhan, China as well as with estimates from
 across the pandemic in the UK that ranged from an average of 8.0 to 9.7
-days, more precisely, 8.0 days (95\% interval: $[2.7, 18.5]$) for the first
+days (more precisely, 8.0 days (95\% interval: $[2.7, 18.5]$) for the first
 wave to 9.7 days (95\% interval: $[4.1, 19.6]$) for the second wave,
-\citep{ward2021understanding}. However, we should note the first study is based
+\citep{ward2021understanding}). However, we should note the first study is based
 on a small sample size for outbreak cases reported well before our study start
 date. As well, both sets of estimates depend upon the healthcare system and the
 population structure, amongst other things \citep{ward2021understanding}.
-Nevertheless, their relative agreement with our estimate of 14 days for the US
+Nevertheless, their relative agreement with our estimate of 13 days for the \US\
 states lends some credence to of our results. 
 
-While we computed IHRs for all states, it is important to note that the IHR is
- also likely to vary within states and depend on additional variables such as
+While we computed and compared CHRs and IHRs for all states, it is important to note that both
+likely to vary within states and depend on confounding variables such as
  age and the presence of major comorbidities \citep{russell2023comorbidities}.
- Therefore, it would be beneficial to account for such variables in the IHR
+ Therefore, it would be beneficial to account for such variables in their
  calculations by, for example, stratifying infections and hospitalizations by
  age to produce age-specific estimates of the IHRs for each state (similar to
  \citealp{fox2023disproportionate} though with the additional element of being
@@ -1030,12 +978,13 @@ Our approach offers a number of advantages.
 % of a way of modelling immunity and space-time-specific reporting ratios based on 
 % seroprevalence data.
 % Similar phrase on line 1268, though we may want to emphasize that point up here.
-To the best of our knowledge, no other modelling approach has been used to 
-reconstruct the infection time series
-for every state over as much of the COVID-19 pandemic as in this study.
-Furthermore, we aim to incorporate as much state-specific information as
-possible when deriving our estimates. For instance, using variant circulation
-and line list data, we are able to construct incubation and delay distributions
+% To the best of our knowledge, no other modelling approach has been used to 
+% reconstruct the infection time series
+%for every state over as much of the COVID-19 pandemic as in this study. %%
+%Furthermore, 
+For instance, we aim to incorporate as much state-specific information as
+possible when deriving our estimates. By using state case, line list, and
+variant circulation data, we are able to construct incubation and delay distributions
 that are unique for each state. By using time-varying and state-specific
 seroprevalence data, we are able to allow the reporting ratio to vary over both
 time and state, which is an advantage over such ratios that are non-time varying
@@ -1045,12 +994,13 @@ Existing approaches that use the delay distribution to generate infection
 estimates often only construct one delay distribution that is used for all
 states \citep{chitwood2022reconstructing, jahja2022real}. That is, they operate
 under the assumption of geographic invariance, where it is assumed that all
-states have the same patterns of delay from infection onset to case report,
+states have the same patterns of delay from onset to case report,
 which is unlikely to be true due to differences in reporting pipelines, pandemic
 response, and variants in circulation, amongst other things. 
 
-Another major limitation is that these models do not to account for
-reinfections. Now, it may be contended that reinfections do not account for a
+Another major limitation of these existing approaches to derive infections 
+is that they do not to account for reinfections. 
+Now, it may be contended that reinfections do not account for a
 substantial fraction of the infections until later in the pandemic, so they are
 not absolutely necessary to include in the earlier stages of the pandemic.
 Still, at no stage did infection confer lifelong immunity.
@@ -1070,18 +1020,19 @@ to this is the issue of how newer variants may escape detection
 finalized data is used this is less likely to be an issue, this could very well
 pose a problem for real-time estimates of infections.
 
-As for reinfections, it would be ideal to have confirmed rates
-over time for each US state. However, we are unable to find such data available
-over the entire time period considered for even one state. So we have turned to
+Regarding reinfections, a major reason why we chose an end date of November 29, 2021 and ultimately decided to not tread into Omicron territory is because the Omicron variants come with substantial increase in the risk of reinfection in comparison to previous variants as Omicron has been shown to have an increased tendency towards immune escape \citep{wei2024risk, pulliam2022increased, eythorsson2022rate}. So having quality reinfection data that is representative of each location under study is of the utmost importance for the Omicron era. 
+
+While it would be ideal to use confirmed rates over time for each \US\ state, most states do not publicly report reinfection 
+data over the entire time period we considered. So we have turned to 
 suspected reinfection data over time for Clark County, USA, as that surveillance
-is amongst the most detailed that we have found for the United States.
+is among the most detailed and reputable that we have found for the United States.
 Nevertheless, using such localized data raises questions of representativeness
 and the applicability of such estimates to Nevada and all other states.
 Furthermore, this data has no information available beyond suspected third
 infections, which imposes an irremediable bias. However, based on the third
 infection data available there, we expect that the probability of being
 reinfected more than three times is likely very low for time frame considered
-and so the omission of these would impact our infection estimates to a small
+and so the omission of these would impact our infection estimates to a minimal
 extent. 
 
 The vast majority of issues we encountered when trying to reconstruct the
@@ -1119,14 +1070,14 @@ ibarrondo2020rapid}.
 In this work, we do not attempt to directly address infection underascertainment
 due to the increase in asymptomatic infections across variants
 \citep{pho2023covid19}. We simply note that this would likely pose a greater
-problem later in the pandemic, particularly during the Omicron era
+problem later in the pandemic, particularly after the Delta era
 \citep{fan2022sars}. We hope that such infections would be largely represented
 by the seroprevalence and reinfection estimates, but there is undoubtedly
 increasing reliance on such estimates to be able to do this over time (owing to
 the simultaneous decline in the reporting cadence and the apparent rise in
 asymptomatic infections over time) \citep{oph2022covid, garrett2022high,
 blauer2022reduce, ren2021asymptomatic}. Consequently, there is an increasing
-uncertainty over time that is not expressed by the model or the estimates.   
+uncertainty over time that is not captured by the model or the estimates.   
 
 Due to such concerns with the seroprevalence data, one further area of research
 is on investigating the utility of various sources to estimate the incidence of
@@ -1135,7 +1086,7 @@ sources would likely lead to more accurate and stable estimates than those from
 using one source. Wastewater surveillance data is one
 promising source that may be complementary to seroprevalence data, especially
 when testing is low \citep{mcmanus2023predicting}. However, there has been
-limited success in predicting incidence using such data and the extent that
+limited success in predicting incidence using such data. The extent that
 wastewater concentration data is a useful in estimating COVID-19 incidence is
 unclear owing to problems with viral occurrence and detectability in wastewater
 that render detection inconsistent across locations (ex. due to temperature,
@@ -1150,11 +1101,11 @@ indication of the disease intensity over time \citep{ecdc2020strategies}.
 
 Overall, we adopt a relatively simple deconvolution-based approach and devote
 much of our efforts to tailoring our approach to the available data. A
-major result of this was the development of a way of to model the waning
+major result of this is the development of a way of to model the waning
 of detectable antibody levels and space-time-specific reporting ratios based on seroprevalence data.
 In a way, our approach is built for the data rather than trying to force the data to fit
-to an existing approach. However, our model is only as good as the quantity and 
-the quality of the data provided to it. In our case, the lack of data is both a barrier to entry
+to an existing approach. However, our model is only as good as the quality and
+the quantity of the data provided to it. In our case, the lack of data is both a barrier to entry
 and a continual roadblock. The assumptions we are required to make as a
 consequence of this clearly limit the generalizability and call into question
 the reliability of the results. So while we highlight some interesting trends and
@@ -1173,7 +1124,7 @@ infections at the state level by using standard sources of data.
 Our framework is quite versatile as it lends itself to more localized, county or
 community level estimates, or globalized, country-specific estimates.
 Fundamentally, to produce estimates of infections for different geographic
-regions, one would simply need to input the required data and re-run the
+regions, one would simply need to input the required data and re-run the code
 pipeline. In this way, one could readily adapt our approach to generate
 estimates for the provinces in Canada or the regions in England.
 
@@ -1208,7 +1159,20 @@ is based.
 \title{\supptitlefont Online Supplement}
 \maketitle
 
-\section{Additional information about estimation methodology}
+\section{Additional information about dataset used or estimation methodology}
+
+\subsection{Table on the percent pairwise occurrence of events in the CDC line list}
+\begin{table}[h!]
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Order of events}                              & \textbf{Percent pairwise occurrence}                                                                                    & \textbf{Handling}                                                                                                                                                                                                                                                                                                                                                          \\ \hline
+IO $\rightarrow$ SO $\rightarrow$ PS $\rightarrow$ RE & \begin{tabular}[c]{@{}l@{}}PS $\geq$ SO: 97.1 \\ PS = SO: 33.6\\ PS \textgreater RE: 1.74\\  PS = RE: 14.6\end{tabular} & \begin{tabular}[c]{@{}l@{}}This is the idealized order of events and so we \\ built the current support sets for \\ SO $\rightarrow$ PS and PS $\rightarrow$ RE \\ delay distribution constructions around this \\ such that IO comes first by construction, \\ SO typically precedes PS, but may be the same \\ or come before, and RE comes after PS and SO\end{tabular} \\ \hline
+IO $\rightarrow$ PS $\rightarrow$ SO $\rightarrow$ RE & \begin{tabular}[c]{@{}l@{}}PS \textless SO: 2.91 \\ SO $\leq$ RE: 99.3 \\ SO \textless RE: 86.1\end{tabular}            & \begin{tabular}[c]{@{}l@{}}Allowed for negative delays up to the largest \\ non-outlier value for the 0.05 quantile of delay\\ from PS to SO by state\end{tabular}                                                                                                                                                                                                         \\ \hline
+IO $\rightarrow$ PS $\rightarrow$ RE $\rightarrow$ SO & \begin{tabular}[c]{@{}l@{}}RE \textless SO: 0.7 \\ RE \textless PS: 1.7\end{tabular}                                    & \begin{tabular}[c]{@{}l@{}}Nothing because current handling of the CDC \\ of the line list ensures that the most concerning \\ cases are handled where \\ SO = PO = RE, SO = RE and PO = RE\end{tabular}                                                                                                                                                                   \\ \hline
+\end{tabular}
+\caption{Percent pairwise occurrence for the different permutations of events considered in the restricted CDC line list. The abbreviation IO stands for infection onset, SO is symptom onset, PS is positive specimen, and RE is report date. We consider a restricted set of permutations because we assume that IO must come first and that PS must precede report date for a case to be legitimate. Finally, the underlying assumption for the percent pairwise occurrence calculations is that the cases must have both elements present (not missing).}
+\label{order_events_table}
+\end{table}
 
 \subsection{State space representation of the antibody prevalence model}\label{supp:ssapm} 
 
@@ -1291,7 +1255,7 @@ a_{m-1}\\
 a_{m-2}
 \end{bmatrix} & 
 T_m &= \begin{bmatrix}
- \gamma & \sum_{t = m-1}^{m} C_t z_m & 0 & 0\\ 
+ \gamma & C_{m-1}^m z_m & 0 & 0\\ 
  0 & 3 & -3 & 1 \\ 
  0 & 1 & 0 & 0\\ 
  0 & 0 & 1 & 0
@@ -1357,7 +1321,7 @@ from the linear models for the sources where the observed seroprevalence
 measurements are regressed on the enumerated dates. The initial value of 
 the multiplier is set to be $100$ for all states. The $\sigma^2_s$ and $\gamma$ 
 values are fixed and from averaging the estimated values for all states on the real line
-(obtained under the starting conditions $\sigma^2_s = 0.00003$, $\gamma = 0.99$,
+(obtained under the starting conditions $\sigma^2_s = 0.000003$, $\gamma = 0.99$,
 and $\sigma^2_o$ as described).
 
 Following the maximum likelihood estimation of the two non-fixed parameters
