@@ -8,10 +8,12 @@
 \usepackage{ragged2e}
 \usepackage{xr-hyper}
 \usepackage{array}
+\usepackage{caption}
+\usepackage{subcaption}
 
 \usepackage[colorlinks=true,citecolor=blue,urlcolor=blue,linkcolor=blue]{hyperref}
 \usepackage[margin=1in]{geometry}
-\usepackage[round]{natbib}
+\usepackage[super,sort&compress]{natbib}
 
 \usepackage[utf8]{inputenc} % allow utf-8 input
 \usepackage[T1]{fontenc}    % use 8-bit T1 fonts
@@ -142,7 +144,11 @@
 \def\cY{\mathcal{Y}}
 \def\cZ{\mathcal{Z}}
 
+\usepackage{xspace}
+\makeatletter
+\DeclareRobustCommand\onedot{\futurelet\@let@token\@onedot}
+\def\@onedot{\ifx\@let@token.\else.\null\fi\xspace}
 
 \def\given{\mid}
-\def\US{U.S.}
+\def\US{U.S\onedot}
 \def\indicator{\mathbf{1}}
