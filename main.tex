@@ -675,6 +675,8 @@ encouraged by the ability to use routine data to produce sensible estimates of
 infections in the United States and the plausibility of the apparent geospatial
 and temporal trends. 
  
+
+
 % Our approach is predicated upon having case, line list, viral circulation, and
 % seroprevalence data for each state, all of which are readily available (or
 % available upon request in the case of restricted line list data). As a result of
@@ -698,11 +700,13 @@ pandemic.
 
 \section{Methods}
 
+
 In what follows, we provide details on how we estimate the daily incident
 infections for each state over the considered time period of June 1, 2020 to
-November 29, 2021 and the data we used to achieve this. We start with a brief
-introduction to each data source used and follow this with a description of each
-major analysis task in the order they are performed.
+November 29, 2021 and the data we used to achieve this. 
+% We start with a brief
+% introduction to each data source used and follow this with a description of each
+% major analysis task in the order they are performed.
 \autoref{fig:cases_to_infect_flowchart} provides a visual summary of the data,
 analysis tasks, and the relationships between them. The major analysis tasks
 this figure aims to convey are as follows: First, we estimate variant-specific
@@ -745,7 +749,83 @@ daily incident infection estimates.
 % So I am not convinced we should extrapolate multiple months away from the start or end for sero. 
 % One month in either direction seems reasonable & doesn't overreach.
 
-\subsection{Data} 
+
+
+
+
+
+
+\subsection{Estimating delay distributions from private line lists}
+\label{sec:delaystop}
+
+We obtain de-identified patient-level line list data on COVID-19 cases from the
+CDC. Although there are both public and restricted versions of the dataset
+available containing the same patient records \citep{cdc2020casepub,
+cdc2020caserestr}, only the restricted dataset contains information on the state
+of residence. The three key dates of interest are those for symptom onset,
+positive specimen collection, and report to the CDC. Handling missingness and
+imputation in these dates is somewhat complicated, and additional details and
+justifications are deferred to \autoref{sec:linelist-details}.
+
+We use the line list to estimate the delay distribution for the pairs symptom
+onset to positive specimen and positive specimen to report. We provide the full
+procedure for the latter, before giving a brief description below for the
+former. First, define $z_{\ell,t}$ to be a case report occurring at time $t$ in
+location $\ell$, and let $\pi_{\ell,t}(k)$ to be the probability that
+$z_{\ell,t}$ has a positive specimen collected $k$ days earlier. We assume that
+all positive specimens will be reported within 60 days and that no test will be
+reported on the same date as it was collected, that is, $\pi_{\ell,t}(0) = 0$
+and $\pi_{\ell,t}(k) = 0$ whenever $k > 60$. Let $N_{\ell,t}$ be the number of
+$z_{\ell,s}$ with $s\in[t-75+1,t+60] = \mathcal{S}_t$ and positive specimen date
+greater than $s-60$. Then, we first compute
+\begin{align*}
+    \tilde{p}_{\ell,t}(k) = \frac{1}{N_{\ell,t}}\sum_{s \in \mathcal{S}_t}
+    \big(\textrm{\# $z_{\ell,s}$ with positive specimen at $s-k$}\big).
+\end{align*}
+Next we compute a similar national quantity $\tilde{p}_{t}(k) =
+\frac{1}{N_{t}}\sum_{s \in \mathcal{S}_t} \big(\textrm{\# $z_{s}$ with positive
+specimen at $s-k$}\big)$, without restricting to location $\ell$. Next, let
+$\alpha_{\ell,t}$ be the ratio of $N_{\ell,t}$ to the number of cases reported
+by JHU CSSE\cite{dong2020interactive} in the same window. Then, compute
+$p_{\ell,t}(k) = \alpha_{\ell,t}\tilde{p}_{\ell,t}(k) +
+(1-\alpha_{\ell,t})\tilde{p}_t(k)$. This construction allows for more reliance
+on the state estimate when there are more CDC cases relative to JHU (and vice
+versa). We calculate the mean $m_{\ell,t}$ and variance $v_{\ell,t}$ of
+$\{p_{\ell,t}(k) : 0<k\leq 60\}$ and estimate a gamma distribution by solving
+the moment equations $m_{\ell,t} = \alpha_{\ell,t}\theta_{\ell,t}$ and
+$v_{\ell,t}= \alpha_{\ell,t}\theta_{\ell,t}^2$ for the shape $\alpha_{\ell,t}$
+and scale $\theta_{\ell,t}$. Finally, we discretize the resulting gamma density
+to the support set of 1 to 60 days to produce an estimate
+$\{\widehat{\pi}_{\ell,t}(k): 0 < k \leq 60\}$ of the delay distribution
+$\pi_{\ell,t}$.
+ 
+Estimating the delay from symptom onset to positive specimen date follows the
+same procedure with a few minor adjustments. First, we allow $k$ to range from
+$-3$ to $21$ (rather than 1 to 60). These upper and lower bounds are based on
+the largest delay values for the state-wide 0.05 and 0.95 quantiles. This is
+reasonable because the median delay is very short at approximately 2 days, and
+an asymptomatic individual may test positive following a known exposure, before
+the onset of symptoms. Additional minor details are discussed in
+\autoref{sec:delay-justifications}.
+
+
+
+\subsection{Estimating the incubation period distributions} 
+
+\attn{DJM: I stopped here, for now.}
+
+One incubation period distribution is estimated for each variant under
+consideration. The variants we consider are Alpha, Beta, Gamma, and Delta, which
+are included because they are are designated to be variants of concern by WHO
+based on their potential to cause new waves, dethrone the dominant variant, and
+lead to changes in public health policy \citep{who2021tracking}. In addition, we
+include the Epsilon (California) and Iota (New York) variants because of their
+impact on those and the surrounding states \citep{yang2022investigation,
+duerr2021dominance}. We relegate all other variants to be in the Other category
+(which, for our purposes, is treated as a catch-all for all 2020 Ancestral
+variants observed in the U.S.) This decision to include an Other category is, in
+part, motivated by the lack of sequencing data for most states in 2020 as well
+as the presence of an Others category in the sequencing data for that time. 
 
 We obtain literature estimates of the variant-specific incubation periods for
 the following eight variant categories: Ancestral, Alpha, Beta, Epsilon, Iota,
@@ -760,18 +840,97 @@ Epsilon, Iota, and Beta are all children from the same parent in the
 phylogenetic tree of the Nextstrain Clades (as depicted in
 \citealp{hodcroft2021covariants}). 
 
+We construct the incubation period distributions for the variants as gamma
+distributions. These distributions are the same for all states and based on
+literature estimates of the gamma parameters or the mean and standard deviation
+of the incubation period (in which case the method of moments is used to fit a
+gamma density). Then, we discretize each resulting density to the support set,
+which is taken to be from 1 and 21 days. In other words, those are taken to be
+the lower and upper limits for the number of days that the virus could be
+incubating in someone. The implicit assumption for the lower bound is that there
+must be at least one day between infection and symptom onset (which follows the
+convention given in \citealp{phcan2021covid}). The assumption underlying the
+upper bound is that 21 days is the maximum number of days that the virus could
+be incubating in someone (which is reasonable based on
+\citealp{zaki2021estimations} and \citealp{cortes2022sars}).
+
+\subsection{Variant circulation proportions}
+
 To estimate the daily proportions of the variants circulating in each state, we
 obtain the GISAID genomic sequencing data counts from CoVariants.org
 \citep{hodcroft2021covariants, elbe2017data}. Since these counts are biweekly totals, we
 apply multinomial logistic regression using a third-order polynomial in time to
 get estimates of the daily proportions for the eight variant categories
 separately for each state.
-% This relatively simple model was selected because it allows for exponential growth 
-% and different rates by variant.
-% Since these counts are biweekly totals, we use
-% a simple convex optimization approach to interpolate daily numbers, where we
-% enforce that the counts in each interval must sum to the right boundary (the
-% biweekly total) and linear growth between the pairs of adjacent days. 
+
+\attn{write down the model and define notation. Then show the result for one
+state: show the original proportions on the left, and the smoothed on the
+right.}
+
+
+\subsection{Convolutional estimates of the infection to positive specimen distributions} 
+
+The previous two steps enabled us to estimate one incubation period per variant
+and one symptom onset to positive specimen distribution for each state at each
+time under consideration. We proceed to convolve each such pair of distributions
+to get estimated infection to positive specimen distributions and, hence,
+estimated time-varying probabilities for the delay from infection onset to
+positive test specimen date for each state.
+
+\subsection{Retrospective deconvolution}
+
+The main goal for the retrospective deconvolution stage is to estimate the daily
+number of new infections for each time using the dates that those cases were
+eventually reported. To this end, there are two types of deconvolution
+performed. The first is the deconvolution from report to positive specimen date
+and the second is from positive specimen date to infection onset date. We
+allocated the deconvolutions in this way to allow us to get the daily
+deconvolved case estimates by variant. The intermediate of positive specimen
+date was chosen because the variant proportion estimates are aligned to this
+date. So for each state at each time, nine deconvolutions are performed in
+total. The first is the deconvolution from report to positive specimen date,
+followed by the eight deconvolutions from positive specimen to infection onset
+for the eight different variant categories.
+
+We will start by describing the first type of deconvolution performed from
+report to positive specimen date in detail and then describe the second type in
+terms of the changes made with respect to the first. For each state, we achieve
+the first goal to estimate positive specimen dates for the cases by solving an
+optimization problem. 
+% Following the notation of \citet{jahja2022real} (save for suppressing the
+% state/location subscript), 
+For this problem, let $\cT$ represent the extended deconvolution period from
+March 1, 2020 to March 1, 2023, which was used to minimize the effect of
+boundary issues and to produce sufficient deconvolved case estimates for further
+analysis. Let $\hat{p}_t$ be probabilities from the estimated positive specimen
+to report date distribution for $t \in \cT$, $y_t$ the number of new cases
+reported, and where $D^{(4)}$ is the discrete derivative matrix of order 4 such
+that $D^{(4)}x$ yields all $4\th$-order differences of the vector $x$. From
+these, we estimate the deconvolved case counts across time by solving for the
+vector $x$ in
+\begin{align*}
+\minimize_{x}\ \sum_{t \in \cT} \left ( y_t -  \sum_{k = 1}^{d} \hat{p}_t(k)x_{t-k} 
+\right )^2 + \lambda \|D^{(4)}x\|_1. 
+\end{align*}
+
+The above loss function decouples into two parts which trade data fidelity with
+desired smoothness (that
+encapsulate the classic bias-variance trade off). The first part represents
+minimizing the sum of squared errors between the JHU reported cases and the
+estimates, while the second part captures the smoothness of the estimates
+(smaller values being more smooth). The tuning parameter $\lambda$ determines
+the relative importance of these competing goals.
+
+We solve this trend-filtering-regularized least squares deconvolution problem by
+employing the ADMM algorithm from \citet{ramdas2016fast} that is described in
+Appendix A of \citet{jahja2022real}. The solution to the problem is an adaptive
+piecewise cubic polynomial \citep{tibshirani2014adaptive,
+tibshirani2022divided}.
+
+We select the tuning parameter, $\lambda$, by using $3$-fold cross validation
+similar to \citet{jahja2022real} in which every third infection count is
+reserved for testing. The tuning parameter that results in the smallest mean
+squared error is selected.
 
 The COVIDcast API \citep{reinhart2021open} is used to retrieve the daily number
 of new confirmed COVID-19 cases for each state that are based on reports from
@@ -781,106 +940,40 @@ daily number of confirmed COVID-19 hospital admissions for each state that are
 collected by the \US Department of Health and Human Services (HHS). Both
 datasets are updated as of June 6, 2022.
 
-We obtain de-identified patient-level line list data on COVID-19 cases from the
-CDC. Although there are both public and restricted versions of the dataset
-available containing the same patient records \citep{cdc2020casepub,
-cdc2020caserestr}, the restricted dataset is selected because it contains
-information on the state of residence which is essential for constructing
-state-specific delay distributions. Since the restricted dataset is updated
-monthly and cases may undergo revision, we use a single version of it that was
-released on June 6, 2022. We consider this version to be finalized in that it
-well-beyond our study end date such that the dataset is unlikely to be subject
-to further significant revisions.
+From this first type of deconvolution, we obtain case estimates by positive
+specimen date for each state. The second type of deconvolution, where the goal
+is to get estimates of the infection onset date for these cases, follows the
+form of first type, save for two key modifications to the inputs. Firstly, we
+utilize the results from the first deconvolution and, secondly, we must update
+the probabilities to be the convolutional estimates of the infection to positive
+specimen distributions. Thus, for a fixed variant category, $y_t$ is the number
+of new cases deconvolved to positive specimen date multiplied by the estimated
+proportion of the variant in circulation in the state at $t$, and $\hat{p}_t$
+are the probabilities from the estimated infection onset to positive specimen
+distribution for $t \in \cT$. With these modifications to the inputs, the
+deconvolution proceeds in the exact same way as before. Since this deconvolution
+is done separately for each variant category, we ultimately obtain deconvolved
+case estimates by the date of infection onset that are separated by variant.
 
-In this dataset, the three key variables of interest are the dates of symptom
-onset, positive specimen date and report to the CDC.
-Table~\ref{order_events_table} presents the percent of pairwise occurrences for
-the different possible permutations of events in the line list. Essentially,
-most cases follow the idealized ordering shown by
-\autoref{fig:chain_events_onset_report} and so we adhere to this construction as
-much as possible. 
+\subsection{Inverse reporting ratio and the antibody prevalence model} 
 
-We observe that the line list is prone to high percentages of missing data,
-notably with respect to our variables of interest. Approximately 62.3\% of cases
-are missing the symptom onset date, 55.4\% are missing positive specimen date,
-and 8.96\% of cases are missing the report date. Relatedly, we faced the
-fundamental issue that \citet{jahja2022real} described, in which cases with
-missing report dates may be filled with their symptom onset date. On top of
-this, we have the additional factor of positive specimen date to contend with.
-Previous correspondence with the CDC confirms that the imputation issue extends
-to this variable as well. So it is possible that all three variables may be
-imputed with the same date for a case. However, we only actually deal with
-select pairs of events; we do not use all three at once in our construction of
-the delay distributions or anywhere else in our analysis. Therefore, we restrict
-our investigation of missingness to the pairs of events.
-\autoref{fig:prop_cc_zero_delay} suggests that this issue impacts states
-differentially due to the inconsistent proportions of zero delay between
-positive specimen and report date across states. 
+The infection estimates from retrospective deconvolution are derived solely from
+the infection onset dates of the reported cases. To capture the unreported
+infections, it is necessary to adjust these deconvolved case estimates by a
+scaling factor that approximates the ratio of the true number of new infections
+to the new reported infections. We refer to this quantity as the inverse
+reporting ratio and denote it by $a_t$ for day $t$. Our new goal is to estimate
+this quantity for every state at every time under consideration from June 1,
+2020 to November 29, 2021.
 
-Due to the contamination in the zero delay cases (the true extent of which is
-unknown to us), we omit all such cases where the positive specimen and report
-dates have zero delay from our analysis. We choose to allow for zero and
-negative delay for symptom onset to report because correspondence with the CDC
-confirms the distinct possibility that a person could test positive before
-symptom onset and it is a reasonable ordering to expect if, for example, the
-individual is aware that they have been exposed to an infected individual. We
-explain how we incorporated these variations in the ordering of events into our
-analysis in Section~\ref{delaystop}. 
-
-\begin{figure}[!tb]
-\centering
-    \includegraphics[width=.99\textwidth]{prop_cc_zero_delay.pdf}
-    \caption{Proportions of complete cases with zero delay between positive specimen
-     and report date in the restricted CDC line list dataset.}
-    \label{fig:prop_cc_zero_delay}
-\end{figure}
-
-For the same release date, the restricted line list contains 74,849,225 cases
-(rows) in total compared to 84,714,805 cases reported by the JHU CSSE; that is,
-line list is missing about 10 million cases. The extent that this issue impacts
-each state is shown in \autoref{fig:prop_cc_cdc_vs_jhu}, from which it is clear
-the fraction of missing cases is substantial for many states, often surpassing
-50\% \citep{jahja2022real}. In addition, the probability of being missing does
-not appear to be the same for states, so there is likely bias introduced from
-using the complete case line list data. We consider such bias to be unavoidable
-in our analysis due to a lack of alternative line list sources.
-
-\begin{figure}[!tb]
-\centering
-    \includegraphics[width=0.99\textwidth]{prop_cc_cdc_vs_jhu.pdf} 
-    \caption{Complete case counts by state in the CDC line list versus the 
-    cumulative complete case counts from JHU CSSE as of June 6, 2022.
-     All counts have been scaled by the 2022 state populations as of
-     July 1, 2022 from \citet{uscensus2022annual}.}
-    \label{fig:prop_cc_cdc_vs_jhu}
-\end{figure}
-
-In the line list, we observe unusual jarring spikes in reporting in 2020
-compared to 2021. Upon plotting by report date, we find that a few states are
-contributing unusually large case counts on isolated days very late in the
-reporting process (usually well beyond 50 days). We strongly suspect that these
-large accumulations of cases over time are due breakdowns of the reporting
-pipeline (which may be expected to occur more frequently in the year following
-its instantiation than later in time). Such anomalies are not likely to be
-reliable indicators of the delay from positive specimen to case report.
-Therefore, we devise a simple, ad hoc approach to detect and prune these
-reporting backlogs.
-
-First, we obtain the part of the line list intended for the positive specimen to
-case report delay estimation, where both such dates are present and where zero
-and negative delay cases have been omitted. Then, for each of the three dates of
-June 1, September 1, and December 1, 2020, we bin the reporting delays occurring
-from 50 days up to the maximum observed delay. For each bin, we obtain the total
-delay count for each state. We check whether each count on the log scale is at
-least the median (for the bin) plus 1.5 times the interquartile range and retain
-only those that exceed this criterion as potential candidates for pruning. Next,
-we compute the counts by report date for each candidate state. If there is a
-report date with a count greater than or equal to the pre-specified threshold,
-then we remove those cases from the line list. Based on inspection and
-intuition, we set the threshold to 2000 for the first two bins, and then lower
-it to 500 for the remaining bins. A similar trial and error approach is used to
-set the bin size (to 50 days). % Area for sensitivity
-% analysis? Also, could discuss the choice of using only 3 dates 
+The number of new reported infections is obtained from our deconvolved case
+estimates. As for the true infections, since seroprevalence of anti-nucleocapsid
+antibodies is used to estimate the percentage of people who have at least one
+resolving or past infection \citep{cdc2020data}, we can use the change in
+subsequent seroprevalence measurements to capture new infections, accounting for
+those whose antibody levels fall below the detection threshold. We can adjust
+the retrospective deconvolution estimates using a model that is based on such
+seroprevalence estimates.
 
 To estimate the proportion of the population in each state with evidence of
 previous infection across time, we use two major seroprevalence surveys that
@@ -949,11 +1042,6 @@ aggregate the measurements into one per month per state by using a weighted
 average (to account for the given sample sizes of the regions). The median of
 the median dates is taken to be the date for the weighted average.
 
-For adjusting our infection counts, annual estimates of the resident state
-populations as of July 1 of 2020 and 2021 are taken from the December
-2022 press release on the \US Census Bureau website \citep{uscensus2022annual}.
-Unless otherwise specified, we use the July 1, 2020 estimates.
-
 The daily fraction of new infections are estimated from the provided incidence
 of suspected reinfections over March 2020 to April 2022 in Clark County, which
 is based on surveillance work conducted by the Southern Nevada Health District
@@ -963,220 +1051,6 @@ suspected reinfections by all new PCR-identified cases during the same week.
 %Possible problem here – reinfections not include third infections (see comments
 % in the discussion section about this)
 
-% Possible change to the paper based on Ajitesh's feedback - 
-% Main contribution is the model, shows without reinfection 
-% & here's an extension that shows how to include reinfection data. 
-
-\subsection{Estimating the delay from positive specimen to report date} 
-
-We use the restricted CDC line list to estimate the distribution between
-positive specimen and report for each state at each time. To formalize this, let
-$y_t$ denote the count of new cases reported at time $t$ and $x_t$ denote the
-count of deconvolved cases with positive specimen at $t$. For all cases in the
-line list that had both a positive specimen and a report date, we can count the
-those that are reported at time $t$ by enumerating them according to positive
-specimen date (similar to how symptom onset date was used in
-\citealp{jahja2022real}):
-\begin{align*}
-y_t = \sum_{s=1}^{t} \sum_{i=1}^{x_s}\indicator \left ( \text{the }i\th\text{ positive specimen at }
- s \text{ gets reported at }t \right ).
-\end{align*}
-Taking the conditional expectation of the above yields
-\begin{align*}
-\E(y_t \mid x_s, s \leq t) = \sum_{s=1}^{t} \pi_t(s) x_s ,
-\end{align*}
-where $\pi_t(s) = \P(\text{case report at }t \mid \text{positive specimen date
-at }s)$ for each $s \leq t$ are the delay probabilities and the $\{ \pi_t(s) : s
-\leq t \}$ sequence comprises the delay distribution at time $t$. Notice that
-there are no time restrictions placed on the positive specimen date, except that
-it must have been between the start of the pandemic and the report date,
-inclusive. This is unlikely to be a realistic assumption to make as $t$ moves
-farther away from $s$. 
-
-Thus, we make two key assumptions about these distributions. First, positive
-specimen tests that are reported to the CDC are always reported within $d = 60$
-days, which is true for the majority of the reported cases. Second, the
-probability of zero delay is zero, which stems from the contamination of
-zero-delay in the line list. As in \citet{jahja2022real}, we update the
-conditional expectation formula to reflect these two assumptions: 
-\begin{align*}
-\E(y_t \mid x_s, s \leq t) = \sum_{k=1}^{60} p_t(k) x_{t-k}
-\end{align*}
-where for $k = 1, \dots, 60$,
-\begin{align*}
-p_t(k) = \P(\text{case report at }t \mid \text{positive specimen at }t-k).
-\end{align*}
-
-For each state, we estimate the positive specimen to report date distribution at
-each $t$ by using the empirical distribution of all non-zero lags between the
-complete cases whose positive specimen dates fall in the interval around $t$
-designated by $[ t - 75 + 1, t + 60]$). 
-
-Now, the task of estimating the positive specimen to report date distribution
-for each state at each time requires four distinct steps. First, we obtain the
-empirical distribution of all lags (excluding zero) from all cases with positive
-specimen dates falling in the roughly center-aligned interval. Next, we weight
-the state-specific empirical distribution by the proportion of CDC cases to JHU
-cases. That is, we compare the number of CDC cases used to create the empirical
-distribution to the number of cases reported by JHU in the time window of
-$\left[t - 60 + 2, t + 75\right]$ (to correspond appropriately to the interval
-for the CDC cases). This proportion is used as the weight for the state's
-empirical distribution, while the complement is used to weight the overall
-empirical distribution that is formed from the data for all states. This
-construction allows for more reliance on the state's distribution when there are
-more CDC cases relative to JHU (and vice versa). After implementing the
-shrinkage method, we fit a gamma density to the resulting empirical distribution
-by the method of moments. Finally, we discretize the resulting density to the
-support set of 1 to 60 days.
- 
-\subsection{Estimating the delay from symptom onset to positive specimen date}  
-\label{sec:delaystop} %% Maybe add appendix plots here?
-
-The task of estimating the delay from symptom onset to positive specimen date
-follows the same procedure as for positive specimen to report date with a few
-key data-driven amendments. Firstly, we allow for negative delays to account for
-the possibility that an individual case tests positive before symptom onset.
-Under this assumption, the lower and upper bounds for the support of $-3$ and
-$21$ are chosen based on the largest delay values for the statewise 0.05 and
-0.95 quantiles that are not outliers. Secondly, we allow for zero delay because
-the median statewise delay is very short at approximately 2 days. Thirdly, there
-are times where the empirical probability was observed to be precisely 1 at zero
-delay and the proportion of CDC relative to JHU cases used for the weight was
-also 1. Since we believe that having zero delay for all cases is unrealistic and
-unlikely to be representative of all cases for the state, we inject a small
-amount of variance manually by setting the the CDC-to-JHU proportion to be the
-minimum shrinkage proportion observed for the affected state (such instances
-were isolated to the state of New Hampshire). Aside from these modifications,
-the construction of the delay distribution proceeds in precisely the same manner
-as for positive specimen to report date. 
-
-\subsection{Estimating the incubation period distributions} 
-
-One incubation period distribution is estimated for each variant under
-consideration. The variants we consider are Alpha, Beta, Gamma, and Delta, which
-are included because they are are designated to be variants of concern by WHO
-based on their potential to cause new waves, dethrone the dominant variant, and
-lead to changes in public health policy \citep{who2021tracking}. In addition, we
-include the Epsilon (California) and Iota (New York) variants because of their
-impact on those and the surrounding states \citep{yang2022investigation,
-duerr2021dominance}. We relegate all other variants to be in the Other category
-(which, for our purposes, is treated as a catch-all for all 2020 Ancestral
-variants observed in the U.S.) This decision to include an Other category is, in
-part, motivated by the lack of sequencing data for most states in 2020 as well
-as the presence of an Others category in the sequencing data for that time. 
-
-We construct the incubation period distributions for the variants as gamma
-distributions. These distributions are the same for all states and based on
-literature estimates of the gamma parameters or the mean and standard deviation
-of the incubation period (in which case the method of moments is used to fit a
-gamma density). Then, we discretize each resulting density to the support set,
-which is taken to be from 1 and 21 days. In other words, those are taken to be
-the lower and upper limits for the number of days that the virus could be
-incubating in someone. The implicit assumption for the lower bound is that there
-must be at least one day between infection and symptom onset (which follows the
-convention given in \citealp{phcan2021covid}). The assumption underlying the
-upper bound is that 21 days is the maximum number of days that the virus could
-be incubating in someone (which is reasonable based on
-\citealp{zaki2021estimations} and \citealp{cortes2022sars}).
-
-\subsection{Convolutional estimates of the infection to positive specimen distributions} 
-
-The previous two steps enabled us to estimate one incubation period per variant
-and one symptom onset to positive specimen distribution for each state at each
-time under consideration. We proceed to convolve each such pair of distributions
-to get estimated infection to positive specimen distributions and, hence,
-estimated time-varying probabilities for the delay from infection onset to
-positive test specimen date for each state.
-
-\subsection{Retrospective deconvolution}
-
-The main goal for the retrospective deconvolution stage is to estimate the daily
-number of new infections for each time using the dates that those cases were
-eventually reported. To this end, there are two types of deconvolution
-performed. The first is the deconvolution from report to positive specimen date
-and the second is from positive specimen date to infection onset date. We
-allocated the deconvolutions in this way to allow us to get the daily
-deconvolved case estimates by variant. The intermediate of positive specimen
-date was chosen because the variant proportion estimates are aligned to this
-date. So for each state at each time, nine deconvolutions are performed in
-total. The first is the deconvolution from report to positive specimen date,
-followed by the eight deconvolutions from positive specimen to infection onset
-for the eight different variant categories.
-
-We will start by describing the first type of deconvolution performed from
-report to positive specimen date in detail and then describe the second type in
-terms of the changes made with respect to the first. For each state, we achieve
-the first goal to estimate positive specimen dates for the cases by solving an
-optimization problem. 
-% Following the notation of \citet{jahja2022real} (save for suppressing the
-% state/location subscript), 
-For this problem, let $\cT$ represent the extended deconvolution period from
-March 1, 2020 to March 1, 2023, which was used to minimize the effect of
-boundary issues and to produce sufficient deconvolved case estimates for further
-analysis. Let $\hat{p}_t$ be probabilities from the estimated positive specimen
-to report date distribution for $t \in \cT$, $y_t$ the number of new cases
-reported, and where $D^{(4)}$ is the discrete derivative matrix of order 4 such
-that $D^{(4)}x$ yields all $4\th$-order differences of the vector $x$. From
-these, we estimate the deconvolved case counts across time by solving for the
-vector $x$ in
-\begin{align*}
-\minimize_{x}\ \sum_{t \in \cT} \left ( y_t -  \sum_{k = 1}^{d} \hat{p}_t(k)x_{t-k} 
-\right )^2 + \lambda \|D^{(4)}x\|_1. 
-\end{align*}
-
-The above loss function decouples into two parts which trade data fidelity with
-desired smoothness (that
-encapsulate the classic bias-variance trade off). The first part represents
-minimizing the sum of squared errors between the JHU reported cases and the
-estimates, while the second part captures the smoothness of the estimates
-(smaller values being more smooth). The tuning parameter $\lambda$ determines
-the relative importance of these competing goals.
-
-We solve this trend-filtering-regularized least squares deconvolution problem by
-employing the ADMM algorithm from \citet{ramdas2016fast} that is described in
-Appendix A of \citet{jahja2022real}. The solution to the problem is an adaptive
-piecewise cubic polynomial \citep{tibshirani2014adaptive,
-tibshirani2022divided}.
-
-We select the tuning parameter, $\lambda$, by using $3$-fold cross validation
-similar to \citet{jahja2022real} in which every third infection count is
-reserved for testing. The tuning parameter that results in the smallest mean
-squared error is selected.
-
-From this first type of deconvolution, we obtain case estimates by positive
-specimen date for each state. The second type of deconvolution, where the goal
-is to get estimates of the infection onset date for these cases, follows the
-form of first type, save for two key modifications to the inputs. Firstly, we
-utilize the results from the first deconvolution and, secondly, we must update
-the probabilities to be the convolutional estimates of the infection to positive
-specimen distributions. Thus, for a fixed variant category, $y_t$ is the number
-of new cases deconvolved to positive specimen date multiplied by the estimated
-proportion of the variant in circulation in the state at $t$, and $\hat{p}_t$
-are the probabilities from the estimated infection onset to positive specimen
-distribution for $t \in \cT$. With these modifications to the inputs, the
-deconvolution proceeds in the exact same way as before. Since this deconvolution
-is done separately for each variant category, we ultimately obtain deconvolved
-case estimates by the date of infection onset that are separated by variant.
-
-\subsection{Inverse reporting ratio and the antibody prevalence model} 
-
-The infection estimates from retrospective deconvolution are derived solely from
-the infection onset dates of the reported cases. To capture the unreported
-infections, it is necessary to adjust these deconvolved case estimates by a
-scaling factor that approximates the ratio of the true number of new infections
-to the new reported infections. We refer to this quantity as the inverse
-reporting ratio and denote it by $a_t$ for day $t$. Our new goal is to estimate
-this quantity for every state at every time under consideration from June 1,
-2020 to November 29, 2021.
-
-The number of new reported infections is obtained from our deconvolved case
-estimates. As for the true infections, since seroprevalence of anti-nucleocapsid
-antibodies is used to estimate the percentage of people who have at least one
-resolving or past infection \citep{cdc2020data}, we can use the change in
-subsequent seroprevalence measurements to capture new infections, accounting for
-those whose antibody levels fall below the detection threshold. We can adjust
-the retrospective deconvolution estimates using a model that is based on such
-seroprevalence estimates.
  
 To adapt to the sparseness in the seroprevalence data, we convert our daily data
 to weekly by summing the reported infections and shifting the observed
@@ -1311,7 +1185,7 @@ IO $\rightarrow$ PS $\rightarrow$ SO $\rightarrow$ RE & \begin{tabular}[c]{@{}l@
 IO $\rightarrow$ PS $\rightarrow$ RE $\rightarrow$ SO & \begin{tabular}[c]{@{}l@{}}RE \textless SO: 0.7 \\ RE \textless PS: 1.7\end{tabular}                                    & \begin{tabular}[c]{@{}l@{}}Nothing because current handling of the CDC \\ of the line list ensures that the most concerning \\ cases are handled where \\ SO = PO = RE, SO = RE and PO = RE\end{tabular}                                                                                                                                                                   \\ \hline
 \end{tabular}
 \caption{Percent pairwise occurrence for the different permutations of events considered in the restricted CDC line list. The abbreviation IO stands for infection onset, SO is symptom onset, PS is positive specimen, and RE is report date. We consider a restricted set of permutations because we assume that IO must come first and that PS must precede report date for a case to be legitimate. Finally, the underlying assumption for the percent pairwise occurrence calculations is that the cases must have both elements present (not missing).}
-\label{order_events_table}
+\label{tab:order_events_table}
 \end{table}
 
 \subsection{State space representation of the antibody prevalence model}\label{supp:ssapm} 
@@ -1544,6 +1418,163 @@ hospitalizations by about $17$ days.
     for which the highest average correlation is attained.}
     \label{fig:adj_unadj_sym_hosp_lag_corr}
 \end{figure}
+
+
+\subsection{Scaling by population}
+
+Annual estimates of the resident state
+populations as of July 1 of 2020 and 2021 are taken from the December
+2022 press release on the \US Census Bureau website \citep{uscensus2022annual}.
+Unless otherwise specified, we use the July 1, 2020 estimates.
+
+
+\subsection{Additional details on the date fields in the CDC linelist}
+\label{sec:linelist-details}
+
+Since the restricted dataset is updated
+monthly and cases may undergo revision, we use a single version of it that was
+released on June 6, 2022. We consider this version to be finalized in that it
+well-beyond our study end date such that the dataset is unlikely to be subject
+to further significant revisions.
+
+\autoref{tab:order_events_table} presents the percent of pairwise occurrences
+for the different possible permutations of events in the line list. Essentially,
+most cases follow the idealized ordering shown by
+\autoref{fig:chain_events_onset_report} and so we adhere to this construction as
+much as possible.
+
+ 
+
+We observe that the line list is prone to high percentages of missing data,
+notably with respect to our variables of interest. Approximately 62.3\% of cases
+are missing the symptom onset date, 55.4\% are missing positive specimen date,
+and 8.96\% of cases are missing the report date. Relatedly,
+cases with
+missing report or positive specimen dates may be filled with their symptom onset date
+\citet{jahja2022real}. So it is possible that all three variables may be
+imputed with the same date for a case. However, we only actually deal with
+select pairs of events; we do not use all three at once in our construction of
+the delay distributions or anywhere else in our analysis. Therefore, we restrict
+our investigation of missingness to the pairs of events.
+\autoref{fig:prop-cc} suggests that this issue impacts states
+differentially due to the inconsistent proportions of zero delay between
+positive specimen and report date across states. 
+
+Due to the contamination in the zero delay cases (the true extent of which is
+unknown to us), we omit all such cases where the positive specimen and report
+dates have zero delay from our analysis. We choose to allow for zero and
+negative delay for symptom onset to report because correspondence with the CDC
+confirms the distinct possibility that a person could test positive before
+symptom onset and it is a reasonable ordering to expect if, for example, the
+individual is aware that they have been exposed to an infected individual.
+
+\begin{figure}[!tb]
+\centering
+\includegraphics[width=0.9\linewidth]{prop_cc_zero_delay.pdf}\\
+\includegraphics[width=0.9\linewidth]{prop_cc_cdc_vs_jhu.pdf} 
+\caption{Top panel: Proportion of complete cases with zero delay between
+    positive specimen and report date in the restricted CDC line list dataset.
+    Bottom panel: Complete case counts by state in the CDC line list versus the
+    cumulative complete case counts from JHU CSSE as of June 6, 2022. All
+    counts have been scaled by the 2022 state populations as of July 1, 2022
+    from \citet{uscensus2022annual}.}
+\label{fig:prop-cc}
+\end{figure}
+
+For the same release date, the restricted line list contains 74,849,225 cases
+(rows) in total compared to 84,714,805 cases reported by the JHU CSSE; that is,
+line list is missing about 10 million cases. The extent that this issue impacts
+each state is shown in \autoref{fig:prop-cc}, from which it is clear
+the fraction of missing cases is substantial for many states, often surpassing
+50\% \citep{jahja2022real}. In addition, the probability of being missing does
+not appear to be the same for states, so there is likely bias introduced from
+using the complete case line list data. We consider such bias to be unavoidable
+in our analysis due to a lack of alternative line list sources.
+
+In the line list, we observe unusual jarring spikes in reporting in 2020
+compared to 2021. Upon plotting by report date, we find that a few states are
+contributing unusually large case counts on isolated days very late in the
+reporting process (usually well beyond 50 days). We strongly suspect that these
+large accumulations of cases over time are due breakdowns of the reporting
+pipeline (which may be expected to occur more frequently in the year following
+its instantiation than later in time). Such anomalies are not likely to be
+reliable indicators of the delay from positive specimen to case report.
+Therefore, we devise a simple, ad hoc approach to detect and prune these
+reporting backlogs.
+
+First, we obtain the part of the line list intended for the positive specimen to
+case report delay estimation, where both such dates are present and where zero
+and negative delay cases have been omitted. Then, for each of the three dates of
+June 1, September 1, and December 1, 2020, we bin the reporting delays occurring
+from 50 days up to the maximum observed delay. For each bin, we obtain the total
+delay count for each state. We check whether each count on the log scale is at
+least the median (for the bin) plus 1.5 times the interquartile range and retain
+only those that exceed this criterion as potential candidates for pruning. Next,
+we compute the counts by report date for each candidate state. If there is a
+report date with a count greater than or equal to the pre-specified threshold,
+then we remove those cases from the line list. Based on inspection and
+intuition, we set the threshold to 2000 for the first two bins, and then lower
+it to 500 for the remaining bins. A similar trial and error approach is used to
+set the bin size (to 50 days).
+
+\subsection{Justifications for delay distribution calculations}
+\label{sec:delay-justifications}
+
+Let $y_t$ denote the count of new cases reported at time $t$ and $x_t$ denote
+the count of deconvolved cases with positive specimen at $t$. For all cases in
+the line list that had both a positive specimen and a report date, we can count
+the those that are reported at time $t$ by enumerating them according to
+positive specimen date (similar to how symptom onset date was used in
+\citealp{jahja2022real}):
+\begin{align*}
+y_t = \sum_{s=1}^{t} \sum_{i=1}^{x_s}\indicator \left ( \text{the }i\th\text{ positive specimen at }
+    s \text{ gets reported at }t \right ).
+\end{align*}
+Taking the conditional expectation of the above yields
+\begin{align*}
+\E(y_t \mid x_s, s \leq t) = \sum_{s=1}^{t} \pi_t(s) x_s ,
+\end{align*}
+where $\pi_t(s) = \P(\text{case report at }t \mid \text{positive specimen date
+at }s)$ for each $s \leq t$ are the delay probabilities and the $\{ \pi_t(s) : s
+\leq t \}$ sequence comprises the delay distribution at time $t$. Notice that
+there are no time restrictions placed on the positive specimen date, except that
+it must have been between the start of the pandemic and the report date,
+inclusive. This is unlikely to be a realistic assumption to make as $t$ moves
+farther away from $s$. 
+
+Thus, we make two key assumptions about these distributions. First, positive
+specimen tests that are reported to the CDC are always reported within $d = 60$
+days, which is true for the majority of the reported cases. Second, the
+probability of zero delay is zero, which stems from the contamination of
+zero-delay in the line list. As in \citet{jahja2022real}, we update the
+conditional expectation formula to reflect these two assumptions: 
+\begin{align*}
+\E(y_t \mid x_s, s \leq t) = \sum_{k=1}^{60} p_t(k) x_{t-k}
+\end{align*}
+where for $k = 1, \dots, 60$,
+\begin{align*}
+p_t(k) = \P(\text{case report at }t \mid \text{positive specimen at }t-k).
+\end{align*}
+
+
+Thirdly, there are times where the empirical probability
+was observed to be precisely 1 at zero delay and the proportion of CDC relative
+to JHU cases used for the weight was also 1. Since we believe that having zero
+delay for all cases is unrealistic and unlikely to be representative of all
+cases for the state, we inject a small amount of variance manually by setting
+the the CDC-to-JHU proportion to be the minimum shrinkage proportion observed
+for the affected state (such instances were isolated to the state of New
+Hampshire). Aside from these modifications, the construction of the delay
+distribution proceeds in precisely the same manner as for positive specimen to
+report date. 
+
+
+
+\subsection{Possible investigation of reinfections}
+
+Possible change to the paper based on Ajitesh's feedback - 
+Main contribution is the model, shows without reinfection 
+\& here's an extension that shows how to include reinfection data. 
 
 
 \end{document}
