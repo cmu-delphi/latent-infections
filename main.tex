@@ -863,8 +863,19 @@ apply multinomial logistic regression using a third-order polynomial in time to
 get estimates of the daily proportions for the eight variant categories
 separately for each state.
 
-\attn{write down the model and define notation. Then show the result for one
-state: show the original proportions on the left, and the smoothed on the
+We write $z_{k,t} = 1$ if a positive test at time $t$ is caused by
+variant $k$ and take $z_{k,t} = 0$ otherwise. Then the multinomial logistic
+regression model is given as
+$$
+\textrm{softmax}\left(\P(z_{k,t} = 1)\right) = \beta_{0,k} + 
+\beta_{1,k} t + \beta_{2,k} t^2 + \beta_{3,k} t^3,
+$$
+for $k = 1,\ldots,K$ where $\textrm{softmax}(z_k) = \log(z_k) - \log(z_1 +
+\cdots + z_K)$, and we use third-order polynomials in time as covariates (these
+are computed to be orthogonal). 
+
+\attn{show the result for one
+state: the original proportions on the left, and the smoothed on the
 right.}
 
 
