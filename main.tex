@@ -812,8 +812,6 @@ the onset of symptoms. Additional minor details are discussed in
 
 \subsection{Estimating the incubation period distributions} 
 
-\attn{DJM: I stopped here, for now.}
-
 One incubation period distribution is estimated for each variant under
 consideration. The variants we consider are Alpha, Beta, Gamma, and Delta, which
 are included because they are are designated to be variants of concern by WHO
@@ -857,26 +855,30 @@ be incubating in someone (which is reasonable based on
 \subsection{Variant circulation proportions}
 
 To estimate the daily proportions of the variants circulating in each state, we
-obtain the GISAID genomic sequencing data counts from CoVariants.org
-\citep{hodcroft2021covariants, elbe2017data}. Since these counts are biweekly totals, we
-apply multinomial logistic regression using a third-order polynomial in time to
-get estimates of the daily proportions for the eight variant categories
-separately for each state.
+obtain the GISAID genomic sequencing data from CoVariants.org
+\citep{hodcroft2021covariants, elbe2017data}. These counts represent the total
+number of cases belonging to a particular variant using
+a sample of positive tests over a biweekly period. To estimate the population
+proportion of each variant, we apply multinomial logistic regression 
+for the eight variant categories separately for each state.
 
-We write $z_{k,t} = 1$ if a positive test at time $t$ is caused by
-variant $k$ and take $z_{k,t} = 0$ otherwise. Then the multinomial logistic
-regression model is given as
+We let $V_{j\ell,t}$ to be the probability of a new cases at time $t$ in location
+$\ell$ corresponding to variant $j$. Let $v_{j\ell,t}$ be the analogous observed
+proportion. Then the nonparametric multinomial logistic regression model is given
+as the system
 $$
-\textrm{softmax}\left(\P(z_{k,t} = 1)\right) = \beta_{0,k} + 
-\beta_{1,k} t + \beta_{2,k} t^2 + \beta_{3,k} t^3,
+\log\left(\frac{V_{j\ell,t}}{1-V_{j\ell,t}}\right) = f_{j\ell}(t),\;\; j=1,\ldots J,\quad
+\textrm{subject to }\sum_{j=1}^K\exp\{f_{j\ell}(t)\} = 1, \;\;\forall t.
 $$
-for $k = 1,\ldots,K$ where $\textrm{softmax}(z_k) = \log(z_k) - \log(z_1 +
-\cdots + z_K)$, and we use third-order polynomials in time as covariates (these
-are computed to be orthogonal). 
+The constraint ensures that the estimated proportions will sum to 1 across all
+$J$ variants. To encourage smoothness of the estimated proportions, we specify
+$f_{j\ell}(t)$ as a third-order polynomial in time: that is $f_{j\ell}(t) =
+\beta_{j\ell,0} + \beta_{j\ell,1} t + \beta_{j\ell,2}t^2 + \beta_{j\ell,3}t^3$,
+computed such that the resulting matrix of covariates is orthogonal.
 
 \attn{show the result for one
 state: the original proportions on the left, and the smoothed on the
-right.}
+right. Then describe this to a small degree (2-3 sentences).}
 
 
 \subsection{Convolutional estimates of the infection to positive specimen distributions} 
