@@ -778,10 +778,10 @@ reported on the same date as it was collected, that is, $\pi_{\ell,t}(0) = 0$
 and $\pi_{\ell,t}(k) = 0$ whenever $k > 60$. Let $N_{\ell,t}$ be the number of
 $z_{\ell,s}$ with $s\in[t-75+1,t+60] = \mathcal{S}_t$ and positive specimen date
 greater than $s-60$. Then, we first compute
-\begin{align*}
+\begin{align}
     \tilde{p}_{\ell,t}(k) = \frac{1}{N_{\ell,t}}\sum_{s \in \mathcal{S}_t}
     \big(\textrm{\# $z_{\ell,s}$ with positive specimen at $s-k$}\big).
-\end{align*}
+\end{align}
 Next we compute a similar national quantity $\tilde{p}_{t}(k) =
 \frac{1}{N_{t}}\sum_{s \in \mathcal{S}_t} \big(\textrm{\# $z_{s}$ with positive
 specimen at $s-k$}\big)$, without restricting to location $\ell$. Next, let
@@ -811,48 +811,42 @@ the onset of symptoms. Additional minor details are discussed in
 
 
 \subsection{Estimating the incubation period distributions} 
+\label{sec:incubation}
 
-One incubation period distribution is estimated for each variant under
-consideration. The variants we consider are Alpha, Beta, Gamma, and Delta, which
-are included because they are are designated to be variants of concern by WHO
-based on their potential to cause new waves, dethrone the dominant variant, and
-lead to changes in public health policy \citep{who2021tracking}. In addition, we
-include the Epsilon (California) and Iota (New York) variants because of their
-impact on those and the surrounding states \citep{yang2022investigation,
-duerr2021dominance}. We relegate all other variants to be in the Other category
-(which, for our purposes, is treated as a catch-all for all 2020 Ancestral
-variants observed in the U.S.) This decision to include an Other category is, in
-part, motivated by the lack of sequencing data for most states in 2020 as well
-as the presence of an Others category in the sequencing data for that time. 
+To model the incubation period, the time between infection and symptom onset, we
+use estimates from the existing literature, modified slightly to for coherence
+with each other: we model each incubation as a gamma distribution with different
+parameters. We focus on the following eight variants, which dominated at various
+points during our study period: Ancestral, Alpha, Beta, Epsilon, Iota, Gamma,
+Delta, and Omicron. Alpha, Beta, Delta, Gamma, and Omicron are all variants of
+concern \citep{who2021tracking}, while we include the Epsilon (California) and
+Iota (New York) variants because of large impact on those and neighbouring
+states \citep{yang2022investigation, duerr2021dominance}.
 
-We obtain literature estimates of the variant-specific incubation periods for
-the following eight variant categories: Ancestral, Alpha, Beta, Epsilon, Iota,
-Gamma, Delta, and Omicron. For the Ancestral variants, we use the literature
-estimates of the gamma distribution parameters \citep{tindale2020evidence}. For
-the Alpha, Beta, Gamma, Delta and Omicron variants, we use the mean and standard
-deviation of the number of days of incubation as reported in
-\citet{tanaka2022shorter, grant2022impact, ogata2022shorter}.
-Since the literature lacks reliable estimates for the incubation period of the
-Epsilon and Iota variants, we use the incubation period for Beta because
-Epsilon, Iota, and Beta are all children from the same parent in the
-phylogenetic tree of the Nextstrain Clades (as depicted in
-\citealp{hodcroft2021covariants}). 
+The Ancestral variant has been modelled as a gamma
+distribution~\citep{tindale2020evidence}, so we simply use those reported
+parameters. For the Alpha, Beta, Gamma, Delta and Omicron variants, we use the
+reported mean and standard deviation of the number of days of incubation
+\citep{tanaka2022shorter, grant2022impact, ogata2022shorter}. To match these
+moments to the gamma distribution, we solve the same moment equations described
+in \autoref{sec:delaystop}. Then, we discretize each resulting density to the support set,
+which is taken to be from 1 and 21 days. This range assumes that symptoms
+require at least 1 day to develop \citealp{phcan2021covid} and that an
+asymptomatic infection will resolve within 21 days \citep{zaki2021estimations,cortes2022sars}.
 
-We construct the incubation period distributions for the variants as gamma
-distributions. These distributions are the same for all states and based on
-literature estimates of the gamma parameters or the mean and standard deviation
-of the incubation period (in which case the method of moments is used to fit a
-gamma density). Then, we discretize each resulting density to the support set,
-which is taken to be from 1 and 21 days. In other words, those are taken to be
-the lower and upper limits for the number of days that the virus could be
-incubating in someone. The implicit assumption for the lower bound is that there
-must be at least one day between infection and symptom onset (which follows the
-convention given in \citealp{phcan2021covid}). The assumption underlying the
-upper bound is that 21 days is the maximum number of days that the virus could
-be incubating in someone (which is reasonable based on
-\citealp{zaki2021estimations} and \citealp{cortes2022sars}).
+We were unable to locate incubation period estimates
+for the geo-specific Epsilon and Iota variants, so we use the
+incubation period for Beta because Epsilon, Iota, and Beta are all children from
+the same parent in the phylogenetic tree of the Nextstrain Clades
+\citep{hodcroft2021covariants}. All other circulating variants are grouped
+together with the Ancestral variant. There was little available sequencing data
+prior to Alpha-emergence, but unfortunately, later in the pandemic, it is
+impossible to separate Ancestral from other rare variants.
+
+\attn{Perhaps plot the incubation periods? Maybe sharing a panel with the circulation proportions below.}
 
 \subsection{Variant circulation proportions}
+\label{sec:variant-proportions}
 
 To estimate the daily proportions of the variants circulating in each state, we
 obtain the GISAID genomic sequencing data from CoVariants.org
@@ -866,10 +860,10 @@ We let $V_{j\ell,t}$ to be the probability of a new cases at time $t$ in locatio
 $\ell$ corresponding to variant $j$. Let $v_{j\ell,t}$ be the analogous observed
 proportion. Then the nonparametric multinomial logistic regression model is given
 as the system
-$$
+\begin{equation}
 \log\left(\frac{V_{j\ell,t}}{1-V_{j\ell,t}}\right) = f_{j\ell}(t),\;\; j=1,\ldots J,\quad
-\textrm{subject to }\sum_{j=1}^K\exp\{f_{j\ell}(t)\} = 1, \;\;\forall t.
-$$
+\textrm{subject to }\sum_{j=1}^J \exp\{f_{j\ell}(t)\} = 1, \;\;\forall t.
+\end{equation}
 The constraint ensures that the estimated proportions will sum to 1 across all
 $J$ variants. To encourage smoothness of the estimated proportions, we specify
 $f_{j\ell}(t)$ as a third-order polynomial in time: that is $f_{j\ell}(t) =
@@ -881,92 +875,68 @@ state: the original proportions on the left, and the smoothed on the
 right. Then describe this to a small degree (2-3 sentences).}
 
 
-\subsection{Convolutional estimates of the infection to positive specimen distributions} 
 
-The previous two steps enabled us to estimate one incubation period per variant
-and one symptom onset to positive specimen distribution for each state at each
-time under consideration. We proceed to convolve each such pair of distributions
-to get estimated infection to positive specimen distributions and, hence,
-estimated time-varying probabilities for the delay from infection onset to
-positive test specimen date for each state.
+\subsection{Retrospective deconvolution: from cases to infections}
 
-\subsection{Retrospective deconvolution}
-
-The main goal for the retrospective deconvolution stage is to estimate the daily
-number of new infections for each time using the dates that those cases were
-eventually reported. To this end, there are two types of deconvolution
-performed. The first is the deconvolution from report to positive specimen date
-and the second is from positive specimen date to infection onset date. We
-allocated the deconvolutions in this way to allow us to get the daily
-deconvolved case estimates by variant. The intermediate of positive specimen
-date was chosen because the variant proportion estimates are aligned to this
-date. So for each state at each time, nine deconvolutions are performed in
-total. The first is the deconvolution from report to positive specimen date,
-followed by the eight deconvolutions from positive specimen to infection onset
-for the eight different variant categories.
+Retrospective deconvolution estimates the daily number of new infections
+corresponding to each variant for each time and location, ``pushing back'' the
+dates that those cases were eventually reported to the time of infection.
+Because the circulating variant proportions in \autoref{sec:variant-proportions}
+correspond to the positive specimen date, this requires two stages. The first is
+the deconvolution from report to positive specimen date, and the second is from
+positive specimen date to infection onset date.
 
 We will start by describing the first type of deconvolution performed from
-report to positive specimen date in detail and then describe the second type in
-terms of the changes made with respect to the first. For each state, we achieve
-the first goal to estimate positive specimen dates for the cases by solving an
-optimization problem. 
-% Following the notation of \citet{jahja2022real} (save for suppressing the
-% state/location subscript), 
-For this problem, let $\cT$ represent the extended deconvolution period from
-March 1, 2020 to March 1, 2023, which was used to minimize the effect of
-boundary issues and to produce sufficient deconvolved case estimates for further
-analysis. Let $\hat{p}_t$ be probabilities from the estimated positive specimen
-to report date distribution for $t \in \cT$, $y_t$ the number of new cases
-reported, and where $D^{(4)}$ is the discrete derivative matrix of order 4 such
-that $D^{(4)}x$ yields all $4\th$-order differences of the vector $x$. From
-these, we estimate the deconvolved case counts across time by solving for the
-vector $x$ in
-\begin{align*}
-\minimize_{x}\ \sum_{t \in \cT} \left ( y_t -  \sum_{k = 1}^{d} \hat{p}_t(k)x_{t-k} 
-\right )^2 + \lambda \|D^{(4)}x\|_1. 
-\end{align*}
+report to positive specimen date in detail. For this problem, let $t=1,\ldots,T$
+represent the extended deconvolution period from March 1, 2020 to March 1, 2023,
+which was chosen to minimize the effects of boundary issues. Define $y_{\ell,t}$
+to be the number of new cases reported in location $\ell$ at time $t$, as
+reported by the John Hopkins Center for Systems Science and Engineering (JHU
+CSSE)\citealp{dong2020interactive} and retrieved with the The COVIDcast API
+\citep{reinhart2021open}. Recall that $\widehat{\pi}_{\ell,t}(k)$ is the
+associated probability that these reported cases were collected $k$ days earler. 
 
-The above loss function decouples into two parts which trade data fidelity with
-desired smoothness (that
-encapsulate the classic bias-variance trade off). The first part represents
-minimizing the sum of squared errors between the JHU reported cases and the
-estimates, while the second part captures the smoothness of the estimates
-(smaller values being more smooth). The tuning parameter $\lambda$ determines
-the relative importance of these competing goals.
+We estimate the deconvolved cases by positive specimen date by solving the
+following optimization problem:
+\begin{align}
+\minimize_{\mathbf{x}_\ell}\ \sum_{t=1}^T 
+\left( y_{\ell,t} -  \sum_{k=1}^{60}\widehat{\pi}_{\ell,t}(k) x_{t-k} \right)^2 
++ \lambda \sum_{t=4}^T \big|x_t - 4x_{t-1} + 6x_{t-2} -4x_{t-3}+ x_{t-4}\big|.
+\end{align}
+This two parts of this optimization problem trade data fidelity (the sum of
+squared errors) with smoothness in the resulting estimates (the absolute error
+of the differences of $\mathbf{x}$). The tuning parameter $\lambda$ determines
+the relative importance of these competing goals. The solution to the problem is
+an adaptive piecewise cubic polynomial \citep{tibshirani2014adaptive,
+tibshirani2022divided} and can be accurately computed easily
+\citep{ramdas2016fast}. We select $\lambda$ with $3$-fold cross validation
+\citep{jahja2022real} in which every third day is reserved for testing, and the
+value that results in the smallest out-of-sample mean squared error is chosen.
 
-We solve this trend-filtering-regularized least squares deconvolution problem by
-employing the ADMM algorithm from \citet{ramdas2016fast} that is described in
-Appendix A of \citet{jahja2022real}. The solution to the problem is an adaptive
-piecewise cubic polynomial \citep{tibshirani2014adaptive,
-tibshirani2022divided}.
-
-We select the tuning parameter, $\lambda$, by using $3$-fold cross validation
-similar to \citet{jahja2022real} in which every third infection count is
-reserved for testing. The tuning parameter that results in the smallest mean
-squared error is selected.
-
-The COVIDcast API \citep{reinhart2021open} is used to retrieve the daily number
-of new confirmed COVID-19 cases for each state that are based on reports from
-the John Hopkins Center for Systems Science and Engineering (JHU
-CSSE)\citealp{dong2020interactive}. From the same API, we also retrieve the
-daily number of confirmed COVID-19 hospital admissions for each state that are
-collected by the \US Department of Health and Human Services (HHS). Both
-datasets are updated as of June 6, 2022.
-
-From this first type of deconvolution, we obtain case estimates by positive
-specimen date for each state. The second type of deconvolution, where the goal
-is to get estimates of the infection onset date for these cases, follows the
-form of first type, save for two key modifications to the inputs. Firstly, we
-utilize the results from the first deconvolution and, secondly, we must update
-the probabilities to be the convolutional estimates of the infection to positive
-specimen distributions. Thus, for a fixed variant category, $y_t$ is the number
-of new cases deconvolved to positive specimen date multiplied by the estimated
-proportion of the variant in circulation in the state at $t$, and $\hat{p}_t$
-are the probabilities from the estimated infection onset to positive specimen
-distribution for $t \in \cT$. With these modifications to the inputs, the
-deconvolution proceeds in the exact same way as before. Since this deconvolution
-is done separately for each variant category, we ultimately obtain deconvolved
-case estimates by the date of infection onset that are separated by variant.
+The result of this first deconvolution is $\widehat{x}_{\ell,t}$, case estimates
+by positive specimen date for each state. To continue, pushing back to infection
+estimate, we first need the variant-specific delays from infection to positive
+specimen collection. These are calculated by convolving the
+location-time-specific symptom-to-test distributions from
+\autoref{sec:delaystop}, denoted by $\{q_{\ell,t}(k) : -3\leq k \leq 21\}$, with
+the variant-specific incubation periods from \autoref{sec:incubation}, denoted
+by $\{i_{j}(k) : 0 < k \leq 21\}$. The convolution of these yields a
+distribution $\mathbf{q}_{\ell,t}*\mathbf{i}_j = \{\tau_{j\ell,t}(k): -3 \leq k
+\leq 42\}$. However, only a fraction of $\widehat{x}_{\ell,t}$ corresponds to
+each variant, so we must weight them by the variant proportions
+$\widehat{v}_{j\ell,t}$ estimated in \autoref{sec:variant-proportions}. The
+analogous optimization problem is therefore:
+\begin{align}
+\minimize_{\mathbf{u}_{j\ell}}\ \sum_{t=1}^T 
+\left( 
+    \widehat{v}_{j\ell,t}\widehat{x}_{\ell,t} -  
+    \sum_{k=-3}^{42} \tau_{j\ell,t}(k) u_{t-k} 
+\right)^2 
++ \lambda \sum_{t=4}^T \big|u_{t} - 4u_{t-1} + 6u_{t-2} -4u_{t-3}+ u_{t-4}\big|.
+\end{align}
+Because this deconvolution is done separately for each location and variant
+category, we ultimately obtain deconvolved case estimates by the date of
+infection onset that are separated by variant.
 
 \subsection{Inverse reporting ratio and the antibody prevalence model} 
 
@@ -1110,6 +1080,11 @@ deferred to the Supplementary Materials \ref{supp:ssapm}.
 
 \subsection{Lagged correlation to hospitalizations and time-varying IHRs} 
 
+From the same API, we also retrieve the
+daily number of confirmed COVID-19 hospital admissions for each state that are
+collected by the \US Department of Health and Human Services (HHS). Both
+datasets are updated as of June 6, 2022.
+
 We use our infection estimates in a lagged correlation analysis with confirmed
 COVID-19 hospitalizations. Our primary goal of this analysis is to find the lag
 between infection and hospitalization rates that gives the highest average
@@ -1132,20 +1107,6 @@ state. To compute this for a given day, the number of individuals who are
 hospitalized due to COVID-19 on a day are divided by the estimated total number
 who were infected on the lagged number of days before.
 
-\subsection{Ablation study for the lagged correlation analysis} 
-
-To better understand the contribution of the intermediate steps to the lagged
-correlation analysis, we carry out a brief ablation study in which we calculate
-the lagged correlation using the following infection estimates: 1. those from
-the deconvolution procedure under the assumption that the infection onset is the
-same as the positive specimen date (i.e., excluding the positive specimen to
-infection onset data and deconvolution); 2. those from the deconvolution
-procedure under the assumption that the infection onset is the same as the
-symptom onset date (excluding the incubation period data); 3. those from the
-deconvolution procedure when utilizing all incubation period and delay data (the
-deconvolved case estimates); 4. those from applying the antibody prevalence
-model to produce estimates for both the reported and the unreported cases (the
-infection estimates).
 
 \section*{Data availability}
 \section*{Code availability}
@@ -1581,6 +1542,20 @@ Hampshire). Aside from these modifications, the construction of the delay
 distribution proceeds in precisely the same manner as for positive specimen to
 report date. 
 
+\subsection{Ablation study for the lagged correlation analysis} 
+
+To better understand the contribution of the intermediate steps to the lagged
+correlation analysis, we carry out a brief ablation study in which we calculate
+the lagged correlation using the following infection estimates: 1. those from
+the deconvolution procedure under the assumption that the infection onset is the
+same as the positive specimen date (i.e., excluding the positive specimen to
+infection onset data and deconvolution); 2. those from the deconvolution
+procedure under the assumption that the infection onset is the same as the
+symptom onset date (excluding the incubation period data); 3. those from the
+deconvolution procedure when utilizing all incubation period and delay data (the
+deconvolved case estimates); 4. those from applying the antibody prevalence
+model to produce estimates for both the reported and the unreported cases (the
+infection estimates).
 
 
 \subsection{Possible investigation of reinfections}
