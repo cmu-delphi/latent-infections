@@ -1,0 +1,271 @@
+\section{Results}
+\label{sec:results}
+
+By estimating the time series of COVID-19 infections per 100,000 inhabitants
+for each \US state from June 1, 2020 to November 29, 2021, we observe rates of
+infections that vary in intensity and disease burden across space and time
+(Figures \ref{fig:state_infect_est}--\ref{fig:six-states}). Outbreaks in
+infections precede those in reported cases and are reliably larger in magnitude.
+But simply shifting cases back in time and increasing them by a constant
+multiplicative factor fails to capture the spatio-temporal dynamics of the
+pandemic. 
+
+The largest per-capita outbreaks prior to Omicron were observed in the late
+summer or early fall of 2021 in Georgia, Louisiana, Idaho, Montana, and Wyoming,
+matching the intuition of similar viral spread in clusters of geographically
+proximate states. During this time, the two states that have the highest rate of
+infections on single day are Georgia (451 infections per 100K, on August 15,
+2021) and Idaho (also 451 infections per 100K, on September 7, 2021). The period
+of lowest viral transmission is observed in the summer and fall of 2020. During
+this time, New Hampshire saw only about 1 new infection per million residents
+per week \attn{really?}. From June 2020 to the end of August, Vermont saw only
+about 10 infections per 100K per week, the longest such lull for any state.
+
+
+
+\subsection{Infection estimates reveal waves missed by reported cases.}
+\label{sec:omitted-waves}
+
+Relative to reported cases, examining estimated infections reveals a
+rather different pattern. \autoref{fig:state_infect_est} shows
+estimates of the number of daily new infections per 100,000 inhabitants for each
+\US state from June 1, 2020 to November 29, 2021 compared with reported cases,
+and deconvolved cases---reported cases ``pushed back'' by the delays shown in
+\autoref{fig:chain_events_onset_report}. 
+
+Most states exhibit at least two major spikes in infections---the first starts
+in the fall of 2020 and extends into the winter season, while the second starts
+in the late summer of 2021 and proceeds into the mid-fall. These represent major
+waves driven by the Ancestral and Delta variants, respectively. Similar patterns
+of these major surges are observed in nearly all states, though to varying
+degrees. In general, greater similarities in the strength and magnitude of
+outbreaks are found to emerge in the clusters of states that border each other.
+
+While the major Ancestral, Alpha, and Delta waves tend to be visible for most
+states, there are clear outbreaks in unreported infections that are not easily
+detectable from cases alone in the falls of 2020 and 2021. Additionally, a wave
+of infections is present in the spring of 2021 for North Dakota and South
+Dakota, preceeding the Alpha wave in other jurisdictions. For the specific date
+of Oct. 20, 2020, \autoref{fig:choro_inf_case_rates} shows increased case
+reports in a cluster of Northern-Midwest states like North Dakota, South Dakota,
+and Wisconsin relative to others. However, the infection rates more clearly
+emphasize that this phenomenon is not limited to these states, but extends out
+to the surrounding states as well. In the fall of 2021, we can see that the
+major Delta wave is only faintly detectable from cases in a number of eastern
+states such as Maryland and Connecticut. It is clear that cases fail to
+adequately capture the rise and fall in infections during this time.
+
+\subsection{The cases-to-infections ratio varies by state and variant.}
+\label{sec:case-infection-ratio}
+
+While it is clear from \autoref{fig:state_infect_est} that cases underestimate
+the true burden of infections for every state, the degree to which this problem
+persists varies across states and variants. For the Delta wave, some of
+the greatest discrepancies between cases and infections are visible in the
+Western states of Idaho and Montana, the Southern states of Louisiana and
+Georgia, and the Midwestern states of Iowa and Nebraska. In addition, we can see
+that the Delta wave is only faintly detectable from cases in a number of Eastern
+states (e.g., Maryland and Connecticut). The Ancestral wave is poorly
+represented \attn{what does ``poorly represented'' mean} by cases in several
+midwestern states (for example, Illinois, Indiana, and Ohio). Early
+in the pandemic, such discrepancies between cases and infections may be
+attributable to state-specific issues with the reporting pipeline, while later, they more likely due to the rise in asymptomatic infections
+across variants \citep{oph2022covid, garrett2022high}. 
+
+The ratio between cases and infections decreases with time. While the Delta wave
+is somewhat apparent from the case counts for all states
+(\autoref{fig:state_infect_est}), infection estimates suggest that case counts
+severely underestimate infections during this time for many states, moreso than
+in earlier waves. The most extreme was New Jersey, where about 4.6\% of
+estimated infections were eventually reported as cases. Similarly low are
+Maryland (7.4\%), Connecticut (8.0\%), and Florida (8.7\%). This issue extends
+to most states: in 39 states fewer than 30\% of infections would eventually
+appear in case reports. This ratio was less extreme in earlier waves, and its
+effects most apparent in different regions. During Alpha, Louisiana had the
+lowest ratio of infections to cases (11.7\%) followed by California (14.4\%).
+Such patterns are even less apparent during the Ancestral wave, where Ohio and
+Maryland had the lowest ratio of reported cases to infections at 22.0\%  and
+22.3\%, respectively. 
+
+\autoref{fig:choro_inf_case_rates} shows that on June 1, 2020, there is little
+difference between case and infection rates across the states, while
+later on, the differences become more pronounced.
+%% Maybe this sentence and the next few belong more in Section 2.2
+For example, on July 20, 2021, while the map of case rates shows low and
+geographically consistent spread, infection rates reveal that Texas, Louisiana,
+Georgia, and their neighbors are hotspots at that time. Generally, the spatial
+extent of infections is often understated by cases. For example, on October 20,
+2020, while case rates are elevated in a handful of upper-Midwestern states
+(namely, North and South Dakota), they fail to reveal the impact on the
+surrounding states: infection rates are similarly elevated in all of the
+surrounding states. 
+
+By focusing on wtates with elevated cases, infection outbreaks may be
+overlooked. For instance, on August 27, 2021, Montana and Idaho have some of the
+highest infection rates. In contrast, the case rates are unremarkable for these
+two states, whereas the highest rates tend to be localized to the Southeastern
+states. However, the opposite occurs as well: on December
+17, 2020, Tennessee and California have the highest case rates but minimal
+infections relative to other states.
+
+\begin{figure}[!tb]
+\centering
+\includegraphics[width=.99\linewidth]{state_niauc_est_faceted_F24.pdf} 
+\caption{Estimates of the number of daily new infections per 100,000
+population for each \US state from June 1, 2020 to November 29, 2021
+(dark blue line). The blue shaded regions depict the 50, 80, and 95\%
+confidence intervals for the estimates, while the teal line represents
+the number of new daily new deconvolved cases per 100,000, and the
+dotted orange line represents the 7-day average of the new cases per
+100,000.}
+\label{fig:state_infect_est}
+\end{figure}
+
+
+\begin{figure}[!tb]
+\centering
+\includegraphics[width=.99\textwidth]{choro_inf_case_rates_F24.pdf}
+\caption{Choropleth maps of the state-level estimates of the number of daily new
+infections per $100,000$ population (top row) and the daily new cases per
+$100,000$ population (bottom row) for five dates between June 1, 2020 to
+November 29, 2021. Note that the first date was chosen as a baseline, while the
+other dates were chosen due to having large counts of infections across all
+states. In particular, the third and fifth dates present the largest number of
+infections across the 50 states from each year.} 
+\label{fig:choro_inf_case_rates}
+\end{figure}    
+
+
+
+    
+\subsection{Infections, overall and by variant, emphasize earlier outbreaks.}
+\label{sec:infections-by-voc}
+
+\autoref{fig:six-states} examines the infection estimates for a selection of
+states more closely. The top panel shows infection estimates for these states,
+while the bottom panel separates their estimated deconvolved cases based on the
+circulating variant proportions at the time. These figures show times when the
+total infections and the deconvolved cases broken down by the variant categories
+emphasize earlier outbreaks than would be indicated by cases alone. For example
+the major Ancestral wave in California, Maryland, Idaho, Montana, and Ohio
+peaks earlier for infections than cases. Such trends are similar with Delta,
+though more obviously in Louisiana, Idaho and Montana than California, Maryland
+and Ohio. The division by variant categories reveals the variant or variants that
+are behind these waves. The crest-trough patterns of these by-variant depictions
+align with infections rather than the cases by construction (as they are for
+deconvolved cases which are re-scaled to get the infection estimates). 
+\attn{These last two sentences are not sufficiently direct: they need to say something interesting, without too much mealy-mouthedness.}
+
+
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=\linewidth]{state_niauc_est_6states_F24.pdf}\\
+    \includegraphics[width=\linewidth]{state_decon_byvar_est_6states_F24.pdf}
+    \caption{Top panel: Reported cases, deconvolved cases, and estimates of
+    daily new infections (dark blue line) per 100K inhabitants. The blue shaded
+    regions indicate the 50, 80, and 95\% confidence bands, while the background
+    is shaded to indicate the dominant variant in circulation at the time.  
+    Bottom panel: Deconvolved cases colored by variant per 100K inhabitants.}
+    \label{fig:six-states}
+\end{figure}
+
+
+\subsection{The relationship between infections and hospitalizations is messy.}
+\label{sec:lagged-correlations}
+
+We systematically investigate the temporal relationship between infections and
+hospitalizations with Spearman's rank-correlation across different lags,
+shifting hospitalizations backward to align with infections
+(\autoref{fig:correlations}). The maximum average correlation across states is
+0.51, occurring at a lag of 13 days. In contrast, we find that the greatest
+average Spearman correlation for cases is 0.69 and occurs at a lag of 1 day.
+That is, case reports are nearly contemporaneous to hospitalizations, while
+infection estimates clearly precede them. The maximum correlation at a lag of 13
+days is in keeping with estimates of the average time from infection to
+hospitalization for cases reported in January, 2020 in Wuhan, China (9.7 days)
+as well as with estimates from across the pandemic in the UK (rangeing from 8.0
+to 9.7 days) \citep{ward2021understanding}. Importantly, the 13 day lag in the
+\US\ also includes the impact of the reporting pipeline, a delay omitted from
+the international estimates. 
+
+\begin{figure}[!tb]
+\centering
+\includegraphics[width=.9\textwidth]{adj_unadj_cases_hosp_lag_corr_F24.pdf} 
+\caption{Spearman's correlation between each of cases, deconvolved cases, and
+infections with hospitalizations per 100,000. These are calculated for each lag,
+state and rolling window of 61 days before averaging. The vertical dashed lines
+indicate the lags for which the highest average correlation is attained.
+\attn{Fig still wrong}}
+\label{fig:correlations}
+\end{figure}
+    
+
+While both the infections and deconvolved cases are leading indicators of
+hospitalizations and their trajectories are similar, the average correlation
+they attain is different. In particular, the correlation is larger for
+deconvolved cases than for infections (with a difference of about 0.18 at the
+peaks). The increase is likely due to 2 issues. First, many cases are detected
+contemporaneously with hospitalization: people first test positive once they go
+to the emergency room for treatment. Second, unreported infections tend to be
+less severe and less likely to lead to hospitalization than those that are
+reported \citep{sallahi2021using}.
+
+
+
+\subsection{Infection-hospitalization ratios are smaller and more stable.}
+\label{sec:ihrs}
+
+As a counterpart to the correlation analysis, we compute the time-varying
+infection-hospitalization ratios (IHRs) for each state using the correlation
+maximizing lag. We similarly compute the case-hospitalization ratios (CHRs)
+using their correlation maximizing lag for for comparison
+(\autoref{fig:IHR_7dav}). 
+
+For each state, the CHRs tend to be larger and noiser relative to IHRs. This
+supports our claim that reported infections are more likely to require
+hospitalization than unreported infections. Both IHRs and CHRs exhibit similar
+geospatial and temporal trends as those noted for infections above. Namely,
+states that are proximate (for example, Ohio, Pennsylvania, and Virginia) tend
+to exhibit similar temporal patterns in IHRs and CHRs. In addition, similar
+spikes are evident across many states during waves of infections that are driven
+by variants of concern. For example, many states exhibit a striking increase in
+hospitalizations in mid-2021, coinciding with the rapid takeover of the Delta
+variant \citep{hodcroft2021covariants}. This finding aligns with previous
+studies that found an increased risk in hospitalization due to Delta
+\citep{twohig2022hospital, nyberg2022comparative}. Similarly, during the fall of
+2020 a spike in IHRs rivals or surpasses that observed during the time of Delta
+(which is the case for states like New York or Wyoming). \attn{what is the
+``Similarly'' referring to here?}
+
+Overall, the relationship between infections and hospitalizations is
+complicated. We observe intermittent spikes that punctuate longer periods where
+the IHRs are relatively stabile, remaining below 0.1 hospitalizations per
+infection. 
+% There does not tend to be a strict upward or downward trajectory or even a mild
+% waning pattern in the IHRs, as one might expect with later variants that are
+% more infectious but result in fewer hospitalization \citep{lorenzo2022covid,
+% blauer2022compare}. \attn{Is the IHR actually H/I? or are the units not quite
+% right (e.g., H/1M / I/100K)?}
+While we computed and compared CHRs and IHRs for all states, it is important to
+note that both likely vary within states and depend on confounding variables
+such as age and the presence of major comorbidities
+\citep{russell2023comorbidities}. Therefore, it would be beneficial to account
+for such variables in their calculations by, for example, stratifying infections
+and hospitalizations by age to produce age-specific estimates of the IHRs for
+each state~\citep{fox2023disproportionate}.
+
+
+
+\begin{figure}[!tb]
+\centering
+\includegraphics[width=.99\linewidth]{IHR_7dav_F24.pdf}
+\caption{Time-varying IHR and CHR estimates for each state from June 1, 2020
+to November 29, 2021, obtained using the corresponding optimal lag from the
+systematic lag analysis. Note that the infection, case, and hospitalization
+counts are subject to a center-aligned 7-day average to remove spurious day
+of the week effects. Also note that the different starting points across
+states are due to the availability of the hospitalization data.}
+\label{fig:IHR_7dav}
+\end{figure}
+
+
