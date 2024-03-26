@@ -9,72 +9,39 @@ infections that are difficult to detect from cases alone such as the Delta wave
 in New Jersey, Connecticut, and Maryland. This suggests that cases paint an
 incomplete picture of the pandemic, especially when outbreaks are largely driven
 by unreported infections. Furthermore, since case reports generally follow
-symptom and infection onsets, cases have a built-in temporal bias. This is in addition
-to other biases from differences in reporting across states (such as temporary
-bottlenecks due influxes of data or more persistent processing issues that
-increase the average time from case detection to report \citep{wash2020dash,
-dunkel2020covid19}. 
+symptom and infection onsets, cases have a built-in temporal bias. This is in
+addition to other biases from differences in reporting across states such as
+temporary bottlenecks due influxes of data or more persistent processing issues
+that increase the average time from case detection to report
+\citep{wash2020dash, dunkel2020covid19}. 
 % Furthermore, no indication of uncertainty is provided for
 % even the gold standard case estimates \citep{delphiepidata2020}. 
 Thus, while reported cases provide an indication of the trajectory of the
 pandemic, it is a delayed and incomplete version.
 
-% Since case reporting is not
-% consistent across time and states, case counts underestimate the true number of
-% infections and, hence, the impact of the pandemic \citep{cdc2022estimated,
-% simon2022inconsistent}. For example, some states report the number of
-% individuals tested rather than the numbers of tests performed
-% \citep{schechtman2020counting, chitwood2022reconstructing}. Additionally, while
-% the definition of a confirmed COVID-19 case tends to be fairly uniform across
-% the United States due to general adherence to the CSTE case definitions, state
-% reporting standards have been known to vary \citep{cste2020, delphiepidata2020}.
-% For instance, there may be inconsistencies across locations if some cases are
-% labelled as confirmed based on positive antigen tests instead of PCR tests
-% \citep{covidtracking2021}. 
-% As well, the definition of a case and related terminology can change
-% or evolve over time as more information becomes available.  
 
-% Estimating the new number of infections by symptom or infection onset date would
-% more closely align with the definition of incidence as we know it
-% \citep{jahja2022real}.
+Our approach offers a number of advantages. For instance, we aim to incorporate
+as much state-specific information as possible when deriving our estimates. By
+using state-level case, line list, and variant circulation data, we are able to
+construct incubation and delay distributions that are specific to each state.
+Time-varying and state-specific seroprevalence data allows the reporting ratio
+estimates to similarly vary over space and time, a departure from existing work
+\citep{unwin2020state, uga2020covid19}. Existing approaches that use the delay
+distribution to generate infection estimates often only construct one delay
+distribution that is used for all states \citep{chitwood2022reconstructing,
+jahja2022real}. That is, our work avoids the assumption of geographic
+invariance, where it is assumed that all states have the same patterns of delay
+from symptom onset to case report. This assumption is unlikely to be true due to
+differences in reporting pipelines, pandemic response, and variants in
+circulation, among other issues. 
 
-
-
-% The remainder of our discussion consists of an in-depth look into the advantages
-% and limitations of our approach and of other comparable approaches, followed by
-% a high level summary of our work and its major contributions. 
-
-Our approach offers a number of advantages.
-% The development 
-% of a way of modelling immunity and space-time-specific reporting ratios based on 
-% seroprevalence data.
-% Similar phrase on line 1268, though we may want to emphasize that point up here.
-% To the best of our knowledge, no other modelling approach has been used to 
-% reconstruct the infection time series
-%for every state over as much of the COVID-19 pandemic as in this study. %%
-%Furthermore, 
-For instance, we aim to incorporate as much state-specific information as
-possible when deriving our estimates. By using state-level case, line list, and
-variant circulation data, we are able to construct incubation and delay
-distributions that are specific to each state. Time-varying and state-specific
-seroprevalence data allows the reporting ratio estimates to similarly vary over
-space and time, a departure from existing work \citep{unwin2020state,
-uga2020covid19}. Existing approaches that use the delay distribution to generate
-infection estimates often only construct one delay distribution that is used for
-all states \citep{chitwood2022reconstructing, jahja2022real}. That is, our work
-avoids the assumption of geographic invariance, where it is assumed that
-all states have the same patterns of delay from symptom onset to case report.
-This assumption is
-unlikely to be true due to differences in reporting pipelines, pandemic
-response, and variants in circulation, among other issues. 
-
-Another limitation of previous approaches to estimate latent infections is
-that they do not to account for reinfections. While
-reinfections represent a small fraction of total infections until
-later in the pandemic, ignoring them means that the
-infection-reporting ratio will tend to be underestimated with seroprevalence
-data alone. By accounting for these as well as the waning of seropositivity (See
-\autoref{sec:report-ratio}), we more accurately estimate this ratio.
+Another limitation of previous approaches to estimate latent infections is that
+they do not to account for reinfections. While reinfections represent a small
+fraction of total infections until later in the pandemic, ignoring them means
+that the infection-reporting ratio will tend to be underestimated with
+seroprevalence data alone. By accounting for these as well as the waning of
+seropositivity (See \autoref{sec:report-ratio}), we more accurately estimate
+this ratio.
 % so they are not absolutely necessary to include in the
 % earlier stages of the pandemic. Still, at no stage did infection confer lifelong
 % immunity. Rather antibody levels and immunity are known to wane over time. And
@@ -82,24 +49,26 @@ data alone. By accounting for these as well as the waning of seropositivity (See
 % virus when tracking infections over time. Therefore, we account for reinfections
 % and the waning of detectable antibody levels in our custom antibody prevalence
 % model. 
-However, we acknowledge that the extent to which each of these are
-accounted for could be improved upon in future work. 
-Since the waning of immunity is likely to be variant-dependent
-\citep{pooley2023durability}, it follows that our model waning parameter may be
-better posed as a mixture of parameters for different variants with weights
-determined by the proportion of the variants circulating at the time in the
-state. Related to this is the issue that newer variants may escape detection
-\citep{nih2022assessing, fda2023sars}. While in a retrospective analysis where
-finalized data is used this is less likely to be an issue, this could very well
-pose a problem for real-time estimates of infections.
+However, we acknowledge that the extent to which each of these are accounted for
+could be improved upon in future work. Since the waning of immunity is likely to
+be variant-dependent \citep{pooley2023durability}, it follows that our model
+waning parameter may be better posed as a mixture of parameters for different
+variants with weights determined by the proportion of the variants circulating
+at the time in the state. Related to this is the issue that newer variants may
+escape detection \citep{nih2022assessing, fda2023sars}. While in a retrospective
+analysis where finalized data is used this is less likely to be an issue, this
+could very well pose a problem for real-time estimates of infections.
 
 Regarding reinfections, a major reason why we chose an end date of November 29,
-2021 and ultimately decided to not tread into Omicron territory is because the
-Omicron variants come with substantial increase in the risk of reinfection in
-comparison to previous variants as Omicron has been shown to have an increased
-tendency towards immune escape \citep{wei2024risk, pulliam2022increased,
-eythorsson2022rate}. So having quality reinfection data that is representative
-of each location under study is of the utmost importance for the Omicron era. 
+2021, and ultimately decided to not continue into the Omicron wave is because
+the Omicron variants come with substantial increases in the risk of reinfection
+in comparison to previous variants, likely due to increased immune escape
+\citep{wei2024risk, pulliam2022increased, eythorsson2022rate}. So having
+reinfection data that is representative of each location under study is crucial
+for extending the analysis. While it would be ideal to use the reinfection rates
+over time for each \US state, most states do not publicly report reinfection
+data over the entire time period we considered or at all.
+
 
 % While it would be ideal to use confirmed rates over time for each \US state,
 % most states do not publicly report reinfection data over the entire time period
@@ -127,34 +96,24 @@ of each location under study is of the utmost importance for the Omicron era.
 % could be a topic of further study.
 
 Using seroprevalence data to estimate the case-ascertainment ratio is subject to
-a number of issues, and precludes us from pushing the period of analysis past
-the Omicron wave in December 2021. While most state-level data suggests that
+a number of additional issues that inhibit us from pushing the period of
+analysis past December 2021. While most state-level data suggests that
 reinfections still account for less than 20\% of reported cases during Omicron
-\attn{cites}, seropositivity rapidly reaches nearly 100\% of the population,
-precluding its continued use. Due to these issues,
-alternative data sources for
-estimating the case-ascertainment ratio is necessary. 
-% Intuitively, one might expect that
-% leveraging data from multiple sources would likely lead to more accurate and
-% stable estimates than those from using one source. 
-For example, wastewater surveillance data
-is may be complementary to seroprevalence data,
-especially when testing is low \citep{mcmanus2023predicting}. However, 
-% there has
-% been limited success in predicting incidence using such data. The extent that
-% wastewater concentration data is a useful in estimating COVID-19 incidence is
-% unclear owing to problems with viral occurrence and detectability in wastewater
-% that render 
-viral detection is inconsistent across locations due to temperature,
-per-capita water use, and in-sewer travel time \citep{mcmanus2023predicting,
-hart2020computational, li2023correlation}. Sentinel surveillance streams for
-influenza-like illness or acute respiratory infection may provide decent proxies
-for COVID-19 incidence, especially when testing for mild cases of COVID-19 is
-diminishing or has ceased completely. Finally, alternative surveillance streams
-(potentially outside of public health) such as those from surveys, helplines, or
-medical records could potentially be integrated if they provide at least a rough
-indication of the disease intensity over time
-\citep{reinhart2021open,ecdc2020strategies}.
+\citep{ruff2022rapid, nyreinfect2021, hireinfect2022, wareinfect2022},
+seropositivity rapidly reaches nearly 100\% of the population, precluding its
+continued use. Due to these issues, alternative data sources for estimating the
+case-ascertainment ratio is necessary. For example, wastewater surveillance data
+may be complementary to seroprevalence data, especially when testing is low
+\citep{mcmanus2023predicting}. However, viral detection is inconsistent across
+locations due to temperature, per-capita water use, and in-sewer travel time
+\citep{mcmanus2023predicting, hart2020computational, li2023correlation}.
+Sentinel surveillance streams for influenza-like illness or acute respiratory
+infection may provide decent proxies for COVID-19 incidence, especially when
+testing for mild cases of COVID-19 is diminishing or has ceased completely.
+Finally, alternative surveillance streams (potentially outside of public health)
+such as those from surveys, helplines, or medical records could potentially be
+integrated if they provide at least a rough indication of the disease intensity
+over time \citep{reinhart2021open,ecdc2020strategies}.
 
 
 

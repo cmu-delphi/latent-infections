@@ -4,10 +4,7 @@
 
 In what follows, we provide details on how we estimate the daily incident
 infections for each state over the considered time period of June 1, 2020 to
-November 29, 2021 and the data we used to achieve this. 
-% We start with a brief
-% introduction to each data source used and follow this with a description of each
-% major analysis task in the order they are performed.
+November 29, 2021 and the data we used to achieve this.
 \autoref{fig:cases_to_infect_flowchart} provides a visual summary of the data,
 analysis tasks, and the relationships between them. The major analysis tasks
 this figure aims to convey are as follows: First, we estimate variant-specific
@@ -20,22 +17,17 @@ case report to positive specimen date. We then deconvolve from positive specimen
 to report date by variant. The resulting infection estimates are aggregated
 across the variant categories, and adjusted to account for the unreported
 infections by using state-specific, time-varying seroprevalence data in an
-antibody prevalence model. This lets us reach our ultimate goal of obtaining
-daily incident infection estimates.
-% Then, we can apply these estimates in a
-% lagged correlation to hospitalizations to find the ``best'' lag between
-% infection and hospitalization rates according to Spearman's rank-based correlation 
-% and use this to compute time-varying IHRs for each state. 
+antibody prevalence model. 
 
 
 \begin{figure}[!tb]
 \centering
     \includegraphics[width=.99\textwidth]{Reported_cases_to_infect_flowchart.pdf} 
-    \caption{Flowchart of the inputted data and major analysis steps required 
-    to get from reported cases to incident infection estimates for each day 
-    over June 1, 2020 to November 29, 2021 for a state. Data sources are coloured 
-    in yellow, while data analysis steps are coloured in blue. The data sources that
-    do not stem from an analysis step are literature estimates.}
+    \caption{Flowchart of the inputted data and major analysis steps required to
+    get from reported cases to incident infection estimates for each day over
+    June 1, 2020 to November 29, 2021 for a state. Data sources are coloured in
+    yellow, while data analysis steps are coloured in blue. The data sources
+    that do not stem from an analysis step are literature estimates.}
     \label{fig:cases_to_infect_flowchart}
 \end{figure}
 
@@ -114,15 +106,15 @@ the onset of symptoms. Additional minor details are discussed in
 \subsection{Estimating the incubation period distributions} 
 \label{sec:incubation}
 
-To model the incubation period, the time between infection and symptom onset, we
-use estimates from the existing literature, modified slightly to for coherence
-with each other: we model each incubation as a gamma distribution with different
-parameters. We focus on the following eight variants, which dominated at various
-points during our study period: Ancestral, Alpha, Beta, Epsilon, Iota, Gamma,
-Delta, and Omicron. Alpha, Beta, Delta, Gamma, and Omicron are all variants of
-concern \citep{who2021tracking}, while we include the Epsilon (California) and
-Iota (New York) variants because of large impact on those and neighbouring
-states \citep{yang2022investigation, duerr2021dominance}.
+To account for the incubation period, the time between infection and symptom
+onset, we use estimates from the existing literature, modified slightly for
+coherence with each other: we model each incubation as a gamma distribution with
+different parameters. We focus on the following eight variants, which dominated
+at various points during our study period: Ancestral, Alpha, Beta, Epsilon,
+Iota, Gamma, Delta, and Omicron. Alpha, Beta, Delta, Gamma, and Omicron are all
+variants of concern \citep{who2021tracking}, while we include the Epsilon
+(California) and Iota (New York) variants because of large impact on those and
+neighbouring states \citep{yang2022investigation, duerr2021dominance}.
 
 The Ancestral variant has been modelled as a gamma distribution
 \citep{tindale2020evidence}, so we simply use those reported parameters. For the
@@ -171,13 +163,17 @@ The constraint ensures that the estimated proportions will sum to 1 across all
 $J$ variants. To encourage smoothness of the estimated proportions, we specify
 $f_{j\ell}(t)$ as a third-order polynomial in time: that is $f_{j\ell}(t) =
 \beta_{j\ell,0} + \beta_{j\ell,1} t + \beta_{j\ell,2}t^2 + \beta_{j\ell,3}t^3$,
-computed such that the resulting matrix of covariates is orthogonal.
+computed such that the resulting matrix of covariates is orthogonal. \autoref{fig:prop_figs} shows the proportions by variant for California before
+(left) and after (right) the smoothing procedure. 
 
-\attn{show the result for one
-state: the original proportions on the left, and the smoothed on the
-right. Then describe this to a small degree (2-3 sentences).}
-
-
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=0.4\linewidth]{proportions_before_multi.pdf}
+    \includegraphics[width=0.47\linewidth]{proportions_after_multi_pred.pdf}
+    \caption{Left: Original biweekly proportions of the variants in circulation for California.
+    Right: Daily proportions of the variants in circulation for California.}
+    \label{fig:prop_figs}
+\end{figure}
 
 \subsection{Retrospective deconvolution: from cases to infections}
 \label{sec:deconvolution}
@@ -189,6 +185,16 @@ Because the circulating variant proportions in \autoref{sec:variant-proportions}
 correspond to the positive specimen date, this requires two stages. The first is
 the deconvolution from report to positive specimen date, and the second is from
 positive specimen date to infection onset date.
+
+An important aspect of our methods is that deconvolution is not the same as a shift because simply shifting cases back in time and increasing them by some factor fails to capture the spatio-temporal dynamics of the pandemic. In our situation, reported cases are ``pushed back'' by the delays shown in \autoref{fig:chain_events_onset_report}).
+
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=0.9\linewidth]{convolution_diagram.pdf}
+    \caption{A general depiction of convolving smoothed cases (orange line) with the corresponding delay probabilities (shaded blue area) to get the convolved estimates (blue line) over four different times.}
+    \label{fig:convol}
+\end{figure}
+
 
 We will start by describing the first type of deconvolution performed from
 report to positive specimen date in detail. For this problem, let $t=1,\ldots,T'$
@@ -207,7 +213,7 @@ following optimization problem:
 \left( y_{\ell,t} -  \sum_{k=1}^{60}\widehat{\pi}_{\ell,t}(k) x_{t-k} \right)^2 
 + \lambda\ \sum_{t=4}^{T'} \big|x_t - 4x_{t-1} + 6x_{t-2} -4x_{t-3}+ x_{t-4}\big|.
 \end{align}
-\attn{These summs aren't quite right: the outer $t$ makes $x_{t-k}$ run
+\attn{These sums aren't quite right: the outer $t$ makes $x_{t-k}$ run
 negative? Actually this wouldn't be a problem, except that we don't deconvolve
 before $t=1$, we renormalize the delays. Perhaps too much detail, but the math
 annoys me. Ideas?}
@@ -285,8 +291,8 @@ Commercial Lab Seroprevalence Survey \citep{cdc2021blood, cdc2021comm}. See
 \autoref{sec:sero-details} for additional details. Each of these provides
 seroprevalence estimates along with confidence intervals.
 The daily fraction of new infections are based on surveillance work conducted by
-the Southern Nevada Health District \citep{ruff2022rapid}. \attn{These results
-are broadly similar to those in other locations with available data...}
+the Southern Nevada Health District \citep{ruff2022rapid}. These results
+are broadly similar to those in other locations with available data  \citep{ruff2022rapid, nyreinfect2021, hireinfect2022, wareinfect2022}.
 
 In order to account for different surveys occurring on different dates with
 noisy estimates, we estimate the model on the weekly frequency, observed on
@@ -341,13 +347,14 @@ signals are averaged over a 7-day, center-aligned, moving window before their
 conversion to rates.
 
 For each considered lag, we calculate Spearman's correlation between the state
-infection and hospitalization rates for each observed between June 1, 2020
-to November 29, 2021 with a center-aligned rolling window of 61 days.
-We then average these correlations across all
-states and times for each lag. 
+infection and hospitalization rates for each observed between June 1, 2020 to
+November 29, 2021 with a center-aligned rolling window of 61 days. We then
+average these correlations across all states and times for each lag. 
 
 The lag that leads to the highest average correlation is used to estimate the
 time-varying IHRs for each state. The IHR is computed by dividing the number of
 individuals who are hospitalized due to COVID-19 by the estimated total number
-who were infected on the lagged number of days before. \attn{Isn't there a
-window here?}
+who were infected on the lagged number of days before. To stabilize these lagged
+IHR estimates, we average these hospitalizations and infections within a window
+of 31 days centered on the date of interest, rather than just using one pair of
+dates for each computation.
