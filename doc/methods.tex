@@ -124,27 +124,29 @@ concern \citep{who2021tracking}, while we include the Epsilon (California) and
 Iota (New York) variants because of large impact on those and neighbouring
 states \citep{yang2022investigation, duerr2021dominance}.
 
-The Ancestral variant has been modelled as a gamma
-distribution~\citep{tindale2020evidence}, so we simply use those reported
-parameters. For the Alpha, Beta, Gamma, Delta and Omicron variants, we use the
-reported mean and standard deviation of the number of days of incubation
-\citep{tanaka2022shorter, grant2022impact, ogata2022shorter}. To match these
-moments to the gamma distribution, we solve the same moment equations described
-in \autoref{sec:delaystop}. Then, we discretize each resulting density to the support set,
-which is taken to be from 1 and 21 days. This range assumes that symptoms
-require at least 1 day to develop \citealp{phcan2021covid} and that an
-asymptomatic infection will resolve within 21 days \citep{zaki2021estimations,cortes2022sars}.
+The Ancestral variant has been modelled as a gamma distribution
+\citep{tindale2020evidence}, so we simply use those reported parameters. For the
+Alpha, Beta, Gamma, Delta and Omicron variants, we use the reported mean and
+standard deviation of the number of days of incubation \citep{tanaka2022shorter,
+grant2022impact, ogata2022shorter}. To match these moments to the gamma
+distribution, we solve the same moment equations described in
+\autoref{sec:delaystop}. Then, we discretize each resulting density to the
+support set, which is taken to be from 1 and 21 days. This range assumes that
+symptoms require at least 1 day to develop \citealp{phcan2021covid} and that an
+asymptomatic infection will resolve within 21 days
+\citep{zaki2021estimations,cortes2022sars}.
 
-We were unable to locate incubation period estimates
-for the geo-specific Epsilon and Iota variants, so we use the
-incubation period for Beta because Epsilon, Iota, and Beta are all children from
-the same parent in the phylogenetic tree of the Nextstrain Clades
-\citep{hodcroft2021covariants}. All other circulating variants are grouped
-together with the Ancestral variant. There was little available sequencing data
-prior to Alpha-emergence, but unfortunately, later in the pandemic, it is
-impossible to separate Ancestral from other rare variants.
+We were unable to locate incubation period estimates for the geo-specific
+Epsilon and Iota variants, so we use the incubation period for Beta because
+Epsilon, Iota, and Beta are all children from the same parent in the
+phylogenetic tree of the Nextstrain Clades \citep{hodcroft2021covariants}. All
+other circulating variants are grouped together with the Ancestral variant.
+There was little available sequencing data prior to Alpha-emergence, but
+unfortunately, later in the pandemic, it is impossible to separate Ancestral
+from other rare variants.
 
-\attn{Perhaps plot the incubation periods? Maybe sharing a panel with the circulation proportions below.}
+\attn{Perhaps plot the incubation periods? Maybe sharing a panel with the 
+circulation proportions below.}
 
 \subsection{Variant circulation proportions}
 \label{sec:variant-proportions}
@@ -189,9 +191,9 @@ the deconvolution from report to positive specimen date, and the second is from
 positive specimen date to infection onset date.
 
 We will start by describing the first type of deconvolution performed from
-report to positive specimen date in detail. For this problem, let $t=1,\ldots,T$
-represent the extended deconvolution period from March 1, 2020 to March 1, 2023,
-which was chosen to minimize the effects of boundary issues. Define $y_{\ell,t}$
+report to positive specimen date in detail. For this problem, let $t=1,\ldots,T'$
+index the extended deconvolution period from March 1, 2020 to March 1, 2023,
+extended to minimize the effects of boundary issues. Define $y_{\ell,t}$
 to be the number of new cases reported in location $\ell$ at time $t$, as
 reported by the John Hopkins Center for Systems Science and Engineering (JHU
 CSSE)\citealp{dong2020interactive} and retrieved with the The COVIDcast API
@@ -201,11 +203,15 @@ associated probability that these reported cases were collected $k$ days earler.
 We estimate the deconvolved cases by positive specimen date by solving the
 following optimization problem:
 \begin{align}
-\minimize_{\mathbf{x}_\ell}\ \sum_{t=1}^T 
+\minimize_{\mathbf{x}}\ \sum_{t=1}^{T'} 
 \left( y_{\ell,t} -  \sum_{k=1}^{60}\widehat{\pi}_{\ell,t}(k) x_{t-k} \right)^2 
-+ \lambda \sum_{t=4}^T \big|x_t - 4x_{t-1} + 6x_{t-2} -4x_{t-3}+ x_{t-4}\big|.
++ \lambda\ \sum_{t=4}^{T'} \big|x_t - 4x_{t-1} + 6x_{t-2} -4x_{t-3}+ x_{t-4}\big|.
 \end{align}
-This two parts of this optimization problem trade data fidelity (the sum of
+\attn{These summs aren't quite right: the outer $t$ makes $x_{t-k}$ run
+negative? Actually this wouldn't be a problem, except that we don't deconvolve
+before $t=1$, we renormalize the delays. Perhaps too much detail, but the math
+annoys me. Ideas?}
+The two parts of this optimization problem trade data fidelity (the sum of
 squared errors) with smoothness in the resulting estimates (the absolute error
 of the differences of $\mathbf{x}$). The tuning parameter $\lambda$ determines
 the relative importance of these competing goals. The solution to the problem is
@@ -229,25 +235,27 @@ each variant, so we must weight them by the variant proportions
 $\widehat{v}_{j\ell,t}$ estimated in \autoref{sec:variant-proportions}. The
 analogous optimization problem is therefore:
 \begin{align}
-\minimize_{\mathbf{u}_{j\ell}}\ \sum_{t=1}^T 
+\minimize_{\mathbf{u}}\ \sum_{t=1}^{T'} 
 \left( 
     \widehat{v}_{j\ell,t}\widehat{x}_{\ell,t} -  
     \sum_{k=-3}^{42} \tau_{j\ell,t}(k) u_{t-k} 
 \right)^2 
-+ \lambda \sum_{t=4}^T \big|u_{t} - 4u_{t-1} + 6u_{t-2} -4u_{t-3}+ u_{t-4}\big|.
++ \lambda\ \sum_{t=4}^{T'} \big|u_{t} - 4u_{t-1} + 6u_{t-2} -4u_{t-3}+ u_{t-4}\big|.
 \end{align}
-We call the solution $\widetilde{\mathbf{u}}_{j\ell}$ the \emph{variant-specific deconvolved cases} and
-emphasize that these are those cases that will eventually be reported to public
-health. Because this deconvolution is done separately for each location and
-variant category, we ultimately obtain deconvolved case estimates by the date of
-infection onset that are separated by variant. Finally, we will denote the total
-deconvolved cases at location $\ell$ as $\widehat{\mathbf{u}}_\ell$.
+We call the solution $\widetilde{\mathbf{u}}_{j\ell}$ the \emph{variant-specific
+deconvolved cases} and emphasize that these are those cases that will eventually
+be reported to public health. Because this deconvolution is done separately for
+each location and variant category, we ultimately obtain deconvolved case
+estimates by the date of infection onset that are separated by variant. Finally,
+we will denote the total deconvolved cases at location $\ell$ as
+$\widehat{\mathbf{u}}_\ell = \sum_j \widetilde{\mathbf{u}}_{j\ell}$. 
 
 \subsection{Inverse reporting ratio and the antibody prevalence model} 
 \label{sec:report-ratio}
 
-To capture the unreported infections, it is necessary to adjust these deconvolved case estimates by the ratio of the true number of new infections
-to the new reported infections. 
+To capture the unreported infections, it is necessary to adjust these
+deconvolved case estimates by the ratio of the true number of new infections to
+the new reported infections. 
 
 Because seroprevalence of anti-nucleocapsid antibodies represents the percentage
 of people who have at least one resolving or past infection \citep{cdc2020data},
@@ -256,9 +264,10 @@ we can use the change in subsequent seroprevalence measurements to estimate
 This intuition suggests modelling reported seroprevalence at time $t+1$ as a
 fraction $1-\gamma$ of the previous seroprevalence measurement at $t$ plus the
 reinfection-adjusted deconvolved cases multiplied by
-the inverse reporting ratio at time $t$. That is, 
+the inverse reporting ratio at time $t$:
 \begin{align}
-s_{\ell,t+1} &= (1 -\gamma_{\ell}) s_t + a_{\ell,t} z_{\ell,t} \widehat{u}_{\ell,t} + \epsilon_{\ell,t},
+s_{\ell,t+1} & = (1 -\gamma_{\ell}) s_t 
++ a_{\ell,t} z_{\ell,t} \widehat{u}_{\ell,t} + \epsilon_{\ell,t},
 \end{align}
 where $\widehat{u}_{\ell,t}$ is deconvolved cases,
 $z_{\ell,t}$ is the percentage of reinfections, $a_{\ell,t}$ is the inverse
@@ -285,12 +294,12 @@ Monday, and treat $s_{\ell,t}$ as a latent variable. Therefore, we write,
 \begin{align}
 \label{eq:waningpr}
 r^1_{\ell,m} &= s_{\ell,m} + \tau_{\ell,m}, 
-  & \tau_{\ell,m} &\sim \textrm{N}(0,\ w^1_{\ell,m}\sigma^2_r)\\
+  & \tau_{\ell,m} &\sim \textrm{N}(0, w^1_{\ell,m}\sigma^2_{\ell,r}),\\
 r^2_{\ell,m} &= s_{\ell,m} + \varphi_{\ell,m}, 
-  & \varphi_{\ell,m} &\sim \textrm{N}(0,\ w^2_{\ell,m}\sigma^2_r)\\
+  & \varphi_{\ell,m} &\sim \textrm{N}(0, w^2_{\ell,m}\sigma^2_{\ell,r}),\\
 s_{\ell,m+1} &= (1 -\gamma_{\ell}) s_{\ell,m} + 
-  a_{\ell,m} z_{\ell,m} y^\Sigma_{\ell,m} + \epsilon_{\ell,m}, 
-  & \epsilon_{m} &\sim \textrm{N}(0,\ \sigma^2_{\ell,\epsilon}),
+  a_{\ell,m} z_{\ell,m} \widehat{u}^\Sigma_{\ell,m} + \epsilon_{\ell,m}, 
+  & \epsilon_{\ell,m} &\sim \textrm{N}(0, \sigma^2_{\ell,\epsilon}),
 \end{align}
 where $r^1$ and $r^2$ correspond to the two different seroprevalence surveys.
 These surveys each have measurement errors with variance $\sigma^2_r$ that scale
@@ -298,10 +307,10 @@ proportional to the observed confidence intervals for the estimates,
 respectively $w^1_{\ell,m}$ and $w^2_{\ell,m}$. We denote
 $\widehat{u}^\Sigma_{\ell,m} = \sum_{t=m}^{m+1} \widehat{u}_{\ell,t}$. Finally,
 to ensure that $\mathbf{a}_\ell$ is smooth over time, we complete the model with
-an additional equation that enforces smoothness
+an additional equation that enforces smoothness,
 \begin{align}
-a_{\ell,m+1} &= 3a_{\ell,m} - 3a_{\ell,m-1} + a_{\ell,m-2} + \eta_m, 
-  &\eta_m  &\sim \textrm{N}(0, \sigma^2_{\eta}).
+a_{\ell,m+1} &= 3a_{\ell,m} - 3a_{\ell,m-1} + a_{\ell,m-2} + \eta_{\ell,m}, 
+  &\eta_{\ell,m}  &\sim \textrm{N}(0, \sigma^2_{\eta}).
 \end{align}
     
 This antibody prevalence model is a state-space model with latent variables
@@ -318,30 +327,27 @@ deferred to \autoref{supp:ssapm}.
 \subsection{Lagged correlation to hospitalizations and time-varying IHRs} 
 \label{sec:ihr-calculations}
 
-\attn{Revise the below to reflect current methods.}
+From The COVIDcast API \citep{reinhart2021open}, we retrieve the daily number of
+confirmed COVID-19 hospital admissions for each state that are collected by the
+\US Department of Health and Human Services (HHS). We use our infection
+estimates $\mathbf{\widehat{u}}_\ell$ to compute the lagged correlation with 
+hospitalizations. The goal of this analysis is to find the lag between
+infection and hospitalization rates that gives the highest average rank-based
+correlation across \US states. To that end, we consider a wide range of possible
+lag values ranging from 1 to 25 days. Zero and negative lags are not considered
+because COVID-19 infection onset must precede hospitalization.
+To remove day of the week effects, both the infection and hospitalization
+signals are averaged over a 7-day, center-aligned, moving window before their
+conversion to rates.
 
-From the same API, we also retrieve the daily number of confirmed COVID-19
-hospital admissions for each state that are collected by the \US Department of
-Health and Human Services (HHS). Both datasets are updated as of June 6, 2022.
+For each considered lag, we calculate Spearman's correlation between the state
+infection and hospitalization rates for each observed between June 1, 2020
+to November 29, 2021 with a center-aligned rolling window of 61 days.
+We then average these correlations across all
+states and times for each lag. 
 
-We use our infection estimates in a lagged correlation analysis with confirmed
-COVID-19 hospitalizations. Our primary goal of this analysis is to find the lag
-between infection and hospitalization rates that gives the highest average
-rank-based correlation across \US states. To that end, we consider a wide range
-of possible lag values ranging from 1 to 25 days. Zero and negative lags are not
-considered because COVID-19 infection onset must precede hospitalization due to
-the virus. To remove day of the week effects, both the infection and
-hospitalization signals are subject to a 7-day moving average (center-aligned)
-before their conversion to rates.
-
-For each considered lag, we calculate the Spearman's correlation between the 
-state infection and hospitalization rates for each observed day 
-over the June 1, 2020 to November 29, 2021
-time period %, and use the epi\_slide function \citep{mcdonald2023epipredict} to 
-with a center-aligned rolling window of 61 days for each such computation.
-We then calculate the average correlation across all states and times for each lag. 
-The lag that leads to the highest average correlation is used to estimate 
-the time-varying IHRs for each
-state. To compute this for a given day, the number of individuals who are
-hospitalized due to COVID-19 on a day are divided by the estimated total number
-who were infected on the lagged number of days before.
+The lag that leads to the highest average correlation is used to estimate the
+time-varying IHRs for each state. The IHR is computed by dividing the number of
+individuals who are hospitalized due to COVID-19 by the estimated total number
+who were infected on the lagged number of days before. \attn{Isn't there a
+window here?}
