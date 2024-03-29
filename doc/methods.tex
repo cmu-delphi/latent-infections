@@ -7,18 +7,19 @@ infections for each state over the considered time period of June 1, 2020 to
 November 29, 2021 and the data we used to achieve this.
 \autoref{fig:cases_to_infect_flowchart} provides a visual summary of the data,
 analysis tasks, and the relationships between them. The major analysis tasks
-this figure aims to convey are as follows: First, we estimate variant-specific
+this figure aims to convey are as follows. First, we estimate variant-specific
 incubation periods and two types of delay distributions for each day over the
-considered time period. Next, each incubation period and symptom onset to
-positive specimen delay distribution are joined using convolution to obtain
-variant-specific infection onset to positive specimen distributions for each
-time (for a brief description of convolution, please see \autoref{sec:convol}). 
-Subsequently, two types of deconvolution are performed. We first deconvolve from
-case report to positive specimen date. We then deconvolve from positive specimen
-to report date by variant. The resulting infection estimates are aggregated
-across the variant categories, and adjusted to account for the unreported
-infections by using state-specific, time-varying seroprevalence data in an
-antibody prevalence model. 
+time period under consideration. Next, each day-location-specific incubation
+period and symptom onset to positive specimen delay distribution are combined
+using convolution, resulting in variant-specific infection onset to positive
+specimen distributions for each time and location (for a brief description of
+convolution, please see \autoref{sec:convol}). Subsequently, two types of
+deconvolution are performed. We first deconvolve from case report to positive
+specimen date. We then deconvolve from positive specimen to report date by
+variant. The resulting infection estimates are aggregated across the variant
+categories and adjusted to account for the unreported infections by using
+state-specific, time-varying seroprevalence data in an antibody prevalence
+model. 
 
 
 \begin{figure}[!tb]
@@ -141,10 +142,10 @@ from other rare variants (which is one reason why we may refer to it as the Othe
 \begin{figure}[!tb]
 \centering
     \includegraphics[width=0.6\linewidth]{inc-gammas-1.pdf}
-    \caption{Gamma density for the incubation period of each of the eight variant categories. 
-    Note that the Ancestral variant directly utilizes the available gamma shape and scale parameters, 
-    while the remaining variants use the method of moments to estimate the
-    gamma parameters.}
+    \caption{Gamma density for the incubation period of each of the eight
+    variant categories. Note that the Ancestral variant directly utilizes the
+    available gamma shape and scale parameters, while the remaining variants use
+    the method of moments to estimate the gamma parameters.}
     \label{fig:inc_gammas}
 \end{figure}
 
@@ -195,12 +196,17 @@ correspond to the positive specimen date, this requires two stages. The first is
 the deconvolution from report to positive specimen date, and the second is from
 positive specimen date to infection onset date.
 
-An important aspect of our methods is that deconvolution is not the same as a shift because simply shifting cases back in time and increasing them by some factor fails to capture the spatio-temporal dynamics of the pandemic. In our situation, reported cases are ``pushed back'' by the delays shown in \autoref{fig:chain_events_onset_report}. 
+An important aspect of our methods is that deconvolution is not the same as a
+shift. Simply shifting cases back in time and increasing them by some
+factor fails to capture the temporal dynamics of the pandemic. In our
+situation, reported cases are ``pushed back'' by the delays shown in
+\autoref{fig:chain_events_onset_report}. 
 
 We will start by describing the first type of deconvolution performed from
 report to positive specimen date in detail. For this problem, let $t=1,\ldots,T'$
 index the extended deconvolution period from March 1, 2020 to March 1, 2023,
-extended to minimize the effects of boundary issues. Define $y_{\ell,t}$
+extended to minimize the effects of boundary issues. \attn{Ryan, thoughts on
+this notation? The sum over $t$ is awkward.} Define $y_{\ell,t}$
 to be the number of new cases reported in location $\ell$ at time $t$, as
 reported by the John Hopkins Center for Systems Science and Engineering (JHU
 CSSE)\citealp{dong2020interactive} and retrieved with the The COVIDcast API

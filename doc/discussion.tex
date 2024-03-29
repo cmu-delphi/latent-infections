@@ -3,35 +3,31 @@
 We retrospectively estimated daily incident infections for each \US state over
 the period June 1, 2020 to November 29, 2021. Our  estimates suggest both (a)
 that the pandemic impacted states earlier and at a larger scale than is
-indicated by cases and that (b) examining cases alone hides some spatio-temporal
-waves that become apparent by examining infections. We observe outbreaks in
-infections that are difficult to detect from cases alone such as the Delta wave
-in New Jersey, Connecticut, and Maryland. This suggests that cases paint an
-incomplete picture of the pandemic, especially when outbreaks are largely driven
-by unreported infections. Furthermore, since case reports generally follow
-symptom and infection onsets, cases have a built-in temporal bias. This is in
-addition to other biases from differences in reporting across states such as
-temporary bottlenecks due influxes of data or more persistent processing issues
-that increase the average time from case detection to report
-\citep{wash2020dash, dunkel2020covid19}. 
-% Furthermore, no indication of uncertainty is provided for
-% even the gold standard case estimates \citep{delphiepidata2020}. 
-Thus, while reported cases provide an indication of the trajectory of the
-pandemic, it is a delayed and incomplete version.
+indicated by reported cases and that (b) examining cases alone hides significant
+spatio-temporal variation that becomes more apparent with infections. We observe
+outbreaks in infections that are difficult to detect from cases alone such as
+the Delta wave in New Jersey, Connecticut, and Maryland. This suggests that
+cases paint an incomplete picture of the pandemic, especially when outbreaks are
+largely driven by unreported infections. Furthermore, since case reports
+generally follow symptom and infection onsets, cases have a built-in temporal
+bias. This is in addition to other biases from differences in reporting across
+states such as temporary bottlenecks due influxes of data or more persistent
+processing issues that increase the average time from case detection to report
+\citep{wash2020dash, dunkel2020covid19}. Thus, while reported cases provide an
+indication of the trajectory of the pandemic, it is a delayed and incomplete
+version.
 
-
-Our approach offers a number of advantages. For instance, we aim to incorporate
-as much state-specific information as possible when deriving our estimates. By
-using state-level case, line list, and variant circulation data, we are able to
-construct incubation and delay distributions that are specific to each state.
+Our approach offers a number of advantages. For instance, we incorporate as much
+state-specific information as possible when deriving our estimates. By using
+state-level case, line list, and variant circulation data, we are able to
+construct incubation and delay distributions that are spatio-temporally specific.
 Time-varying and state-specific seroprevalence data allows the reporting ratio
 estimates to similarly vary over space and time, a departure from existing work
 \citep{unwin2020state, uga2020covid19}. Existing approaches that use the delay
 distribution to generate infection estimates often only construct one delay
 distribution that is used for all states \citep{chitwood2022reconstructing,
-jahja2022real}. In contrast, our work avoids the assumption of geographic
-invariance, where it is assumed that all states have the same patterns of delay
-from symptom onset to case report. This assumption is unlikely to be true due to
+jahja2022real}. In contrast, our work avoids this assumption of geographic
+invariance. This assumption is far from realistic due to
 differences in reporting pipelines, pandemic response, and variants in
 circulation, among other issues. 
 
@@ -54,20 +50,20 @@ could be improved upon in future work. Since the waning of immunity is likely to
 be variant-dependent \citep{pooley2023durability}, it follows that our model
 waning parameter may be better posed as a mixture of parameters for different
 variants with weights determined by the proportion of the variants circulating
-at the time in the state. Related to this is the issue that newer variants may
-escape detection \citep{nih2022assessing, fda2023sars}. While in a retrospective
-analysis where finalized data is used this is less likely to be an issue, this
-could very well pose a problem for real-time estimates of infections.
+at the time in the state. Relatedly, newer variants may escape detection
+\citep{nih2022assessing, fda2023sars}. While in a retrospective analysis, where
+finalized data is used, this is less likely to be an issue, detection escape
+would pose a problem for real-time estimates of infections.
 
-Regarding reinfections, a major reason why we chose an end date of November 29,
+The major reason why we chose an end date of November 29,
 2021, and ultimately decided to not continue into the Omicron wave is because
 the Omicron variants come with substantial increases in the risk of reinfection
 in comparison to previous variants, likely due to increased immune escape
-\citep{wei2024risk, pulliam2022increased, eythorsson2022rate}. So having
+\citep{wei2024risk, pulliam2022increased, eythorsson2022rate}. Access to
 reinfection data that is representative of each location under study is paramount
 for extending the analysis. While it would be ideal to use the reinfection rates
-over time for each \US state, most states do not publicly report reinfection
-data over the entire time period we considered or at all.
+over time for each \US state, many states do not publicly report reinfection
+data over the entire time period we examined, if at all.
 
 
 % While it would be ideal to use confirmed rates over time for each \US state,
@@ -153,20 +149,17 @@ over time \citep{reinhart2021open,ecdc2020strategies}.
 
 Overall, we adopt a relatively simple deconvolution-based approach and devote
 much of our efforts to tailoring our approach to the available data. A major
-result of this is the development of a way of to model the waning of detectable
+result of this is the development of a model for the waning of detectable
 antibody levels and space-time-specific reporting ratios based on seroprevalence
 data. In a way, our approach is built for the data rather than trying to force
-the data to fit to an existing approach. However, our model is only as good as
-the quality and the quantity of the data provided to it. In our case, the lack
-of data is both a barrier to entry and a continual roadblock. The assumptions we
-are required to make as a consequence of this clearly limit the generalizability
-and call into question the reliability of the results. So while we highlight
-some interesting trends and numerical findings, these results are not
-definitive, but rather exploratory and intended to stimulate discussion on the
-challenging task of estimating infections. Despite these limitations, we are
-encouraged by the ability to use routine data to produce sensible estimates of
-infections in the United States and the plausibility of the apparent geospatial
-and temporal trends. 
+the data to fit to an existing modelling framework. However, our model is only
+as good as the quality and the quantity of the data provided to it. In our case,
+the lack of data is both a barrier to entry and a continual roadblock. The
+assumptions we are required to make as a consequence of this limit the
+generalizability. So while we highlight many interesting trends and numerical
+findings, these results are not definitive. Despite these limitations, we are
+encouraged by the sensiblity of the estimates of infections in the United States
+and the plausibility of the apparent geospatial and temporal trends. 
  
 
 
@@ -183,10 +176,10 @@ and temporal trends.
 % pipeline. In this way, one could readily adapt our approach to generate
 % estimates for the provinces in Canada or the regions in England.
 
-Well-informed, localized estimates of COVID-19 infections over time can help us
-to have a more clear and comprehensive understanding of the course of the
-pandemic. Such estimates contribute important information on the timing and
-magnitude of disease burden for each location and they highlight trends that may
-not be visible from case data alone. Therefore, our infection estimates provide
-key information for the ongoing debate on the true size and impact of the
-pandemic.
+Well-informed, localized estimates of COVID-19 infections over time can provide
+a clearer and more comprehensive understanding of the course of the pandemic.
+Such estimates contribute important information on the timing and magnitude of
+the disease burden for each location and they highlight trends that may not be
+visible from reported case data alone. Therefore, our infection estimates
+provide key information for the ongoing analysis on the true size and impact of
+the pandemic.
