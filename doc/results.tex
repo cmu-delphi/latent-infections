@@ -104,7 +104,7 @@ infections relative to other states.
 
 \begin{figure}[!tb]
 \centering
-\includegraphics[width=.99\linewidth]{state_niauc_est_faceted_F24.pdf} 
+\includegraphics[width=.99\linewidth]{adj-unadj-cases-plot-1.pdf} 
 \caption{Estimates of the number of daily new infections per 100,000
 population for each \US state from June 1, 2020 to November 29, 2021
 (dark blue line). The blue shaded regions depict the 50, 80, and 95\%
@@ -118,7 +118,7 @@ dotted orange line represents the 7-day average of the new cases per
 
 \begin{figure}[!tb]
 \centering
-\includegraphics[width=.99\textwidth]{choro_inf_case_rates_F24.pdf}
+\includegraphics[width=.99\textwidth]{choro-maps-1.pdf}
 \caption{Choropleth maps of the state-level estimates of the number of daily new
 infections per $100,000$ population (top row) and the daily new cases per
 $100,000$ population (bottom row) for five dates between June 1, 2020 to
@@ -155,8 +155,7 @@ Massachusetts over the spring of 2021. To a lesser extent, this trend is also ap
 
 \begin{figure}[!tb]
 \centering
-    \includegraphics[width=\linewidth]{state_niauc_est_6states_F24.pdf}\\
-    \includegraphics[width=\linewidth]{state_decon_byvar_est_6states_F24.pdf}
+    \includegraphics*[width=\linewidth]{six-decon-var-1.pdf}
     \caption{Top panel: Reported cases, deconvolved cases, and estimates of
     daily new infections (dark blue line) per 100K inhabitants. The blue shaded
     regions indicate the 50, 80, and 95\% confidence bands, while the background
@@ -166,7 +165,7 @@ Massachusetts over the spring of 2021. To a lesser extent, this trend is also ap
 \end{figure}
 
 
-\subsection{The relationship between infections and hospitalizations is complicated.}
+\subsection{The relationship between infections and hospitalizations is messy.}
 \label{sec:lagged-correlations}
 
 We systematically investigate the temporal relationship between infections and
@@ -186,7 +185,7 @@ the international estimates.
 
 \begin{figure}[!tb]
 \centering
-\includegraphics[width=.9\textwidth]{adj_unadj_cases_hosp_lag_corr_F24.pdf} 
+\includegraphics[width=.5\linewidth]{corr-plot-1.pdf} 
 \caption{Spearman's correlation between each of cases, deconvolved cases, and
 infections with hospitalizations per 100,000. These are calculated for each lag,
 state and rolling window of 61 days before averaging. The vertical dashed lines
@@ -248,7 +247,7 @@ each state~\citep{fox2023disproportionate}.
 
 \begin{figure}[!tb]
 \centering
-\includegraphics[width=.99\linewidth]{IHR_7dav_F24.pdf}
+\includegraphics[width=.99\linewidth]{ihrs-1.pdf}
 \caption{Time-varying IHR and CHR estimates for each state from June 1, 2020
 to November 29, 2021, obtained using the corresponding optimal lag from the
 systematic lag analysis. Note that the infection, case, and hospitalization
