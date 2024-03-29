@@ -23,17 +23,16 @@ library(tidyverse)
 
 Data:
 ```{r load-data}
-setwd("/Users/admin/Documents/Github/latent-infections/generate-results/data")
 
-adj_df_list <- readRDS("adj_df_list_F24.RDS")
+adj_df_list <- readRDS("data/adj_df_list_F24.rds")
 adj_df <- bind_rows(adj_df_list)
 
-pop_df <- readRDS("pop_df.RDS")
+pop_df <- readRDS("data/pop_df.rds")
 pop_used <- "population_2020"
 
-load("adj_df_by_var.RData")
+adj_df_by_var <- read_rds("data/adj_df_by_var.rds")
 
-load("corr_inf_decon_case_lags.RData")
+corrs <- read_rds("data/corr_inf_decon_case_lags.rds")
 ```
 
 # Results
@@ -103,9 +102,12 @@ weekly_less_10 %>%
 # Compute the % of estimated infections were eventually reported as cases for the periods of Delta, Other, Alpha domination
 
 # Select only the needed columns in each data frame to reduce code
-adj_df_D21 <- adj_df_D21 %>% select(date, geo_value, case_count_raw, adj_infect) 
-adj_df_O21 <- adj_df_O21 %>% select(date, geo_value, case_count_raw, adj_infect) 
-adj_df_A21 <- adj_df_A21 %>% select(date, geo_value, case_count_raw, adj_infect) 
+adj_df_D21 <- adj_df_by_var$adj_df_D21 %>%
+  select(date, geo_value, case_count_raw, adj_infect) 
+adj_df_O21 <- adj_df_by_var$adj_df_O21 %>%
+  select(date, geo_value, case_count_raw, adj_infect) 
+adj_df_A21 <- adj_df_by_var$adj_df_A21 %>%
+  select(date, geo_value, case_count_raw, adj_infect) 
 
 # Function to sum adj infect and case counts over the relevant time period
 summarise_df_over_period <- function(prepped_df){
@@ -150,12 +152,18 @@ states_cases_infect_pct_A21 %>%
 # Maximum average correlation across states for...
 
 # Infections
-infect_res[which(infect_res$cor == max(infect_res$cor)), ]
+with(corrs,
+     infect_res[which(infect_res$cor == max(infect_res$cor)), ]
+)
 
 # Cases
-cases_res[which(cases_res$cor == max(cases_res$cor)), ]
+with(corrs,
+     cases_res[which(cases_res$cor == max(cases_res$cor)), ]
+)
 
 # Deconvolved cases
-unadj_infect_res[which(unadj_infect_res$cor == max(unadj_infect_res$cor)), ]
+with(corrs,
+     unadj_infect_res[which(unadj_infect_res$cor == max(unadj_infect_res$cor)), ]
+)
 ```
 
