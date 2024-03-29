@@ -1,0 +1,161 @@
+---
+title: "Numeric Results Generation"
+author: "Rachel Lobay"
+date: "2024-03-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+
+# Numeric results generation for Retrospective estimation of latent COVID-19 infections before Omicron in the U.S. paper
+
+This document enables the generation of all non-supplementary numeric results that appear in Retrospective estimation of latent COVID-19 infections before Omicron in the U.S.. We separate these by sub-section and arrange them in order of appearance.
+
+## Load packages and data 
+
+Packages:
+```{r load-packages}
+library(tidyverse)
+```
+
+Data:
+```{r load-data}
+setwd("/Users/admin/Documents/Github/latent-infections/generate-results/data")
+
+adj_df_list <- readRDS("adj_df_list_F24.RDS")
+adj_df <- bind_rows(adj_df_list)
+
+pop_df <- readRDS("pop_df.RDS")
+pop_used <- "population_2020"
+
+load("adj_df_by_var.RData")
+
+load("corr_inf_decon_case_lags.RData")
+```
+
+# Results
+
+```{r max-inf-rate}
+# Max adj_inf_rate per state prior to Nov. 1, 2021
+max_adj_inf_rate = adj_df %>% 
+   group_by(geo_value) %>%
+   filter(date <= as.Date("2021-11-01")) %>%
+   summarise(max_adj_rate = max(adj_inf_rate)) %>%
+   arrange(desc(max_adj_rate))
+
+max_adj_inf_rate = max_adj_inf_rate %>% pull(max_adj_rate)
+
+adj_df %>%
+  filter(adj_inf_rate %in% max_adj_inf_rate[1:5]) %>% # Top 5
+  arrange(desc(adj_inf_rate)) %>% 
+  select(geo_value, date, adj_inf_rate)
+```
+
+
+```{r stretch-less-ten}
+# Which state has longest stretch of less than 10 infections per 100,000 per week?
+
+# Group by week starting on Sunday 
+adj_df_weekly_sums_adj_inf_rate = adj_df %>%
+  group_by(geo_value, week = cut(date, "week", start.on.monday = FALSE)) %>%
+  summarise(sum_weekly_adj_infect = sum(adj_infect)) %>% 
+  left_join(pop_df, by = "geo_value") %>%
+  mutate(sum_weekly_adj_rate = sum_weekly_adj_infect / !! rlang::sym(pop_used) * 100000,
+         week = as.Date(week))
+
+# Filter for instances where there are less than 10 infections per 100,000 per week
+weekly_less_10 = adj_df_weekly_sums_adj_inf_rate %>%
+  arrange(sum_weekly_adj_rate) %>%
+  filter(sum_weekly_adj_rate <= 10)
+
+# Which state has longest stretch of less than 10 infections per 100,000 per week?
+weekly_less_10 = weekly_less_10 %>%
+  group_by(geo_value) %>%
+  arrange(week) %>%
+  mutate(diff_bt_obs_weeks = week - lag(week),
+         binary_7_days_bt = ifelse((as.integer(row_number() == 1)) | (diff_bt_obs_weeks == 7), 1, 0),
+         grp = cumsum(binary_7_days_bt == 0)) %>%
+  ungroup() %>%
+  group_by(geo_value, grp) %>%
+  mutate(cumsum_binary = cumsum(binary_7_days_bt)) %>% 
+  ungroup()
+
+# Max stretch per state - VT is greatest
+weekly_less_10 %>%
+  group_by(geo_value) %>%
+  summarise(max_cumsum_binary = max(cumsum_binary)) %>%
+  arrange(desc(max_cumsum_binary))
+
+# What weeks is this over?
+weekly_less_10 %>%
+  group_by(geo_value) %>%
+  filter(geo_value == "VT") %>%
+  arrange(week) %>% 
+  select(geo_value, week, sum_weekly_adj_rate)
+```
+
+## The cases-to-infections ratio varies by state and variant.
+
+```{r case-infect-ratio}
+# Compute the % of estimated infections were eventually reported as cases for the periods of Delta, Other, Alpha domination
+
+# Select only the needed columns in each data frame to reduce code
+adj_df_D21 <- adj_df_D21 %>% select(date, geo_value, case_count_raw, adj_infect) 
+adj_df_O21 <- adj_df_O21 %>% select(date, geo_value, case_count_raw, adj_infect) 
+adj_df_A21 <- adj_df_A21 %>% select(date, geo_value, case_count_raw, adj_infect) 
+
+# Function to sum adj infect and case counts over the relevant time period
+summarise_df_over_period <- function(prepped_df){
+  prepped_df %>%
+  summarise(sum_adj_infect = sum(adj_infect),
+            sum_case_count_raw = sum(case_count_raw)) %>%
+  mutate(cases_over_infect_pct = (sum_case_count_raw / sum_adj_infect) * 100)
+}
+
+
+# 1. Delta
+states_cases_infect_pct_D21 <- summarise_df_over_period(adj_df_D21)
+
+# Which state had smallest number of infections reported over the Delta period?
+states_cases_infect_pct_D21 %>% 
+  arrange(cases_over_infect_pct)
+
+# Cases account for at least 30% of infections during Delta domination
+states_cases_infect_pct_D21 %>%
+  filter(cases_over_infect_pct >= 30) %>%
+  arrange(desc(cases_over_infect_pct)) # 11 states, so in 39 states cases account for < 30% infections
+
+# 2. Other (considering this category from our start date up to the next dominant variant - whether Alpha or Epsilon or something else)
+states_cases_infect_pct_O21 <- summarise_df_over_period(adj_df_O21)
+
+# Which state had smallest number of infections reported over the Other period?
+states_cases_infect_pct_O21 %>% 
+  arrange(cases_over_infect_pct) 
+
+# 3. Alpha
+states_cases_infect_pct_A21 <- summarise_df_over_period(adj_df_A21)
+
+# Which state had smallest number of infections reported over the Alpha period?
+states_cases_infect_pct_A21 %>% 
+  arrange(cases_over_infect_pct) 
+
+```
+
+## The relationship between infections and hospitalizations is complicated.
+
+```{r inf-case-corr}
+# Maximum average correlation across states for...
+
+# Infections
+infect_res[which(infect_res$cor == max(infect_res$cor)), ]
+
+# Cases
+cases_res[which(cases_res$cor == max(cases_res$cor)), ]
+
+# Deconvolved cases
+unadj_infect_res[which(unadj_infect_res$cor == max(unadj_infect_res$cor)), ]
+```
+

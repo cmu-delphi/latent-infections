@@ -1,0 +1,324 @@
+---
+title: "Plots Generation"
+author: "Rachel Lobay"
+date: "2024-03-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+
+# Plots for Retrospective estimation of latent COVID-19 infections before Omicron in the U.S. paper
+
+This document enables the generation of all non-supplementary plots that appear in Retrospective estimation of latent COVID-19 infections before Omicron in the U.S.. We separate these by section and arrange them in order of appearance.
+
+## Load packages and data 
+
+Packages:
+```{r load-packages}
+library(tidyverse)
+library(geofacet)
+library(usmap)
+library(patchwork)
+```
+
+Data:
+```{r load-data}
+setwd("/Users/admin/Documents/Github/latent-infections/generate-results/data")
+
+adj_df_list <- readRDS("adj_df_list_F24.RDS")
+adj_df <- bind_rows(adj_df_list)
+
+pop_df <- readRDS("pop_df.RDS")
+pop_used <- "population_2020"
+
+six_states = c("MT", "MA", "ID", "LA", "CA", "OH")
+prop_top_circ_df <- read_rds("prop_top_circ_df.rds")
+state_decon_byvar_df <- read_rds("state_decon_byvar_df.rds")
+
+load("corr_inf_decon_case_lags.RData")
+ihrs_dat <- read_rds("ihrs_dat.rds")
+density_data <- read_rds("gamma_density_data.rds")
+ca_interp_list <- read_rds("ca_interp_list.rds")
+```
+
+## Results
+
+Plot specifications:
+```{r grid-spec, include = FALSE}
+# Create my_grid for facet_geo
+my_grid <- us_state_without_DC_grid1
+my_grid$row[my_grid$code == "AK"] <- 2
+my_grid$row <- my_grid$row - 1
+grid_preview(my_grid)
+```
+
+Plots from this section:
+```{r adj-unadj-cases-plot, include = FALSE}
+# Adj. infect. / 100k plot including  unadjusted infections / 100k and cases / 100k for reference
+
+ggplot(adj_df) +
+  geom_ribbon(aes(date, ymin = ninetyfive_lowb_rate, ymax = ninetyfive_upb_rate, fill = "95%")) +
+  geom_ribbon(aes(date, ymin = eighty_lowb_rate, ymax = eighty_upb_rate, fill = "80%")) +
+  geom_ribbon(aes(date, ymin = fifty_lowb_rate, ymax = fifty_upb_rate, fill = "50%")) +
+  geom_line(aes(date, adj_inf_rate, color = "Inf. / 100k"), size = 0.6) +
+  geom_line(aes(date, cases_rate_7d_av, color = "Cases / 100k"), size = 0.4) +
+  geom_line(aes(date, unadj_inf_rate, color = "Deconvolved cases / 100k"), size = 0.4, alpha = 0.8) +
+  scale_x_date(name = "", date_breaks = "6 month", date_labels = "%m/%y", expand = c(0,0)) +
+  scale_y_continuous(labels = scales::comma, limits = c(0, 600), expand = c(0,0), n.breaks = 4) + 
+  scale_color_manual(name='Estimates', # Legend
+                     breaks=c('Inf. / 100k',
+                              'Deconvolved cases / 100k',
+                              'Cases / 100k'),
+                     values=c('Inf. / 100k' = "midnightblue",
+                              'Deconvolved cases / 100k' = "springgreen4",
+                              'Cases / 100k' = "darkorange2")) +
+  scale_fill_manual(name = 'CI', values = c("skyblue3", "lightskyblue", "lightskyblue1")) +
+  ylab("") +
+  facet_geo(~ geo_value, grid = my_grid) +
+  theme_bw(16) +
+  theme(axis.text.x = element_text(hjust = 0.1, vjust = 3, size = 5.5),
+        axis.text.y = element_text(size = 6.5),
+        axis.title.y=element_blank(),
+        title = element_blank(),
+        legend.title = element_text(size = 7.5),
+        legend.text = element_text(size = 6.5),
+        legend.position = "bottom",
+        legend.box.spacing = unit(-1, "pt"),
+        panel.spacing = unit(3, "pt"),
+        strip.text = element_text(size = 4, face = "bold", margin = margin(1, 0, 1, 0, "mm")))
+ggsave(filename = "state_niauc_est_faceted_F24.pdf", width = 12, height = 7)
+```
+
+
+```{r choro-maps, include = FALSE}
+# Side-by-side choropleth maps for infection and case rates
+
+# Add state name to adj_df 
+adj_df = adj_df %>% mutate(state = usdata::abbr2state(geo_value))
+
+total_infects_df = adj_df %>%
+  group_by(date) %>%
+  summarise(sum_adj_infect = sum(adj_infect)) %>%
+  arrange(desc(sum_adj_infect)) %>%
+  filter(date <= as.Date("2021-11-01")) 
+top_ea_year = total_infects_df %>%
+  group_by(year = year(date)) %>% 
+  slice(1) # slice 1st value (when arranged from largest to lowest total infections) for each year
+
+# Set dates to plot
+first_date = as.Date("2020-06-01")
+second_date = as.Date("2020-10-20")
+third_date = top_ea_year$date[1]
+fourth_date = as.Date("2021-07-20")
+fifth_date = top_ea_year$date[2]
+
+# Set max using maximum observed for each of adj_inf_rate and cases_rate_7d_av for the dates considered
+max_choro_lim_inf = adj_df %>%
+  filter(date %in% c(first_date, second_date, third_date, fourth_date, fifth_date)) %>%
+  summarise(max_inf_rate = max(adj_inf_rate)) %>%
+  pull(max_inf_rate) 
+max_choro_lim_cases = adj_df %>%
+  filter(date %in% c(first_date, second_date, third_date, fourth_date, fifth_date)) %>%
+  summarise(max_case_rate = max(cases_rate_7d_av)) %>% pull(max_case_rate)
+
+
+plot_usmap_fun <- function(plot_date, value, plot_name, max_choro_lim){
+  plot_usmap(data = adj_df %>% filter(date == plot_date), values = value, color = "black") +
+  scale_fill_continuous(name = plot_name, label = scales::comma, type = "viridis", limits = c(0, max_choro_lim)) +
+  ggtitle(format(plot_date, format = "%b. %d, %Y")) +
+  theme(legend.title = element_text(size = 8),
+        legend.position="bottom",
+        legend.justification="right",
+        plot.title = element_text(size = 8, vjust = 0))
+}
+# Adjusted infection rates plots
+p1 <- plot_usmap_fun(first_date, "adj_inf_rate", "Infect.", max_choro_lim_inf) 
+p2 <- plot_usmap_fun(second_date, "adj_inf_rate", "Infect.", max_choro_lim_inf) 
+p3 <- plot_usmap_fun(third_date, "adj_inf_rate", "Infect.", max_choro_lim_inf) 
+p4 <- plot_usmap_fun(fourth_date, "adj_inf_rate", "Infect.", max_choro_lim_inf) 
+p5 <- plot_usmap_fun(fifth_date, "adj_inf_rate", "Infect.", max_choro_lim_inf) 
+
+# 7dav case rate plots
+p6 <- plot_usmap_fun(first_date, "cases_rate_7d_av", "Cases", max_choro_lim_cases) 
+p7 <- plot_usmap_fun(second_date, "cases_rate_7d_av", "Cases", max_choro_lim_cases) 
+p8 <- plot_usmap_fun(third_date, "cases_rate_7d_av", "Cases", max_choro_lim_cases) 
+p9 <- plot_usmap_fun(fourth_date, "cases_rate_7d_av", "Cases", max_choro_lim_cases) 
+p10 <- plot_usmap_fun(fifth_date, "cases_rate_7d_av", "Cases", max_choro_lim_cases) 
+
+# Use patchwork to arrange plots side-by-side in ggplot2
+p1 + p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9 + p10 + plot_layout(ncol = 5, guides = "collect") & theme(legend.position = 'right', legend.justification = 'right')
+ggsave(filename = "choro_inf_case_rates_F24.pdf", width = 7, height = 4)
+```
+
+
+```{r six-cases-decon-infect, include = FALSE}
+# Reported cases, deconvolved cases, and estimates of daily new infections (dark blue line) per 100K inhabitants for a sample of six states
+
+ggplot(adj_df %>% filter(geo_value %in% six_states)) +
+  geom_rect(data = prop_top_circ_df %>% 
+              filter(State %in% six_states) %>% 
+              rename("geo_value" = "State"), 
+            aes(xmin = Date-0.5, xmax = Date+0.5, ymin = -Inf, ymax = Inf, fill = variant), alpha = 0.25,
+            inherit.aes = FALSE) +
+  ggnewscale::new_scale_fill() +
+  geom_ribbon(aes(date, ymin = ninetyfive_lowb_rate, ymax = ninetyfive_upb_rate, fill = "95%")) +
+  geom_ribbon(aes(date, ymin = eighty_lowb_rate, ymax = eighty_upb_rate, fill = "80%")) +
+  geom_ribbon(aes(date, ymin = fifty_lowb_rate, ymax = fifty_upb_rate, fill = "50%")) +
+  geom_line(aes(date, adj_inf_rate, color = "Inf. / 100k"), size = 0.6) +
+  geom_line(aes(date, cases_rate_7d_av, color = "Cases / 100k"), size = 0.4) +
+  geom_line(aes(date, unadj_inf_rate, color = "Deconvolved cases / 100k"), size = 0.4, alpha = 0.8) +
+  scale_x_date(name = "", date_breaks = "4 month", date_labels = "%b %Y", expand = c(0,0)) +
+  scale_y_continuous(labels = scales::comma, limits = c(0, 650), expand = c(0,0)) + 
+  scale_color_manual(name='Estimates', # Legend
+                     breaks=c('Inf. / 100k',
+                              'Deconvolved cases / 100k',
+                              'Cases / 100k'),
+                     values=c('Inf. / 100k' = "midnightblue",
+                              'Deconvolved cases / 100k' = "springgreen4",
+                              'Cases / 100k' = "darkorange2")) +
+  scale_fill_manual(name = 'CI', values = c("skyblue3", "lightskyblue", "lightskyblue1")) +
+  ylab("") +
+  facet_wrap(. ~ geo_value, ncol = 3) +
+  theme_bw(16) +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1, size = 8.5),
+        axis.text.y = element_text(size = 8.5),
+        axis.title.y=element_blank(),
+        title = element_blank(),
+        legend.title = element_text(size = 9.5),
+        legend.text = element_text(size = 8.5),
+        legend.position = "bottom", 
+        legend.box.spacing = unit(5, "pt"),
+        strip.text = element_text(size = 8, face = "bold", margin = margin(1, 0, 1, 0, "mm")))
+ggsave(filename = "state_niauc_est_6states_F24.pdf", width = 12, height = 7)
+```
+
+
+```{r six-decon-var, include = FALSE}
+# Deconvolved cases colored by variant per 100K inhabitants
+
+ggplot(state_decon_byvar_df, aes(time_value, infect_rate, fill = variant)) +
+  geom_area(position = "stack") + 
+  scale_x_date(name = "", date_breaks = "4 month", date_labels = "%b %Y", expand = c(0,0)) + 
+  scale_y_continuous(limits = c(0, 100), expand = c(0,0)) + 
+  facet_wrap(. ~ geo_value, ncol = 3, scales = "free_y") +
+  theme_bw(16) +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1, size = 8.5),
+        axis.text.y = element_text(size = 8.5),
+        axis.title.y=element_blank(),
+        title = element_blank(),
+        legend.title = element_text(size = 9.5),
+        legend.text = element_text(size = 8.5),
+        legend.position = "bottom", 
+        legend.box.spacing = unit(5, "pt"),
+        strip.text = element_text(size = 8, face = "bold", margin = margin(1, 0, 1, 0, "mm"))) +
+  guides(fill = guide_legend(nrow = 1)) +
+  xlab("") + 
+  ylab("Deconvolved cases / 100k") + 
+  scale_fill_hue(name = "Variant", c = 60)
+ggsave(filename = "state_decon_byvar_est_6states_F24.pdf", width = 12, height = 7)
+```
+```{r corr-plot, include = FALSE}
+# Infection, deconvolved case, and case average correlation across lags on the same plot
+
+ggplot(infect_res, aes(lag, cor)) +
+  geom_line(data = cases_res, aes(color = "Cases")) + geom_point(data = cases_res, aes(color = "Cases")) +
+  geom_vline(xintercept = best_lag_case, linetype = 2, color = "darkorange2") +
+  geom_line(aes(color = "Infections")) + geom_point(aes(color = "Infections")) +
+  geom_vline(xintercept = best_lag, linetype = 2, color = "midnightblue") +
+  geom_line(data = unadj_infect_res, aes(color = "Deconvolved cases")) +
+  geom_point(data = unadj_infect_res, aes(color = "Deconvolved cases")) +
+  geom_vline(xintercept = best_lag_unadj_infect, linetype = 2, color = "skyblue") +
+  scale_color_manual(name='', # Legend
+                     breaks=c('Cases', 'Deconvolved cases', 'Infections'),
+                     values=c('Deconvolved cases' = "skyblue",
+                              'Infections' = "midnightblue",
+                              'Cases' = "darkorange2")) +
+  labs(x = "Days lagged from hospitalization", y = "Average correlation") +
+  theme_bw(16) +
+  theme(legend.position=c(.85, .90),
+        axis.text.x = element_text(size = 12),
+        axis.title.x = element_text(size = 14),
+        axis.text.y = element_text(size = 12),
+        axis.title.y = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        legend.background=element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+ggsave(filename = "adj_unadj_cases_hosp_lag_corr_F24.pdf", width = 10, height = 6)
+```
+
+```{r ihrs, include = FALSE}
+# Rolling window time-varying IHRs for each state 
+
+ggplot(ihrs_dat, aes(x = time_value)) +
+  geom_line(aes(y = IHR, color = "IHR")) +
+  geom_line(aes(y = CHR, color = "CHR")) +
+  facet_geo( ~ geo_value, grid = "us_state_without_DC_grid2") +
+  ylab("IHR") +
+  scale_x_date(name = "", date_breaks = "6 month", date_labels = "%m/%y", expand = c(0,0)) +
+  scale_y_continuous(labels = scales::comma, limits = c(0, 0.3), expand = c(0,0), n.breaks = 4) +  
+  theme_bw(16) +
+  theme(axis.text.x = element_text(hjust = 0.1, vjust = 2.5, size = 6.4),
+        axis.text.y = element_text(size = 6.4),
+        axis.title.y=element_blank(),
+        axis.title.x=element_blank(),
+        legend.title = element_text(size = 7.5),
+        legend.text = element_text(size = 6.4),
+        legend.position = c(0.9, 0.15),
+        panel.spacing = unit(3, "pt"),
+        strip.text = element_text(size = 6, face = "bold", margin = margin(1, 0, 1, 0, "mm"))) +
+  scale_color_manual(values=c('IHR' = "midnightblue",
+                              'CHR' = "darkorange2"))
+ggsave(filename = "IHR_7dav_rolling_centered.pdf", width = 12, height = 7.9)
+```
+
+
+## Methods
+
+```{r inc-gammas, include = FALSE}
+# Plot densities faceted by variant
+
+ggplot(density_data, aes(x = x, y = density, color = variant)) +
+  geom_line() +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0), limits = c(0, 0.35)) + 
+  theme_bw() +
+  labs(x = "Number of days",
+       y = "Density") +
+  scale_color_viridis_d(name = "Variant")
+ggsave(filename = "inc_gammas.pdf", width = 10, height = 5)
+```
+
+```{r var-props, include = FALSE}
+# Original biweekly proportions of the variants in circulation for California.
+# And daily proportions of the variants in circulation for California.
+
+# Plotter function
+plotter <- function(predmat, dates = NULL) {
+  
+  as_tibble(predmat)  %>% 
+    mutate(time = dates) %>% 
+    pivot_longer(-time) %>% 
+    ggplot(aes(time, y = value, fill = name)) +
+    geom_area(position = "stack") +
+    theme_bw() +
+    ylab("Proportion") +
+    xlab("") + 
+    scale_x_date(name = "", date_breaks = "6 month", date_labels = "%b %Y", expand = c(0,0)) +
+    scale_y_continuous(expand = c(0,0)) + 
+    scale_fill_viridis_d(name = "Variant")
+}
+
+# Original biweekly proportions for CA
+plotter(ca_interp_list$y_props, ca_interp_list$date)
+ggsave(filename = "proportions_before_multi.pdf")
+
+# Daily proportions for CA
+plotter(ca_interp_list$pred2, dates = seq(min(ca_interp_list$date), max(ca_interp_list$date), by = "1 day"))
+ggsave(filename = "proportions_after_multi_pred.pdf")
+
+```
+
