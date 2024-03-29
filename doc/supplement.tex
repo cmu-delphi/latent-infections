@@ -1,5 +1,104 @@
 \section{Additional information about dataset used or estimation methodology}
 
+\subsection{A general description and depiction of convolution}
+\label{sec:convol}
+
+In general, the goal of convolution is to propagate the input signal forward in time using a distribution of probabilities. In the 2D and discrete context, it is simply the elementwise multiplication of the signal for some time by a forward-facing distribution of probabilities, which are then summed to get a value for the outcome. Figure~\ref{fig:convol} presents a depiction of the convolution procedure for the signal of smoothed cases (orange line). Essentially, to push the cases forward in time, we take the appropriately aligned (forward-in-time) delay distribution and convolve or multiply the case counts by it to get the distribution of convolved case estimates (blue line). This process is repeated as we march forward in time, as shown through the stop-motion panels, such that it eventually covers the entire line of cases. An important takeaway from this is that convolution is not the same as a simple shift of the data points, but rather it utilizes the most relevant probabilities to propagate the data points forward in time. Deconvolution proceeds in the same fashion, but in the opposite direction to go back in time. 
+
+\begin{figure}[H]
+\centering
+    \includegraphics[width=0.99\linewidth]{convolution_diagram.pdf}
+    \caption{A general depiction of convolving smoothed cases (orange line) with the corresponding delay probabilities (shaded blue area) to get the convolved estimates (blue line) over four different times.}
+    \label{fig:convol}
+\end{figure}
+
+\subsection{Additional details on the date fields in the CDC line list}
+\label{sec:linelist-details}
+
+Since the restricted dataset is updated
+monthly and cases may undergo revision, we use a single version of it that was
+released on June 6, 2022. We consider this version to be finalized in that it
+well-beyond our study end date such that the dataset is unlikely to be subject
+to further significant revisions.
+
+\autoref{tab:order_events_table} presents the percent of pairwise occurrences
+for the different possible permutations of events in the line list. Essentially,
+most cases follow the idealized ordering shown by
+\autoref{fig:chain_events_onset_report} and so we adhere to this construction as
+much as possible.
+
+We observe that the line list is prone to high percentages of missing data,
+notably with respect to our variables of interest. Approximately 62.3\% of cases
+are missing the symptom onset date, 55.4\% are missing positive specimen date,
+and 8.96\% of cases are missing the report date. Relatedly,
+cases with
+missing report or positive specimen dates may be filled with their symptom onset date
+\citep{jahja2022real}. So it is possible that all three variables may be
+imputed with the same date for a case. However, we only actually deal with
+select pairs of events; we do not use all three at once in our construction of
+the delay distributions or anywhere else in our analysis. Therefore, we restrict
+our investigation of missingness to the pairs of events.
+\autoref{fig:prop-cc} suggests that this issue impacts states
+differentially due to the inconsistent proportions of zero delay between
+positive specimen and report date across states. 
+
+Due to the contamination in the zero delay cases (the true extent of which is
+unknown to us), we omit all such cases where the positive specimen and report
+dates have zero delay from our analysis. We choose to allow for zero and
+negative delay for symptom onset to report because correspondence with the CDC
+confirms the distinct possibility that a person could test positive before
+symptom onset and it is a reasonable ordering to expect if, for example, the
+individual is aware that they have been exposed to an infected individual.
+
+\begin{figure}[!tb]
+\centering
+\includegraphics[width=0.9\linewidth]{prop_cc_zero_delay.pdf}\\
+\includegraphics[width=0.9\linewidth]{prop_cc_cdc_vs_jhu.pdf} 
+\caption{Top panel: Proportion of complete cases with zero delay between
+    positive specimen and report date in the restricted CDC line list dataset.
+    Bottom panel: Complete case counts by state in the CDC line list versus the
+    cumulative complete case counts from JHU CSSE as of June 6, 2022. All
+    counts have been scaled by the 2022 state populations as of July 1, 2022
+    from \citep{uscensus2022annual}.}
+\label{fig:prop-cc}
+\end{figure}
+
+For the same release date, the restricted line list contains 74,849,225 cases
+(rows) in total compared to 84,714,805 cases reported by the JHU CSSE; that is,
+line list is missing about 10 million cases. The extent that this issue impacts
+each state is shown in \autoref{fig:prop-cc}, from which it is clear
+the fraction of missing cases is substantial for many states, often surpassing
+50\% \citep{jahja2022real}. In addition, the probability of being missing does
+not appear to be the same for states, so there is likely bias introduced from
+using the complete case line list data. We consider such bias to be unavoidable
+in our analysis due to a lack of alternative line list sources.
+
+In the line list, we observe unusual jarring spikes in reporting in 2020
+compared to 2021. Upon plotting by report date, we find that a few states are
+contributing unusually large case counts on isolated days very late in the
+reporting process (usually well beyond 50 days). We strongly suspect that these
+large accumulations of cases over time are due breakdowns of the reporting
+pipeline (which may be expected to occur more frequently in the year following
+its instantiation than later in time). Such anomalies are not likely to be
+reliable indicators of the delay from positive specimen to case report.
+Therefore, we devise a simple, ad hoc approach to detect and prune these
+reporting backlogs.
+
+First, we obtain the part of the line list intended for the positive specimen to
+case report delay estimation, where both such dates are present and where zero
+and negative delay cases have been omitted. Then, for each of the three dates of
+June 1, September 1, and December 1, 2020, we bin the reporting delays occurring
+from 50 days up to the maximum observed delay. For each bin, we obtain the total
+delay count for each state. We check whether each count on the log scale is at
+least the median (for the bin) plus 1.5 times the interquartile range and retain
+only those that exceed this criterion as potential candidates for pruning. Next,
+we compute the counts by report date for each candidate state. If there is a
+report date with a count greater than or equal to the pre-specified threshold,
+then we remove those cases from the line list. Based on inspection and
+intuition, we set the threshold to 2000 for the first two bins, and then lower
+it to 500 for the remaining bins. A similar trial and error approach is used to
+set the bin size (to 50 days).
+
 \subsection{Table on the percent pairwise occurrence of events in the CDC line list}
 \begin{table}[h!]
 \begin{tabular}{|l|l|l|}
@@ -12,6 +111,119 @@ IO $\rightarrow$ PS $\rightarrow$ RE $\rightarrow$ SO & \begin{tabular}[c]{@{}l@
 \caption{Percent pairwise occurrence for the different permutations of events considered in the restricted CDC line list. The abbreviation IO stands for infection onset, SO is symptom onset, PS is positive specimen, and RE is report date. We consider a restricted set of permutations because we assume that IO must come first and that PS must precede report date for a case to be legitimate. Finally, the underlying assumption for the percent pairwise occurrence calculations is that the cases must have both elements present (not missing).}
 \label{tab:order_events_table}
 \end{table}
+
+\subsection{Justifications for delay distribution calculations}
+\label{sec:delay-justifications}
+
+Let $y_t$ denote the count of new cases reported at time $t$ and $x_t$ denote
+the count of deconvolved cases with positive specimen at $t$. For all cases in
+the line list that had both a positive specimen and a report date, we can count
+the those that are reported at time $t$ by enumerating them according to
+positive specimen date (similar to how symptom onset date was used in
+\citealp{jahja2022real}):
+\begin{align*}
+y_t = \sum_{s=1}^{t} \sum_{i=1}^{x_s}\indicator \left ( \text{the }i\th\text{ positive specimen at }
+    s \text{ gets reported at }t \right ).
+\end{align*}
+Taking the conditional expectation of the above yields
+\begin{align*}
+\E(y_t \mid x_s, s \leq t) = \sum_{s=1}^{t} \pi_t(s) x_s ,
+\end{align*}
+where $\pi_t(s) = \P(\text{case report at }t \mid \text{positive specimen date
+at }s)$ for each $s \leq t$ are the delay probabilities and the $\{ \pi_t(s) : s
+\leq t \}$ sequence comprises the delay distribution at time $t$. Notice that
+there are no time restrictions placed on the positive specimen date, except that
+it must have been between the start of the pandemic and the report date,
+inclusive. This is unlikely to be a realistic assumption to make as $t$ moves
+farther away from $s$. 
+
+Thus, we make three key assumptions about these distributions. First, positive
+specimen tests that are reported to the CDC are always reported within $d = 60$
+days, which is true for the majority of the reported cases. Second, the
+probability of zero delay is zero, which stems from the contamination of
+zero-delay in the line list. We update the
+conditional expectation formula to reflect these two assumptions as in \citep{jahja2022real}: 
+\begin{align*}
+\E(y_t \mid x_s, s \leq t) = \sum_{k=1}^{60} p_t(k) x_{t-k}
+\end{align*}
+where for $k = 1, \dots, 60$,
+\begin{align*}
+p_t(k) = \P(\text{case report at }t \mid \text{positive specimen at }t-k).
+\end{align*}
+
+
+Thirdly, there are times where the empirical probability
+was observed to be precisely 1 at zero delay and the proportion of CDC relative
+to JHU cases used for the weight was also 1. Since we believe that having zero
+delay for all cases is unrealistic and unlikely to be representative of all
+cases for the state, we inject a small amount of variance manually by setting
+the the CDC-to-JHU proportion to be the minimum shrinkage proportion observed
+for the affected state (such instances were isolated to the state of New
+Hampshire). Aside from these modifications, the construction of the delay
+distribution proceeds in precisely the same manner as for positive specimen to
+report date. 
+
+\subsection{Details about seroprevalence data}
+\label{sec:sero-details}
+
+In the former, the CDC
+collaborated with 17 blood collection organizations in the largest nationwide
+COVID-19 seroprevalence survey to date \citep{cdc2021blood}. The blood donation
+samples were used to construct monthly seroprevalence estimates for nearly all
+states from July 2020 to December 2021 \citep{jones2021estimated}. In the latter
+survey, the CDC collaborated with two private commercial laboratories and used
+blood samples to test for the antibodies to the virus from people that were in
+for routine or clinical management (presumably unrelated to COVID-19
+\citealp{bajema2021estimated}). The resulting dataset contains seroprevalence
+estimates for a number of multi-week collection periods starting in July 2020 to
+February 2022. 
+
+Both datasets are based on repeated, cross-sectional studies that aimed, at
+least in part, to estimate the percentage of people who were previously infected
+with COVID-19 using the percentage of people from a convenience sample who had
+antibodies against the virus \citep{bajema2021estimated, cdc2020data,
+jones2021estimated}. Adjustments were made in both for age and sex to account
+for the demographic differences between the sampled and the target populations.
+However, both datasets are incomplete and they differ in the number and the
+timing of the data points for each state (\autoref{fig:sero_blood_comm_compar}).
+Such limitations indicate that reliance upon only one seroprevalence survey is
+inadvisable. For example, in the commercial dataset, the last estimate for North
+Dakota is in September 2020. In the blood donor dataset, Arkansas does not have
+estimates available until October 2020. 
+
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=.99\textwidth]{sero_blood_comm_compar.pdf}
+    \caption{A comparison of the seroprevalence estimates from the Commercial
+    Lab Seroprevalence Survey dataset (yellow) and the 2020--2021 Blood Donor 
+    Seroprevalence Survey dataset (blue). Note that the maximum and the minimum
+    of the line ranges are the provided 95\% confidence interval bounds to 
+    give a rough indication of uncertainty.}
+    \label{fig:sero_blood_comm_compar}
+\end{figure}
+    
+The date variables that come with the two seroprevalence datasets are different
+and so the date variables that we are able to construct from them are not the
+same. For the commercial dataset, we use the midpoint of the provided specimen
+collection date variable. A major difference in the structure of the two
+datasets is that the commercial dataset always has the seroprevalence estimates
+at the level of the state, while the blood donor dataset can either have
+estimates for the state or for multiple separate regions within the state. For
+the blood donor dataset, we use the median donation date if the seroprevalence
+estimates are designated to be for entire state. If they are instead for regions
+in the state, since there is reliably one measurement per region per month, we
+aggregate the measurements into one per month per state by using a weighted
+average (to account for the given sample sizes of the regions). The median of
+the median dates is taken to be the date for the weighted average.
+
+To adapt to the sparseness in the seroprevalence data, we convert our daily data
+to weekly by summing the reported infections and shifting the observed
+seroprevalence measurements to the nearest Monday. If there are multiple
+measurements in a week from a seroprevalence source, then the average is used.
+We denote these changes by changing the time-based subscript from $t$ to $m$
+where $m$ indicates the Monday relative to our June 1, 2020 start date.
+Since we operate with weekly data where the weeks are designated by Monday, we set the 
+end date to be November 29, 2021. 
 
 \subsection{State space representation of the antibody prevalence model}\label{supp:ssapm} 
 
@@ -57,7 +269,7 @@ Then, the Kalman smoother works backwards to the first time to give
 V_t &= \Var(\alpha_{t}\given y_n, \dots, y_1). \label{eq:Vt}
 \end{align}
 The filtering and smoothing steps are based on recursions that are described in
-Appendix A of \citet{helske2017kfas} as we use the R package KFAS to estimate
+Appendix A of \citep{helske2017kfas} as we use the R package KFAS to estimate
 our model.
 
 % For our situation, the Kalman filter and smoothing approach offers a number of
@@ -146,7 +358,7 @@ and take the average to be $\tilde{s}_{1}$. The corresponding initial variance
 estimate, $\sigma^2_{\tilde{s}_{1}}$, is taken to be the mean of the standard
 errors of the two seroprevalence estimates. For all of the initial values of the
 trend components, we use the inverse of the ascertainment ratio estimate as of
-June 1, 2020 for each state from Table 1 in \citet{unwin2020state} and denote
+June 1, 2020 for each state from Table 1 in \citep{unwin2020state} and denote
 this by $\tilde{a}_1$. The initial variance estimate of $\sigma^2_{\tilde{a}_1}$
 is based on the variance implied by the given inverse ascertainment ratio
 distribution.
@@ -213,264 +425,15 @@ and variance
 \end{align*}
 
 
-
-\subsection{Ablation analysis of infection-hospitalization correlations}
-
-We undertake an ablation study for the lagged correlation of infections, the
-results of which are shown in \autoref{fig:correlations}. From
-this, we can see that the deconvolved case or infection estimates from the
-intermediate steps are all leading indicators of hospitalizations. However, the
-degree that each such set of estimates lead hospitalizations depend on its
-location in the sequence of steps and how close the estimates are to infection
-onset. For example, the deconvolved cases by positive specimen date tend to
-precede hospitalizations by about $11$ days, while those for the subsequent step
-indicate that the deconvolved cases by symptom onset tend to precede
-hospitalizations by a longer time of about $13$ days. Finally, after adding the
-variant-specific incubation period data into the deconvolution and obtaining the
-deconvolved case estimates, we can observe that the reported infections precede
-hospitalizations by about $17$ days. 
-
-\begin{figure}[!tb]
-\centering
-    \includegraphics[width=.8\textwidth]{adj_unadj_pi_no_inc_hosp_lag_corr_F24.pdf} 
-    \caption{Lagged Spearman's correlation between the infection and
-    hospitalization rates per 100,000 averaged for each lag across \US states
-    and days over June 1, 2020 to November 29, 2021, and taken over a rolling
-    window of 61 days. The infection rates are based on the counts for the
-    deconvolved case and infection estimates as well as the reported infections
-    by symptom onset and when the report is symptom onset. Note that each such
-    set of infection counts is subject to a center-aligned 7-day averaging to
-    remove spurious day of the week effects. The dashed lines indicate the lags
-    for which the highest average correlation is attained.}
-    \label{fig:adj_unadj_sym_hosp_lag_corr}
-\end{figure}
-
-
 \subsection{Scaling by population}
 
 Annual estimates of the resident state
-populations as of July 1 of 2020 and 2021 are taken from the December
-2022 press release on the \US Census Bureau website \citep{uscensus2022annual}.
+populations as of July 1 of 2020 and 2021 are taken from the Dec.
+2022 press release from the \US Census Bureau \citep{uscensus2022annual}.
 Unless otherwise specified, we use the July 1, 2020 estimates.
 
 
-\subsection{Additional details on the date fields in the CDC linelist}
-\label{sec:linelist-details}
-
-Since the restricted dataset is updated
-monthly and cases may undergo revision, we use a single version of it that was
-released on June 6, 2022. We consider this version to be finalized in that it
-well-beyond our study end date such that the dataset is unlikely to be subject
-to further significant revisions.
-
-\autoref{tab:order_events_table} presents the percent of pairwise occurrences
-for the different possible permutations of events in the line list. Essentially,
-most cases follow the idealized ordering shown by
-\autoref{fig:chain_events_onset_report} and so we adhere to this construction as
-much as possible.
-
- 
-
-We observe that the line list is prone to high percentages of missing data,
-notably with respect to our variables of interest. Approximately 62.3\% of cases
-are missing the symptom onset date, 55.4\% are missing positive specimen date,
-and 8.96\% of cases are missing the report date. Relatedly,
-cases with
-missing report or positive specimen dates may be filled with their symptom onset date
-\citet{jahja2022real}. So it is possible that all three variables may be
-imputed with the same date for a case. However, we only actually deal with
-select pairs of events; we do not use all three at once in our construction of
-the delay distributions or anywhere else in our analysis. Therefore, we restrict
-our investigation of missingness to the pairs of events.
-\autoref{fig:prop-cc} suggests that this issue impacts states
-differentially due to the inconsistent proportions of zero delay between
-positive specimen and report date across states. 
-
-Due to the contamination in the zero delay cases (the true extent of which is
-unknown to us), we omit all such cases where the positive specimen and report
-dates have zero delay from our analysis. We choose to allow for zero and
-negative delay for symptom onset to report because correspondence with the CDC
-confirms the distinct possibility that a person could test positive before
-symptom onset and it is a reasonable ordering to expect if, for example, the
-individual is aware that they have been exposed to an infected individual.
-
-\begin{figure}[!tb]
-\centering
-\includegraphics[width=0.9\linewidth]{prop_cc_zero_delay.pdf}\\
-\includegraphics[width=0.9\linewidth]{prop_cc_cdc_vs_jhu.pdf} 
-\caption{Top panel: Proportion of complete cases with zero delay between
-    positive specimen and report date in the restricted CDC line list dataset.
-    Bottom panel: Complete case counts by state in the CDC line list versus the
-    cumulative complete case counts from JHU CSSE as of June 6, 2022. All
-    counts have been scaled by the 2022 state populations as of July 1, 2022
-    from \citet{uscensus2022annual}.}
-\label{fig:prop-cc}
-\end{figure}
-
-For the same release date, the restricted line list contains 74,849,225 cases
-(rows) in total compared to 84,714,805 cases reported by the JHU CSSE; that is,
-line list is missing about 10 million cases. The extent that this issue impacts
-each state is shown in \autoref{fig:prop-cc}, from which it is clear
-the fraction of missing cases is substantial for many states, often surpassing
-50\% \citep{jahja2022real}. In addition, the probability of being missing does
-not appear to be the same for states, so there is likely bias introduced from
-using the complete case line list data. We consider such bias to be unavoidable
-in our analysis due to a lack of alternative line list sources.
-
-In the line list, we observe unusual jarring spikes in reporting in 2020
-compared to 2021. Upon plotting by report date, we find that a few states are
-contributing unusually large case counts on isolated days very late in the
-reporting process (usually well beyond 50 days). We strongly suspect that these
-large accumulations of cases over time are due breakdowns of the reporting
-pipeline (which may be expected to occur more frequently in the year following
-its instantiation than later in time). Such anomalies are not likely to be
-reliable indicators of the delay from positive specimen to case report.
-Therefore, we devise a simple, ad hoc approach to detect and prune these
-reporting backlogs.
-
-First, we obtain the part of the line list intended for the positive specimen to
-case report delay estimation, where both such dates are present and where zero
-and negative delay cases have been omitted. Then, for each of the three dates of
-June 1, September 1, and December 1, 2020, we bin the reporting delays occurring
-from 50 days up to the maximum observed delay. For each bin, we obtain the total
-delay count for each state. We check whether each count on the log scale is at
-least the median (for the bin) plus 1.5 times the interquartile range and retain
-only those that exceed this criterion as potential candidates for pruning. Next,
-we compute the counts by report date for each candidate state. If there is a
-report date with a count greater than or equal to the pre-specified threshold,
-then we remove those cases from the line list. Based on inspection and
-intuition, we set the threshold to 2000 for the first two bins, and then lower
-it to 500 for the remaining bins. A similar trial and error approach is used to
-set the bin size (to 50 days).
-
-\subsection{Justifications for delay distribution calculations}
-\label{sec:delay-justifications}
-
-Let $y_t$ denote the count of new cases reported at time $t$ and $x_t$ denote
-the count of deconvolved cases with positive specimen at $t$. For all cases in
-the line list that had both a positive specimen and a report date, we can count
-the those that are reported at time $t$ by enumerating them according to
-positive specimen date (similar to how symptom onset date was used in
-\citealp{jahja2022real}):
-\begin{align*}
-y_t = \sum_{s=1}^{t} \sum_{i=1}^{x_s}\indicator \left ( \text{the }i\th\text{ positive specimen at }
-    s \text{ gets reported at }t \right ).
-\end{align*}
-Taking the conditional expectation of the above yields
-\begin{align*}
-\E(y_t \mid x_s, s \leq t) = \sum_{s=1}^{t} \pi_t(s) x_s ,
-\end{align*}
-where $\pi_t(s) = \P(\text{case report at }t \mid \text{positive specimen date
-at }s)$ for each $s \leq t$ are the delay probabilities and the $\{ \pi_t(s) : s
-\leq t \}$ sequence comprises the delay distribution at time $t$. Notice that
-there are no time restrictions placed on the positive specimen date, except that
-it must have been between the start of the pandemic and the report date,
-inclusive. This is unlikely to be a realistic assumption to make as $t$ moves
-farther away from $s$. 
-
-Thus, we make two key assumptions about these distributions. First, positive
-specimen tests that are reported to the CDC are always reported within $d = 60$
-days, which is true for the majority of the reported cases. Second, the
-probability of zero delay is zero, which stems from the contamination of
-zero-delay in the line list. As in \citet{jahja2022real}, we update the
-conditional expectation formula to reflect these two assumptions: 
-\begin{align*}
-\E(y_t \mid x_s, s \leq t) = \sum_{k=1}^{60} p_t(k) x_{t-k}
-\end{align*}
-where for $k = 1, \dots, 60$,
-\begin{align*}
-p_t(k) = \P(\text{case report at }t \mid \text{positive specimen at }t-k).
-\end{align*}
-
-
-Thirdly, there are times where the empirical probability
-was observed to be precisely 1 at zero delay and the proportion of CDC relative
-to JHU cases used for the weight was also 1. Since we believe that having zero
-delay for all cases is unrealistic and unlikely to be representative of all
-cases for the state, we inject a small amount of variance manually by setting
-the the CDC-to-JHU proportion to be the minimum shrinkage proportion observed
-for the affected state (such instances were isolated to the state of New
-Hampshire). Aside from these modifications, the construction of the delay
-distribution proceeds in precisely the same manner as for positive specimen to
-report date. 
-
-\subsection{Details about seroprevalence data}
-\label{sec:sero-details}
-
-In the former, the CDC
-collaborated with 17 blood collection organizations in the largest nationwide
-COVID-19 seroprevalence survey to date \citep{cdc2021blood}. The blood donation
-samples were used to construct monthly seroprevalence estimates for nearly all
-states from July 2020 to December 2021 \citep{jones2021estimated}. In the latter
-survey, the CDC collaborated with two private commercial laboratories and used
-blood samples to test for the antibodies to the virus from people that were in
-for routine or clinical management (presumably unrelated to COVID-19,
-\citealp{bajema2021estimated}). The resulting dataset contains seroprevalence
-estimates for a number of multi-week collection periods starting in July 2020 to
-February 2022. 
-
-Both datasets are based on repeated, cross-sectional studies that aimed, at
-least in part, to estimate the percentage of people who were previously infected
-with COVID-19 using the percentage of people from a convenience sample who had
-antibodies against the virus \citep{bajema2021estimated, cdc2020data,
-jones2021estimated}. Adjustments were made in both for age and sex to account
-for the demographic differences between the sampled and the target populations.
-However, both datasets are incomplete and they differ in the number and the
-timing of the data points for each state (\autoref{fig:sero_blood_comm_compar}).
-Such limitations indicate that reliance upon only one seroprevalence survey is
-inadvisable. For example, in the commercial dataset, the last estimate for North
-Dakota is in September 2020. In the blood donor dataset, Arkansas does not have
-estimates available until October 2020. In addition, this blood donor dataset
-lacks measurements for any states in 2022 (as the corresponding survey ended in
-December 2021). Finally, as can be seen from
-\autoref{fig:sero_blood_comm_compar}, the final commercial seroprevalence
-measurement from 2022 shows a large increase relative to the immediately
-preceding measurement for each state. Since such an increase may signal
-unreliability or instability of the final estimates, we decided to remove them
-from our analysis. Note that North Dakota is the only state to which this
-exclusion does not apply as there are no commercial seroprevalence measurements
-beyond 2020.
-
-\begin{figure}[!tb]
-\centering
-    \includegraphics[width=.99\textwidth]{sero_blood_comm_compar.pdf}
-    \caption{A comparison of the seroprevalence estimates from the Commercial
-    Lab Seroprevalence Survey dataset (yellow) and the 2020--2021 Blood Donor 
-    Seroprevalence Survey dataset (blue). Note that the maximum and the minimum
-    of the line ranges are the provided 95\% confidence interval bounds to 
-    give a rough indication of uncertainty. \attn{This figure doesn't use space
-    very well. Let's remove the gap between panels and make the facet labels
-    (the state names) normal sized. The x-axis could just show 2021, 2022 (rather
-    than so many ticks). Alternatively, another map layout? And I don't think
-    ``Rate'' is correct for the y-axis.}}
-    \label{fig:sero_blood_comm_compar}
-\end{figure}
-    
-The date variables that come with the two seroprevalence datasets are different
-and so the date variables that we are able to construct from them are not the
-same. For the commercial dataset, we use the midpoint of the provided specimen
-collection date variable. A major difference in the structure of the two
-datasets is that the commercial dataset always has the seroprevalence estimates
-at the level of the state, while the blood donor dataset can either have
-estimates for the state or for multiple separate regions within the state. For
-the blood donor dataset, we use the median donation date if the seroprevalence
-estimates are designated to be for entire state. If they are instead for regions
-in the state, since there is reliably one measurement per region per month, we
-aggregate the measurements into one per month per state by using a weighted
-average (to account for the given sample sizes of the regions). The median of
-the median dates is taken to be the date for the weighted average.
-
-We convert our daily data
-to weekly by summing the reported infections and shifting the observed
-seroprevalence measurements to the nearest Monday. If there are multiple
-measurements in a week from a seroprevalence source, then the average is used.
-We denote these changes by changing the time-based subscript from $t$ to $m$
-where $m$ indicates the Monday relative to our June 1, 2020 start date.
-
-
-
-
-\subsection{Ablation study for the lagged correlation analysis} 
+\subsection{Ablation analysis of infection-hospitalization correlations}
 
 To better understand the contribution of the intermediate steps to the lagged
 correlation analysis, we carry out a brief ablation study in which we calculate
@@ -485,9 +448,31 @@ deconvolved case estimates); 4. those from applying the antibody prevalence
 model to produce estimates for both the reported and the unreported cases (the
 infection estimates).
 
+The results of this study are shown in \autoref{fig:abl_lag_cor}. From
+this, we can see that the deconvolved case or infection estimates from the
+intermediate steps are all leading indicators of hospitalizations. However, the
+degree that each such set of estimates lead hospitalizations depend on its
+location in the sequence of steps and how close the estimates are to infection
+onset. For example, the deconvolved cases by positive specimen date tend to
+precede hospitalizations by about $11$ days, while those for the subsequent step
+indicate that the deconvolved cases by symptom onset tend to precede
+hospitalizations by a longer time of $13$ days. Finally, after adding the
+variant-specific incubation period data into the deconvolution and obtaining the
+deconvolved case estimates, we can observe that the reported infections precede
+hospitalizations by about $17$ days. 
 
-\subsection{Possible investigation of reinfections}
-
-Possible change to the paper based on Ajitesh's feedback - 
-Main contribution is the model, shows without reinfection 
-\& here's an extension that shows how to include reinfection data. 
+\begin{figure}[H]
+\centering
+    \includegraphics[width=.78\textwidth]{adj_unadj_pi_no_inc_hosp_lag_corr_F24.pdf} 
+    \caption{Lagged Spearman's correlation between the infection and
+    hospitalization rates per 100,000 averaged for each lag across \US states
+    and days over June 1, 2020 to November 29, 2021, and taken over a rolling
+    window of 61 days. The infection rates are based on the counts for the
+    deconvolved case and infection estimates as well as the reported infections
+    by symptom onset and when the report is symptom onset. Note that each such
+    set of infection counts is subject to a center-aligned 7-day averaging to
+    remove spurious day of the week effects. The dashed lines indicate the lags
+    for which the highest average correlation is attained.}
+    \label{fig:abl_lag_cor}
+\end{figure}
+ 

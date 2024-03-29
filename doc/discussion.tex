@@ -29,7 +29,7 @@ estimates to similarly vary over space and time, a departure from existing work
 \citep{unwin2020state, uga2020covid19}. Existing approaches that use the delay
 distribution to generate infection estimates often only construct one delay
 distribution that is used for all states \citep{chitwood2022reconstructing,
-jahja2022real}. That is, our work avoids the assumption of geographic
+jahja2022real}. In contrast, our work avoids the assumption of geographic
 invariance, where it is assumed that all states have the same patterns of delay
 from symptom onset to case report. This assumption is unlikely to be true due to
 differences in reporting pipelines, pandemic response, and variants in
@@ -64,7 +64,7 @@ Regarding reinfections, a major reason why we chose an end date of November 29,
 the Omicron variants come with substantial increases in the risk of reinfection
 in comparison to previous variants, likely due to increased immune escape
 \citep{wei2024risk, pulliam2022increased, eythorsson2022rate}. So having
-reinfection data that is representative of each location under study is crucial
+reinfection data that is representative of each location under study is paramount
 for extending the analysis. While it would be ideal to use the reinfection rates
 over time for each \US state, most states do not publicly report reinfection
 data over the entire time period we considered or at all.
@@ -151,7 +151,7 @@ over time \citep{reinhart2021open,ecdc2020strategies}.
 % uncertainty over time that is not captured by the model or the estimates.   
 
 
-We adopt a relatively simple deconvolution-based approach and devote
+Overall, we adopt a relatively simple deconvolution-based approach and devote
 much of our efforts to tailoring our approach to the available data. A major
 result of this is the development of a way of to model the waning of detectable
 antibody levels and space-time-specific reporting ratios based on seroprevalence

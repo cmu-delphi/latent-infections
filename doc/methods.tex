@@ -12,7 +12,8 @@ incubation periods and two types of delay distributions for each day over the
 considered time period. Next, each incubation period and symptom onset to
 positive specimen delay distribution are joined using convolution to obtain
 variant-specific infection onset to positive specimen distributions for each
-time. Then two types of deconvolution are performed. We first deconvolve from
+time (for a brief description of convolution, please see \autoref{sec:convol}). 
+Subsequently, two types of deconvolution are performed. We first deconvolve from
 case report to positive specimen date. We then deconvolve from positive specimen
 to report date by variant. The resulting infection estimates are aggregated
 across the variant categories, and adjusted to account for the unreported
@@ -57,7 +58,7 @@ available containing the same patient records \citep{cdc2020casepub,
 cdc2020caserestr}, only the restricted dataset contains information on the state
 of residence. The three key dates of interest are those for symptom onset,
 positive specimen collection, and report to the CDC. Handling missingness and
-imputation in these dates is somewhat complicated, and additional details and
+imputation in these dates is somewhat complicated and so additional details and
 justifications are deferred to \autoref{sec:linelist-details}.
 
 We use the line list to estimate the delay distribution for the pairs symptom
@@ -110,19 +111,19 @@ To account for the incubation period, the time between infection and symptom
 onset, we use estimates from the existing literature, modified slightly for
 coherence with each other: we model each incubation as a gamma distribution with
 different parameters. We focus on the following eight variants, which dominated
-at various points during our study period: Ancestral, Alpha, Beta, Epsilon,
+at various points during our study period: Ancestral/Other, Alpha, Beta, Epsilon,
 Iota, Gamma, Delta, and Omicron. Alpha, Beta, Delta, Gamma, and Omicron are all
 variants of concern \citep{who2021tracking}, while we include the Epsilon
 (California) and Iota (New York) variants because of large impact on those and
 neighbouring states \citep{yang2022investigation, duerr2021dominance}.
 
 The Ancestral variant has been modelled as a gamma distribution
-\citep{tindale2020evidence}, so we simply use those reported parameters. For the
+\citep{tindale2020evidence}, so we simply use the reported shape and scale parameters. For the
 Alpha, Beta, Gamma, Delta and Omicron variants, we use the reported mean and
 standard deviation of the number of days of incubation \citep{tanaka2022shorter,
 grant2022impact, ogata2022shorter}. To match these moments to the gamma
 distribution, we solve the same moment equations described in
-\autoref{sec:delaystop}. Then, we discretize each resulting density to the
+\autoref{sec:delaystop}. Then, we discretize each resulting density shown in \autoref{fig:inc_gammas} to the
 support set, which is taken to be from 1 and 21 days. This range assumes that
 symptoms require at least 1 day to develop \citealp{phcan2021covid} and that an
 asymptomatic infection will resolve within 21 days
@@ -135,10 +136,17 @@ phylogenetic tree of the Nextstrain Clades \citep{hodcroft2021covariants}. All
 other circulating variants are grouped together with the Ancestral variant.
 There was little available sequencing data prior to Alpha-emergence, but
 unfortunately, later in the pandemic, it is impossible to separate Ancestral
-from other rare variants.
+from other rare variants (which is one reason why we may refer to it as the Other category).
 
-\attn{Perhaps plot the incubation periods? Maybe sharing a panel with the 
-circulation proportions below.}
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=0.9\linewidth]{inc_gammas.pdf}
+    \caption{Gamma density for the incubation period of each of the eight variant categories. 
+    Note that the Ancestral variant directly utilizes the available gamma shape and scale parameters, 
+    while the remaining variants use the method of moments to estimate the
+    gamma parameters.}
+    \label{fig:inc_gammas}
+\end{figure}
 
 \subsection{Variant circulation proportions}
 \label{sec:variant-proportions}
@@ -163,7 +171,8 @@ The constraint ensures that the estimated proportions will sum to 1 across all
 $J$ variants. To encourage smoothness of the estimated proportions, we specify
 $f_{j\ell}(t)$ as a third-order polynomial in time: that is $f_{j\ell}(t) =
 \beta_{j\ell,0} + \beta_{j\ell,1} t + \beta_{j\ell,2}t^2 + \beta_{j\ell,3}t^3$,
-computed such that the resulting matrix of covariates is orthogonal. \autoref{fig:prop_figs} shows the proportions by variant for California before
+computed such that the resulting matrix of covariates is orthogonal.
+ \autoref{fig:prop_figs} shows the proportions by variant for California before
 (left) and after (right) the smoothing procedure. 
 
 \begin{figure}[!tb]
@@ -186,15 +195,7 @@ correspond to the positive specimen date, this requires two stages. The first is
 the deconvolution from report to positive specimen date, and the second is from
 positive specimen date to infection onset date.
 
-An important aspect of our methods is that deconvolution is not the same as a shift because simply shifting cases back in time and increasing them by some factor fails to capture the spatio-temporal dynamics of the pandemic. In our situation, reported cases are ``pushed back'' by the delays shown in \autoref{fig:chain_events_onset_report}).
-
-\begin{figure}[!tb]
-\centering
-    \includegraphics[width=0.9\linewidth]{convolution_diagram.pdf}
-    \caption{A general depiction of convolving smoothed cases (orange line) with the corresponding delay probabilities (shaded blue area) to get the convolved estimates (blue line) over four different times.}
-    \label{fig:convol}
-\end{figure}
-
+An important aspect of our methods is that deconvolution is not the same as a shift because simply shifting cases back in time and increasing them by some factor fails to capture the spatio-temporal dynamics of the pandemic. In our situation, reported cases are ``pushed back'' by the delays shown in \autoref{fig:chain_events_onset_report}. 
 
 We will start by describing the first type of deconvolution performed from
 report to positive specimen date in detail. For this problem, let $t=1,\ldots,T'$
@@ -213,24 +214,21 @@ following optimization problem:
 \left( y_{\ell,t} -  \sum_{k=1}^{60}\widehat{\pi}_{\ell,t}(k) x_{t-k} \right)^2 
 + \lambda\ \sum_{t=4}^{T'} \big|x_t - 4x_{t-1} + 6x_{t-2} -4x_{t-3}+ x_{t-4}\big|.
 \end{align}
-\attn{These sums aren't quite right: the outer $t$ makes $x_{t-k}$ run
-negative? Actually this wouldn't be a problem, except that we don't deconvolve
-before $t=1$, we renormalize the delays. Perhaps too much detail, but the math
-annoys me. Ideas?}
+
 The two parts of this optimization problem trade data fidelity (the sum of
 squared errors) with smoothness in the resulting estimates (the absolute error
 of the differences of $\mathbf{x}$). The tuning parameter $\lambda$ determines
 the relative importance of these competing goals. The solution to the problem is
 an adaptive piecewise cubic polynomial \citep{tibshirani2014adaptive,
-tibshirani2022divided} and can be accurately computed easily
+tibshirani2022divided} and can be accurately computed with ease
 \citep{ramdas2016fast}. We select $\lambda$ with $3$-fold cross validation
 \citep{jahja2022real} in which every third day is reserved for testing, and the
 value that results in the smallest out-of-sample mean squared error is chosen.
 
 The result of this first deconvolution is $\widehat{x}_{\ell,t}$, case estimates
 by positive specimen date for each state. To continue, pushing back to infection
-estimate, we first need the variant-specific delays from infection to positive
-specimen collection. These are calculated by convolving the
+estimates, we first need the variant-specific delays from infection to positive
+specimen collectio. These are calculated by convolving the
 location-time-specific symptom-to-test distributions from
 \autoref{sec:delaystop}, denoted by $\{q_{\ell,t}(k) : -3\leq k \leq 21\}$, with
 the variant-specific incubation periods from \autoref{sec:incubation}, denoted
@@ -281,13 +279,14 @@ reporting ratio, and $\epsilon_{\ell,t}$ represents noise. Note that
 $\gamma_{\ell}$ is the percentage of people whose level of infection-induced
 antibodies falls below the detection threshold between time $t$ and time
 $t+1$. Informally, we refer to $\gamma$ as the waning parameter. Unfortunately,
-population seroprevalence is not directly observed, but is measured using
-various surveys.
+population seroprevalence is not directly observed, but is estimated through
+various surveys that target different subsets of the population.
 
-For the proportion of the population in each state with
-evidence of previous infection across time, we use two major seroprevalence
+We use two major seroprevalence
 surveys: the 2020--2021 Blood Donor Seroprevalence Survey and the Nationwide
-Commercial Lab Seroprevalence Survey \citep{cdc2021blood, cdc2021comm}. See
+Commercial Lab Seroprevalence Survey \citep{cdc2021blood, cdc2021comm}
+to estimate the proportion of the population with
+evidence of previous infection in each state over time. See
 \autoref{sec:sero-details} for additional details. Each of these provides
 seroprevalence estimates along with confidence intervals.
 The daily fraction of new infections are based on surveillance work conducted by
