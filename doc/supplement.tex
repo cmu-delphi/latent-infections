@@ -1,7 +1,9 @@
-\section{Additional information about dataset used or estimation methodology}
+\section{Supplementary Methods}
+
+This section contains additional information about the datasets used and the estimation methodology.
 
 \subsection{A general description and depiction of convolution}
-\label{sec:convol}
+\label{supp:convol}
 
 In general, the goal of convolution is to propagate the input signal forward in time using a distribution of probabilities. In the 2D and discrete context, it is simply the elementwise multiplication of the signal for some time by a forward-facing distribution of probabilities, which are then summed to get a value for the outcome. Figure~\ref{fig:convol} presents a depiction of the convolution procedure for the signal of smoothed cases (orange line). Essentially, to push the cases forward in time, we take the appropriately aligned (forward-in-time) delay distribution and convolve or multiply the case counts by it to get the distribution of convolved case estimates (blue line). This process is repeated as we march forward in time, as shown through the stop-motion panels, such that it eventually covers the entire line of cases. An important takeaway from this is that convolution is not the same as a simple shift of the data points, but rather it utilizes the most relevant probabilities to propagate the data points forward in time. Deconvolution proceeds in the same fashion, but in the opposite direction to go back in time. 
 
@@ -13,7 +15,7 @@ In general, the goal of convolution is to propagate the input signal forward in 
 \end{figure}
 
 \subsection{Additional details on the date fields in the CDC line list}
-\label{sec:linelist-details}
+\label{supp:linelist-details}
 
 Since the restricted dataset is updated
 monthly and cases may undergo revision, we use a single version of it that was
@@ -21,7 +23,7 @@ released on June 6, 2022. We consider this version to be finalized in that it
 well-beyond our study end date such that the dataset is unlikely to be subject
 to further significant revisions.
 
-\autoref{tab:order_events_table} presents the percent of pairwise occurrences
+\autoref{tab:order-events-table} presents the percent of pairwise occurrences
 for the different possible permutations of events in the line list. Essentially,
 most cases follow the idealized ordering shown by
 \autoref{fig:chain_events_onset_report} and so we adhere to this construction as
@@ -109,11 +111,11 @@ IO $\rightarrow$ PS $\rightarrow$ SO $\rightarrow$ RE & \begin{tabular}[c]{@{}l@
 IO $\rightarrow$ PS $\rightarrow$ RE $\rightarrow$ SO & \begin{tabular}[c]{@{}l@{}}RE \textless SO: 0.7 \\ RE \textless PS: 1.7\end{tabular}                                    & \begin{tabular}[c]{@{}l@{}}Nothing because current handling of the CDC \\ of the line list ensures that the most concerning \\ cases are handled where \\ SO = PO = RE, SO = RE and PO = RE\end{tabular}                                                                                                                                                                   \\ \hline
 \end{tabular}
 \caption{Percent pairwise occurrence for the different permutations of events considered in the restricted CDC line list. The abbreviation IO stands for infection onset, SO is symptom onset, PS is positive specimen, and RE is report date. We consider a restricted set of permutations because we assume that IO must come first and that PS must precede report date for a case to be legitimate. Finally, the underlying assumption for the percent pairwise occurrence calculations is that the cases must have both elements present (not missing).}
-\label{tab:order_events_table}
+\label{tab:order-events-table}
 \end{table}
 
 \subsection{Justifications for delay distribution calculations}
-\label{sec:delay-justifications}
+\label{supp:delay-justifications}
 
 Let $y_t$ denote the count of new cases reported at time $t$ and $x_t$ denote
 the count of deconvolved cases with positive specimen at $t$. For all cases in
@@ -163,12 +165,20 @@ Hampshire). Aside from these modifications, the construction of the delay
 distribution proceeds in precisely the same manner as for positive specimen to
 report date. 
 
-\subsection{Estimated delays}
+\subsection{Estimated delays for a sample of six states}
+\label{supp:est-delays-samp}
 
-\attn{we should actually show some of the delay distribution estimates.}
+\begin{figure}[H]
+\centering
+    \includegraphics[width=.90\textwidth]{delay_plots.pdf} 
+    \caption{Depictions of the estimated discretized delay from symptom onset to 
+    positive specimen date (left) and from positive specimen date to report date (right)
+    for a sample of six states over several dates.}
+    \label{fig:delay-plots-samp}
+\end{figure}
 
 \subsection{Details about seroprevalence data}
-\label{sec:sero-details}
+\label{supp:sero-details}
 
 In the former, the CDC
 collaborated with 17 blood collection organizations in the largest nationwide
@@ -189,7 +199,7 @@ antibodies against the virus \citep{bajema2021estimated, cdc2020data,
 jones2021estimated}. Adjustments were made in both for age and sex to account
 for the demographic differences between the sampled and the target populations.
 However, both datasets are incomplete and they differ in the number and the
-timing of the data points for each state (\autoref{fig:sero_blood_comm_compar}).
+timing of the data points for each state (\autoref{fig:sero-blood-comm-compar}).
 Such limitations indicate that reliance upon only one seroprevalence survey is
 inadvisable. For example, in the commercial dataset, the last estimate for North
 Dakota is in September 2020. In the blood donor dataset, Arkansas does not have
@@ -203,7 +213,7 @@ estimates available until October 2020.
     Seroprevalence Survey dataset (blue). Note that the maximum and the minimum
     of the line ranges are the provided 95\% confidence interval bounds to 
     give a rough indication of uncertainty.}
-    \label{fig:sero_blood_comm_compar}
+    \label{fig:sero-blood-comm-compar}
 \end{figure}
     
 The date variables that come with the two seroprevalence datasets are different
@@ -231,7 +241,7 @@ end date to be November 29, 2021.
 
 \subsection{State space representation of the antibody prevalence model}\label{supp:ssapm} 
 
-The antibody prevalence model from \autoref{eq:waningpr} is conceptualized
+The antibody prevalence model is conceptualized
 as a Gaussian state space model (as in \citealp{durbin2012time, helske2017kfas}).
 
 In general, for $t = 1, \dots, n$, let $\alpha_t$ be the $m \times 1$ vector of
@@ -452,7 +462,7 @@ deconvolved case estimates); 4. those from applying the antibody prevalence
 model to produce estimates for both the reported and the unreported cases (the
 infection estimates).
 
-The results of this study are shown in \autoref{fig:abl_lag_cor}. From
+The results of this study are shown in \autoref{fig:abl-lag-cor}. From
 this, we can see that the deconvolved case or infection estimates from the
 intermediate steps are all leading indicators of hospitalizations. However, the
 degree that each such set of estimates lead hospitalizations depend on its
@@ -478,6 +488,6 @@ hospitalizations by about $17$ days.
     remove spurious day of the week effects. The dashed lines indicate the lags
     for which the highest average correlation is attained. \attn{This figure is
     out of date.}}
-    \label{fig:abl_lag_cor}
+    \label{fig:abl-lag-cor}
 \end{figure}
  

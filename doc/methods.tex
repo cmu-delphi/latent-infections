@@ -13,7 +13,7 @@ time period under consideration. Next, each day-location-specific incubation
 period and symptom onset to positive specimen delay distribution are combined
 using convolution, resulting in variant-specific infection onset to positive
 specimen distributions for each time and location (for a brief description of
-convolution, please see \autoref{sec:convol}). Subsequently, two types of
+convolution, please see Supplementary Methods \autoref{supp:convol}). Subsequently, two types of
 deconvolution are performed. We first deconvolve from case report to positive
 specimen date. We then deconvolve from positive specimen to report date by
 variant. The resulting infection estimates are aggregated across the variant
@@ -101,9 +101,9 @@ the largest delay values for the state-wide 0.05 and 0.95 quantiles. This is
 reasonable because the median delay is very short at approximately 2 days, and
 an asymptomatic individual may test positive following a known exposure, before
 the onset of symptoms. Additional minor details are discussed in
-\autoref{sec:delay-justifications}.
-
-
+Supplementary Methods \autoref{supp:delay-justifications}. Moreover, we show
+both types of delays for a sample of states over several dates
+in Supplementary Methods \autoref{supp:est-delays-samp}.
 
 \subsection{Estimating the incubation period distributions} 
 \label{sec:incubation}
@@ -293,7 +293,7 @@ surveys: the 2020--2021 Blood Donor Seroprevalence Survey and the Nationwide
 Commercial Lab Seroprevalence Survey \citep{cdc2021blood, cdc2021comm}
 to estimate the proportion of the population with
 evidence of previous infection in each state over time. See
-\autoref{sec:sero-details} for additional details. Each of these provides
+Supplementary Methods \autoref{supp:sero-details} for additional details. Each of these provides
 seroprevalence estimates along with confidence intervals.
 The daily fraction of new infections are based on surveillance work conducted by
 the Southern Nevada Health District \citep{ruff2022rapid}. These results
@@ -331,7 +331,7 @@ allows for convenient handling of missing data, extrapolation
 before and after the period of observed seroprevalence measurements, and maximum
 likelihood estimates of the errors. Details of this
 methodology and the computation of the associated uncertainty measurements are
-deferred to \autoref{supp:ssapm}.
+deferred to Supplementary Methods \autoref{supp:ssapm}.
 
 
 
