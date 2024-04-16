@@ -1,23 +1,26 @@
 library(dplyr)
 library(ggplot2)
 library(stringr)
+library(here)
 
-setwd("/Users/admin/Downloads")
 
 ############################################################################################################################################
 # Load Commercial
 
-comm_sero_surv = readr::read_csv("Nationwide_Commercial_Laboratory_Seroprevalence_Survey_Sept23.csv", col_names = TRUE)
+comm_sero_surv = readr::read_csv(
+  here("data", "Nationwide_Commercial_Laboratory_Seroprevalence_Survey_Sept23.csv"),
+  col_names = TRUE
+)
 
-comm_sero = comm_sero_surv %>% select(c(Site, `Date Range of Specimen Collection`, 
-                                        `n [Anti-N, All Ages Cumulative Prevalence, Rounds 1-30 only]`, 
-                                        `Rate (%) [Anti-N, All Ages Cumulative Prevalence, Rounds 1-30 only]`, 
-                                        `Lower CI [Anti-N, All Ages Cumulative Prevalence, Rounds 1-30 only]`, 
+comm_sero = comm_sero_surv %>% select(c(Site, `Date Range of Specimen Collection`,
+                                        `n [Anti-N, All Ages Cumulative Prevalence, Rounds 1-30 only]`,
+                                        `Rate (%) [Anti-N, All Ages Cumulative Prevalence, Rounds 1-30 only]`,
+                                        `Lower CI [Anti-N, All Ages Cumulative Prevalence, Rounds 1-30 only]`,
                                         `Upper CI [Anti-N, All Ages Cumulative Prevalence, Rounds 1-30 only]`)) %>%
-  rename(Date_Range = `Date Range of Specimen Collection`, 
-         n = `n [Anti-N, All Ages Cumulative Prevalence, Rounds 1-30 only]`, 
-         Rate = `Rate (%) [Anti-N, All Ages Cumulative Prevalence, Rounds 1-30 only]`, 
-         lb = `Lower CI [Anti-N, All Ages Cumulative Prevalence, Rounds 1-30 only]`, 
+  rename(Date_Range = `Date Range of Specimen Collection`,
+         n = `n [Anti-N, All Ages Cumulative Prevalence, Rounds 1-30 only]`,
+         Rate = `Rate (%) [Anti-N, All Ages Cumulative Prevalence, Rounds 1-30 only]`,
+         lb = `Lower CI [Anti-N, All Ages Cumulative Prevalence, Rounds 1-30 only]`,
          ub = `Upper CI [Anti-N, All Ages Cumulative Prevalence, Rounds 1-30 only]`)
 
 comm_sero_dt_sub = str_split_fixed(comm_sero$Date_Range, " - ", 2)
@@ -28,7 +31,7 @@ colnames(comm_sero_dt_sub) <- c("Start_date", "End_date")
 comm_sero_dt_sub$Start_date = str_trim(comm_sero_dt_sub$Start_date)
 comm_sero_dt_sub$End_date = str_trim(comm_sero_dt_sub$End_date)
 
-comm_sero_dt_sub2 = comm_sero_dt_sub %>% mutate(Start_date = ifelse(str_count(Start_date, ",") == 0, 
+comm_sero_dt_sub2 = comm_sero_dt_sub %>% mutate(Start_date = ifelse(str_count(Start_date, ",") == 0,
                                                                     paste(Start_date, str_split_fixed(End_date, ", ", 2)[,2], sep = ", "), Start_date))
 
 comm_sero_dt_sub2$Start_date = as.Date(comm_sero_dt_sub2$Start_date, format = "%b %d, %Y")
@@ -55,7 +58,9 @@ comm_sero_df = comm_sero2_sub %>%
 ############################################################################################################################################
 # Blood Donor
 # Read in files of CDC blood donor data from CDC site direct download
-blood_cdc_df <- readr::read_csv("2020-2021_Nationwide_Blood_Donor_Seroprevalence_Survey_Infection-Induced_Seroprevalence_Estimates.csv", col_names = TRUE)
+blood_cdc_df <- readr::read_csv(
+  here("data", "2020-2021_Nationwide_Blood_Donor_Seroprevalence_Survey_Infection-Induced_Seroprevalence_Estimates.csv"),
+  col_names = TRUE)
 
 blood_cdc_df = blood_cdc_df %>% select(c(`Region Abbreviation`, `Median \nDonation Date`, `n [Total Prevalence]`, `Rate %[Total Prevalence]`, `Lower CI %[Total Prevalence]`, `Upper CI  %[Total Prevalence]`)) %>%
   rename(Region = `Region Abbreviation`, Date = `Median \nDonation Date`, n = `n [Total Prevalence]`, Rate = `Rate %[Total Prevalence]`, lb = `Lower CI %[Total Prevalence]`, ub = `Upper CI  %[Total Prevalence]`)
@@ -93,8 +98,7 @@ sero_blood_df = bind_rows(blood_cdc_df, comm_sero_df)
 sero_blood_df = sero_blood_df %>% filter(res_state %ni% c("DC", "PR", 'US'))
 
 # Save file of adj_df_list
-setwd("/Users/admin/Downloads") 
-saveRDS(sero_blood_df, file = "sero_blood_df_F24.rds")
+saveRDS(sero_blood_df, file = here("data", "sero_blood_df_F24.rds"))
 
 # Plot to compare both
 # Check just one state
@@ -113,10 +117,10 @@ ggplot(sero_blood_df, aes(Date, y = Rate)) +
     aes(ymin = lb, ymax = ub, color = Source)) +
   scale_color_manual(values = c("#00AFBB", "#E7B800")) + facet_wrap(~ res_state, ncol = 8) +
   scale_x_date(name = "", date_breaks = "6 month", date_labels = "%m/%y", expand = c(0,0)) +
-  scale_y_continuous(expand = c(0,0), n.breaks = 4) + 
+  scale_y_continuous(expand = c(0,0), n.breaks = 4) +
   theme_bw(16) +
   xlab("") +
-  ylab("Seroprevalence estimate (proportion)") + 
+  ylab("Seroprevalence estimate (proportion)") +
   theme(axis.text.x = element_text(vjust = 3, size = 5.5),
         axis.text.y = element_text(size = 7),
         axis.title.y = element_text(size = 9),
@@ -125,4 +129,4 @@ ggplot(sero_blood_df, aes(Date, y = Rate)) +
         legend.text = element_text(size = 7),
         legend.position = c(0.85, 0),
         panel.spacing = unit(3, "pt"))
-ggsave(filename = "sero_blood_comm_compar_Sept23.pdf")
+ggsave(filename = here("gfx", "sero_blood_comm_compar_Sept23.pdf"))
