@@ -2,7 +2,7 @@ library(nnet)
 library(tidyverse)
 library(here)
 
-path_to_data <- "data"
+path_to_data <- here("data")
 cav <- read_csv(here(path_to_data, "seq_df_filled_Nov5.csv"))
 
 # Set start and end dates
@@ -41,7 +41,6 @@ for(state in state.abb){
   time <- date_day_idx / max(date_day_idx)
   interp <- seq(min(date_day_idx), max(date_day_idx), by = 1) / max(date_day_idx)
 
-  # Plotter function
 
   # Original
   y_props = y %>%
