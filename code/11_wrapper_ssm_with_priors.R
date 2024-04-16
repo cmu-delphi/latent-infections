@@ -4,19 +4,19 @@ library(tidyverse)
 library(tsibble)
 library(covidcast)
 library(reticulate) # use reticulate to load numpy file
+library(here)
 np <- import("numpy")
 
-setwd('/Users/admin/Downloads')
 
 # Load prepped sero data
-sero = readRDS("sero_for_ssmod_J18.Rds")
+sero = readRDS(here("data", "sero_for_ssmod_J18.Rds"))
 
 # Initial settings
-pop_df = readRDS("pop_df.RDS")
+pop_df = readRDS(here("data", "pop_df.RDS"))
 pop_used = "population_2020"
 
 # Load const_interp_obs_frac_df
-const_interp_obs_frac_df = readRDS("const_interp_obs_frac_df_J18.RDS")
+const_interp_obs_frac_df = readRDS(here("data", "const_interp_obs_frac_df_J18.RDS"))
 
 # Some initial settings
 start_date = as.Date("2020-06-01")
@@ -89,7 +89,7 @@ model_builder <- function(pars, model = NULL,
     Tmat[1, 2, ] <- (infects / pop) * frac_new
     Tmat[2:(1 + k), 2:(1 + k), ] <- companion_mat(k)
 
-    
+
     P1 = diag(c(mean(first_nonnay_rd_SE2), rep(P1x, k))^2, k + 1, k + 1)
 
     model <- SSModel(
@@ -116,37 +116,37 @@ model_builder <- function(pars, model = NULL,
 }
 
 
-fit_my_ssm <- function(par, model, updatefn, ...) { 
+fit_my_ssm <- function(par, model, updatefn, ...) {
 
   eps <- logistic(par[1])
-  eps_pen <- dnorm(par[1], logit(.995), sd = 2, log = TRUE) 
+  eps_pen <- dnorm(par[1], logit(.995), sd = 2, log = TRUE)
   obsvar <- reals_to_nonneg(par[2])
   svar <- reals_to_nonneg(par[3])
-  svar_pen <- dnorm(par[3], nonneg_to_reals(1e-4), sd = 1, log = TRUE) 
-  mult <- reals_to_nonneg(par[4]) 
-  mult_pen <- dnorm(par[4], nonneg_to_reals(300), sd = .5, log = TRUE) 
-  ss <- updatefn(c(eps, obsvar, svar, mult), model, ...) 
-  val <- -logLik(ss) - eps_pen - svar_pen - mult_pen 
-  
+  svar_pen <- dnorm(par[3], nonneg_to_reals(1e-4), sd = 1, log = TRUE)
+  mult <- reals_to_nonneg(par[4])
+  mult_pen <- dnorm(par[4], nonneg_to_reals(300), sd = .5, log = TRUE)
+  ss <- updatefn(c(eps, obsvar, svar, mult), model, ...)
+  val <- -logLik(ss) - eps_pen - svar_pen - mult_pen
+
   val
 }
 
 # fit_my_ssm when eps and svar are fixed
-fit_my_ssm_w_fixed <- function(par, fixed_par, fixed, model, updatefn, ...) { 
+fit_my_ssm_w_fixed <- function(par, fixed_par, fixed, model, updatefn, ...) {
 
   fnf_par = rep(0, length = length(fixed))
   fnf_par[which(fixed == TRUE)] = fixed_par
   fnf_par[which(fixed != TRUE)] = par
   eps <- logistic(fnf_par[1])
-  eps_pen <- dnorm(fixed_par[1], logit(.995), sd = 2, log = TRUE) 
+  eps_pen <- dnorm(fixed_par[1], logit(.995), sd = 2, log = TRUE)
   obsvar <- reals_to_nonneg(fnf_par[2])
   svar <- reals_to_nonneg(fnf_par[3])
-  svar_pen <- dnorm(fnf_par[3], nonneg_to_reals(1e-4), sd = 1, log = TRUE) 
-  mult <- reals_to_nonneg(fnf_par[4]) 
-  mult_pen <- dnorm(fnf_par[4], nonneg_to_reals(300), sd = .5, log = TRUE) 
-  ss <- updatefn(c(eps, obsvar, svar, mult), model, ...) 
-  val <- -logLik(ss) - eps_pen - svar_pen - mult_pen 
-  
+  svar_pen <- dnorm(fnf_par[3], nonneg_to_reals(1e-4), sd = 1, log = TRUE)
+  mult <- reals_to_nonneg(fnf_par[4])
+  mult_pen <- dnorm(fnf_par[4], nonneg_to_reals(300), sd = .5, log = TRUE)
+  ss <- updatefn(c(eps, obsvar, svar, mult), model, ...)
+  val <- -logLik(ss) - eps_pen - svar_pen - mult_pen
+
   val
 }
 
@@ -175,15 +175,16 @@ iar_df = data.frame(geo_value = pop_df$geo_value,
 # Get sd of 1/X when X is Beta (12, 5) distribution
 alpha = 12
 beta = 5
-P1x_val = sqrt((beta*(alpha + beta - 1))/((alpha - 2) * (alpha - 1)^2)) 
+P1x_val = sqrt((beta*(alpha + beta - 1))/((alpha - 2) * (alpha - 1)^2))
 
 ##############################################################################################################################################
 # Load covidcast case data (for plotting later on)
-options(covidcast.auth = "42ecb34c08d5")
-cases <- covidcast_signal("jhu-csse", "confirmed_7dav_incidence_num",
-                          start_day = start_date, end_day = end_date,
-                          as_of = as.Date("2023-07-06"),
-                          geo_type = "state") %>%
+cases <- covidcast_signal(
+  "jhu-csse", "confirmed_7dav_incidence_num",
+  start_day = start_date, end_day = end_date,
+  as_of = as.Date("2023-07-06"),
+  geo_type = "state"
+) %>%
   select(geo_value, time_value, version = issue, case_count_7d_av = value)
 
 
@@ -192,17 +193,21 @@ cases <- covidcast_signal("jhu-csse", "confirmed_7dav_incidence_num",
 
 # Filter for state
 
-state_model_builder <- function(state, eps_init, svar_init, mult_init, k = 3L, fixed){
+state_model_builder <- function(state, eps_init, svar_init, mult_init,
+                                k = 3L, fixed) {
 
 # Load pop_df
-pop <- pop_df %>% filter(geo_value == state) %>% select(pop_used) %>% as.numeric()
+pop <- pop_df %>% filter(geo_value == state) %>%
+  select(pop_used) %>% as.numeric()
 
 # sero data subset for state
 sero_sub = sero %>% filter(res_state == state)
 
 # Filter for each source
-sero_sub_comm = sero_sub %>% filter(Source == "Commercial") %>% filter(Date <= end_date)
-sero_sub_bd = sero_sub %>% filter(Source == "Blood_Donor") %>% filter(Date <= end_date)
+sero_sub_comm = sero_sub %>% filter(Source == "Commercial") %>%
+  filter(Date <= end_date)
+sero_sub_bd = sero_sub %>% filter(Source == "Blood_Donor") %>%
+  filter(Date <= end_date)
 yorig = cbind(y1 = sero_sub_comm$Rate, y2 = sero_sub_bd$Rate)
 # N <- nrow(yorig)
 
@@ -221,13 +226,12 @@ a1x_val = 1/iar_df_sub$infect_ascert_ratio
 
 n = nrow(yorig)
 
-setwd(paste0("/Users/admin/Downloads/variant-deconvolve/data/", state)) 
-unadj_infect_df = read_rds("final-thetas-df.rds")
+unadj_infect_df = read_rds(here("data", state, "final-thetas-df.rds"))
 unadj_infect_df_day = unadj_infect_df %>% group_by(time_value) %>% summarise(infect = sum(infect))
 unadj_infect = unadj_infect_df_day$infect
 
 unadj_infect = unadj_infect[(start_date - decon_start_date + 1):(end_date - decon_start_date + 1)]
-infects <- unadj_infect 
+infects <- unadj_infect
 
 k <- 3 # degree
 
@@ -242,19 +246,19 @@ lm_sum_source2$sigma^2 # variance est.
 # Get range of dates starting from first obs sero to last obs sero for this state
 dd <- sero_sub_bd$Date[seq_range(nonnay_range)]
 # Ready y values (turn them to weekly where weekly starts on M)
-good_y <- apply(yorig, 1, function(x) any(!is.na(x))) 
-yd <- data.frame(yorig, dd = dd)[good_y, ] 
+good_y <- apply(yorig, 1, function(x) any(!is.na(x)))
+yd <- data.frame(yorig, dd = dd)[good_y, ]
 yd <- yd |>
   mutate(rdd = round_date(dd, "week", week_start = "Monday")) |> # round dd to closest M
   group_by(rdd) |>
   dplyr::summarise(across(starts_with("y"), ~ mean(.x, na.rm = TRUE))) |>
   ungroup() |>
   mutate(yw = yearweek(rdd)) |>  # Get year week for rdd (week starts on Monday)
-  as_tsibble(index = yw) |> 
+  as_tsibble(index = yw) |>
   fill_gaps() |> # Turn implicit missing values into explicit missing values (by yw)
   mutate(across(y1:y2, ~ ifelse(is.nan(.x), NA, .x))) # if NaN replace with NA
 #mutate(yw = ymd(yw)) # Parse dates with year, month, and day components
-yd$rdd <- format(yd$yw, "%Y-%m-%d") 
+yd$rdd <- format(yd$yw, "%Y-%m-%d")
 
 y <- as.matrix(yd[c("y1", "y2")])
 
@@ -312,7 +316,7 @@ if(any(fixed) == TRUE) {
   par <- c(logistic(inits[1]), reals_to_nonneg(inits[2:4]))
 }
 ss <- model_builder(par, k = k)
-fs <- KFS(ss, simplify = FALSE) 
+fs <- KFS(ss, simplify = FALSE)
 mon_obs_weekly <- yd$rdd
 sero_obs_weekly <- fs$alphahat[,1]
 alpha <- fs$alphahat[,2] # alphahat: Smoothed estimates of states E(alpha_t|y_1,..., y_n)
@@ -354,7 +358,7 @@ V <- array(0, c(k, k, N))
 a[,first_rdd_mon_num:(length(yd$rdd) + first_rdd_mon_num-1)] <- t(fs$alphahat[,-c(1)])
 V[,,first_rdd_mon_num:(length(yd$rdd) + first_rdd_mon_num-1)] <- fs$V[-c(1), -c(1), ]
 # backward
-RQR[1, 1] <- par[3] * par[4] 
+RQR[1, 1] <- par[3] * par[4]
 for (i in first_rdd_mon_num:2) {
   a[,i-1] <- Ttrendb %*% a[,i]
   V[,,i-1] <- Tvarb %*% V[,,i]%*% t(Tvarb) + RQR
@@ -376,12 +380,12 @@ alpha_li_df <- alpha_df %>%
          vhat = approx(date[!is.na(.$vhat)], y = vhat[!is.na(.$vhat)], xout = date, method = "linear")$y)
 
 # Plot inverse ratios
-png(paste0(state, "_inv_rr_after_linear_interp.png"))
+png(here("gfx", paste0(state, "_inv_rr_after_linear_interp.png")))
 plot(alpha_li_df$date, one_thresh(alpha_li_df$alpha), ylim = c(1, 12), col = 1, ty = "l",
      xlab = "Date", ylab = "Inverse ratio")
 lines(alpha_li_df$date, one_thresh(alpha_li_df$alpha + 2 * sqrt(alpha_li_df$vhat)), col = 2) # Approximate Normal 95% CI for alpha
 lines(alpha_li_df$date, one_thresh(alpha_li_df$alpha - 2 * sqrt(alpha_li_df$vhat)), col = 2)
-abline(v = c(as.Date(yd$rdd[1]), as.Date(yd$rdd[length(yd$rdd)])), lty = 2, col = 4) 
+abline(v = c(as.Date(yd$rdd[1]), as.Date(yd$rdd[length(yd$rdd)])), lty = 2, col = 4)
 title("Inverse ratios post-linear interpolation (with 95% CI)")
 # Close device
 dev.off()
@@ -459,5 +463,4 @@ inv_ratios_all_states <- lapply(state.abb, function(x) state_model_builder(x, fi
 names(inv_ratios_all_states) <- state.abb
 
 # Save inv_ratios_all_states as RDS
-setwd("/Users/admin/Downloads")
-saveRDS(inv_ratios_all_states, "inv_ratios_all_states_F24.RDS")
+saveRDS(inv_ratios_all_states, here("data", "inv_ratios_all_states_F24.RDS"))
