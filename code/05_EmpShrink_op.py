@@ -13,10 +13,12 @@ from pandas import read_csv, date_range
 from tqdm import tqdm
 from config import *
 
+path_to_data = "data/"
+
 #######################################################################################################################
 # Read in linelist data
 
-surveil_df = read_csv("cdc_restricted_dataset_Feb8.csv",
+surveil_df = read_csv(path_to_data + "cdc_restricted_dataset_Feb8.csv",
                       usecols=["onset_dt", "pos_spec_dt", "res_state"],
                       parse_dates=["onset_dt", "pos_spec_dt"])
 surveil_df.onset_dt = surveil_df.onset_dt.dt.date
@@ -36,7 +38,7 @@ linelist = linelist[linelist.delay.le(21)]
 linelist = linelist[linelist.delay.ge(-3)]
 #######################################################################################################################
 # Read in jhu state cumulative counts data
-jhu_df = read_csv("jhu_dataset_by_state_Sept23.csv",
+jhu_df = read_csv(path_to_data + "jhu_dataset_by_state_Sept23.csv",
                       usecols=["geo_value", "time_value", "value"],
                       parse_dates=["time_value"])
 jhu_df.time_value = jhu_df.time_value.dt.date

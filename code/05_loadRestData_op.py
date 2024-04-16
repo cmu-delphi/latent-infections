@@ -13,10 +13,12 @@ from pandas import read_csv, date_range
 from tqdm import tqdm
 from config import *
 
+path_to_data = "data/"
+
 #######################################################################################################################
 # Read in linelist data
 
-surveil_df = read_csv("cdc_restricted_dataset_Feb8.csv",
+surveil_df = read_csv(path_to_data + "cdc_restricted_dataset_Feb8.csv",
                       usecols=["onset_dt", "pos_spec_dt", "res_state"],
                       parse_dates=["onset_dt", "pos_spec_dt"])
 surveil_df.onset_dt = surveil_df.onset_dt.dt.date
