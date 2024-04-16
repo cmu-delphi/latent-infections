@@ -11,6 +11,8 @@ The following lists the main files in the order they should be run.
 
 ### Part 1: Extracting case data, obtaining the delay distribution estimates, and performing the deconvolutions
 
+* `_install_pkgs.R` installs all packages used elsewhere
+* `00_pop_df_construction.R` creates a dataframe with the state population data;
 * `00_extract_restricted_data.R` extracts the restricted CDC COVID-19 case dataset;
   and stores the necessary variables as both a .csv and a .RData file for further use;
 * `01_restr_cc_plots.R` computes some basic numerical summaries on the 
@@ -42,7 +44,7 @@ The following lists the main files in the order they should be run.
   some basic comparisons on their seroprevalence estimates prior to processing the data;
 * `10_Ready_sero_for_ssmod.R` prepares the seroprevalence data for input into the state space model;
   `10_frac_new_infections.R` creates a datafame containing the fraction of new infection data to be used
-  in the state space model; `10_pop_df_construction.R` creates a dataframe with the state population data;
+  in the state space model; 
   There are also several miscellaneous scripts:
 * `11_wrapper_ssm_with_priors_Sept29.R` builds and executes the leaky immunity state space model to obtain
   the inverse reporting ratios;
