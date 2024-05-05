@@ -8,7 +8,7 @@ health, several infections are likely to have occurred, likely much earlier. To
 see why, it is important to understand \emph{whose} cases are being reported and
 what differentiates them from the unreported cases as well as \emph{when} these
 case reports happen. \autoref{fig:chain_events_onset_report} shows an
-illustration of the path of a symptomatic infection that \emph{is} eventually
+illustration of the path of a symptomatic infection that is eventually
 reported to public health. Using this figure, we can discern a number of sources
 of bias in the reporting pipeline. For instance, diagnostic testing mainly
 targets symptomatic individuals; thus, infected individuals exhibiting little to
@@ -21,7 +21,7 @@ symptom onset, laboratory confirmation, test turnaround times, and eventual
 submission to public health \citep{pellis2021challenges, wash2020dash}. For
 these reasons, reported cases are a lagging indicator of the course of the
 pandemic. Furthermore, they do not represent the actual number of new infections
-that occur on a given day as indicated by exposure to the pathogen. Since there
+that occur on a given day based on exposure to the pathogen. Since there
 was no large-scale surveillance effort in the United States that reliably
 tracked symptom onset, let alone infection onset, ascertaining the onset of all
 \emph{infections} is challenging.
@@ -44,10 +44,10 @@ tracked symptom onset, let alone infection onset, ascertaining the onset of all
 % Our approach to estimate latent infections takes case data and estimates the 
 % following...
 
-Explaining the course of the pandemic and investigating the effects of
-interventions, the burden facing various subgroups, and drawing insights for
-future pandemics is inhibited because the true spatial and temporal behavior of
-infections is unknown. While reported cases provide a convenient proxy of the
+Understanding the course of the pandemic, the effects of interventions and drawing 
+insights from this for future pandemics is challenging because the true spatial 
+and temporal behaviour of infections is unknown.
+While reported cases provide a convenient proxy of the
 disease burden in a population, it is incomplete, delayed, and understates the
 true size of the pandemic. Regardless of these difficulties, it is important to
 the public and public health to perform a pandemic post-mortem and try to better
@@ -62,12 +62,12 @@ daily incident infections for each \US state from June 1, 2020 to November 29,
 distributions for the time from symptom onset to positive specimen date and
 positive specimen to case report date. We combine these with variant-specific
 incubation period distributions to deconvolve daily reported COVID-19 cases back
-to their infection onset. Finally, the resulting deconvolved cases are adjusted
-to account for the unreported infections using seroprevalence and reinfection
-data to adjust for the waning of antibody detectability over time. We
+to their infection onset. Finally, we adjust the resulting deconvolved cases to account 
+for unreported infections using seroprevalence and reinfection data to adjust for the 
+waning of antibody detectability over time. We then
 examine some features of our infection estimates and the implications of using
-them rather than reported cases in assessing the impact of the pandemic. We
-produce simple time-varying infection-hospitalization ratios (IHRs) for each
+them rather than reported cases in assessing the impact of the pandemic. To this end,
+we produce simple time-varying infection-hospitalization ratios (IHRs) for each
 state and compare those to similarly derived case-hospitalization ratios (CHRs).
 While these analyses provide a glimpse into the utility of our infection
 estimates, we believe that there is much more to be explored, and we hope that

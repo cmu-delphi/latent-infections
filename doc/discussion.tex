@@ -1,7 +1,7 @@
 \section{Discussion}
 
 We retrospectively estimated daily incident infections for each \US state over
-the period June 1, 2020 to November 29, 2021. Our  estimates suggest both (a)
+the period June 1, 2020 to November 29, 2021. Our estimates suggest both (a)
 that the pandemic impacted states earlier and at a larger scale than is
 indicated by reported cases and that (b) examining cases alone hides significant
 spatio-temporal variation that becomes more apparent with infections. We observe
@@ -17,10 +17,9 @@ processing issues that increase the average time from case detection to report
 indication of the trajectory of the pandemic, it is a delayed and incomplete
 version.
 
-Our approach offers a number of advantages. For instance, we incorporate as much
-state-specific information as possible when deriving our estimates. By using
-state-level case, line list, and variant circulation data, we are able to
-construct incubation and delay distributions that are spatio-temporally specific.
+Our approach offers a number of advantages. For instance, since we incorporate 
+state-level case, line list, and variant circulation data, we are able to construct 
+incubation and delay distributions that are state and spatio-temporally specific.
 Time-varying and state-specific seroprevalence data allows the reporting ratio
 estimates to similarly vary over space and time, a departure from existing work
 \citep{unwin2020state, uga2020covid19}. Existing approaches that use the delay
@@ -33,7 +32,8 @@ circulation, among other issues.
 
 Another limitation of previous approaches to estimate latent infections is that
 they do not to account for reinfections. While reinfections represent a small
-fraction of total infections until later in the pandemic, ignoring them means
+fraction of total infections until the arrival of high immune escape variants (BA.1), 
+ignoring them means
 that the infection-reporting ratio will tend to be underestimated with
 seroprevalence data alone. By accounting for these as well as the waning of
 seropositivity (See \autoref{sec:report-ratio}), we more accurately estimate
@@ -91,18 +91,19 @@ data over the entire time period we examined, if at all.
 % the missing cases led to a nonrepresentative, and therefore, biased sample, and
 % could be a topic of further study.
 
-Using seroprevalence data to estimate the case-ascertainment ratio is subject to
-a number of additional issues that inhibit us from pushing the period of
-analysis past December 2021. While most state-level data suggests that
+Using seroprevalence data to estimate the case-ascertainment ratio past December 2021
+is subject to additional issues that inhibit us from extending the period of
+analysis. Specifically, while most state-level data suggests that
 reinfections still account for less than 20\% of reported cases during Omicron
 \citep{ruff2022rapid, nyreinfect2021, hireinfect2022, wareinfect2022},
 seropositivity rapidly reaches nearly 100\% of the population, precluding its
-continued use. Due to these issues, alternative data sources for estimating the
-case-ascertainment ratio is necessary. For example, wastewater surveillance data
+continued use. Due to such data-driven limitations, alternative data sources for estimating the
+case-ascertainment ratio should be considered. For example, wastewater surveillance data
 may be complementary to seroprevalence data, especially when testing is low
-\citep{mcmanus2023predicting}. However, viral detection is inconsistent across
-locations due to temperature, per-capita water use, and in-sewer travel time
-\citep{mcmanus2023predicting, hart2020computational, li2023correlation}.
+\citep{mcmanus2023predicting}. 
+% However, viral detection is inconsistent across
+% locations due to temperature, per-capita water use, and in-sewer travel time
+% \citep{mcmanus2023predicting, hart2020computational, li2023correlation}.
 Sentinel surveillance streams for influenza-like illness or acute respiratory
 infection may provide decent proxies for COVID-19 incidence, especially when
 testing for mild cases of COVID-19 is diminishing or has ceased completely.
@@ -147,19 +148,14 @@ over time \citep{reinhart2021open,ecdc2020strategies}.
 % uncertainty over time that is not captured by the model or the estimates.   
 
 
-Overall, we adopt a relatively simple deconvolution-based approach and devote
+Overall, we adopt a deconvolution-based approach and devote
 much of our efforts to tailoring our approach to the available data. A major
 result of this is the development of a model for the waning of detectable
 antibody levels and space-time-specific reporting ratios based on seroprevalence
 data. In a way, our approach is built for the data rather than trying to force
-the data to fit to an existing modelling framework. However, our model is only
-as good as the quality and the quantity of the data provided to it. In our case,
-the lack of data is both a barrier to entry and a continual roadblock. The
-assumptions we are required to make as a consequence of this limit the
-generalizability. So while we highlight many interesting trends and numerical
-findings, these results are not definitive. Despite these limitations, we are
-encouraged by the sensiblity of the estimates of infections in the United States
-and the plausibility of the apparent geospatial and temporal trends. 
+the data to fit to an existing modelling framework. We are
+encouraged by the plausibility of the resulting infection estimates
+as well as their geospatial and temporal trends.
  
 
 
