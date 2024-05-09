@@ -4,7 +4,7 @@
 Reported COVID-19 cases are a staple in tracking the pandemic at varying
 geographic resolutions \citep{dong2020interactive, nyt2020corona,
 wp2020tracking}. Yet, for every case that is eventually reported to public
-health, several infections are likely to have occurred, likely much earlier. To
+health, several infections are likely to have occurred, and likely much earlier. To
 see why, it is important to understand \emph{whose} cases are being reported and
 what differentiates them from the unreported cases as well as \emph{when} these
 case reports happen. \autoref{fig:chain_events_onset_report} shows an
@@ -48,22 +48,23 @@ Understanding the course of the pandemic, the effects of interventions and drawi
 insights from this for future pandemics is challenging because the true spatial 
 and temporal behaviour of infections is unknown.
 While reported cases provide a convenient proxy of the
-disease burden in a population, it is incomplete, delayed, and understates the
-true size of the pandemic. Regardless of these difficulties, it is important to
+disease burden in a population, it is incomplete, delayed, and
+misrepresents the true size and timing of the pandemic. 
+Regardless of these difficulties, it is important to
 the public and public health to perform a pandemic post-mortem and try to better
 explain its implications---to attempt to capture the true size and impact of the
 pandemic as much as we can. Estimates of daily incident infections are one such
 way to measure this and can guide understanding of the pandemic burden over
-space and time.
+space and time. 
 
-In this work, we provide a statistically rigorous, data-driven reconstruction of
+In this work, we provide a data-driven reconstruction of
 daily incident infections for each \US state from June 1, 2020 to November 29,
 2021. Using state-level line list data, we construct time-varying delay
 distributions for the time from symptom onset to positive specimen date and
 positive specimen to case report date. We combine these with variant-specific
 incubation period distributions to deconvolve daily reported COVID-19 cases back
-to their infection onset. Finally, we adjust the resulting deconvolved cases to account 
-for unreported infections using seroprevalence and reinfection data to adjust for the 
+to their infection onset. Finally, we adjust for the unreported infections 
+by using seroprevalence and reinfection data to account for the 
 waning of antibody detectability over time. We then
 examine some features of our infection estimates and the implications of using
 them rather than reported cases in assessing the impact of the pandemic. To this end,
@@ -72,4 +73,7 @@ state and compare those to similarly derived case-hospitalization ratios (CHRs).
 While these analyses provide a glimpse into the utility of our infection
 estimates, we believe that there is much more to be explored, and we hope that
 our work and publicly-available estimates will prove an
-important benchmark for others to undertake retrospective analyses.
+important benchmark for others to undertake retrospective analyses. These estimates
+as well as the R and Python code used to produce them can be found at
+\href{https://github.com/cmu-delphi/latent-infections/}{https://github.com/cmu-delphi/latent-infections/}.
+

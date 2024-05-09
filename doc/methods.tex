@@ -108,6 +108,9 @@ in Supplementary Methods \autoref{supp:est-delays-samp}.
 
 \subsection{Estimating the incubation period distributions} 
 \label{sec:incubation}
+\attn{Daniel, This section could be moved to the supp mat
+if we're looking for stuff to cut from the main body before introducing the models.
+It's up to you.}
 
 To account for the incubation period, the time between infection and symptom
 onset, we use estimates from the existing literature, modified slightly for
@@ -152,6 +155,8 @@ from other rare variants (which is one reason why we may refer to it as the Othe
 
 \subsection{Variant circulation proportions}
 \label{sec:variant-proportions}
+\attn{Daniel, This section could also be moved to the supp mat
+if we're looking for stuff to cut from the main body before introducing the models.}
 
 To estimate the daily proportions of the variants circulating in each state, we
 obtain the GISAID genomic sequencing data from CoVariants.org
@@ -201,10 +206,11 @@ the deconvolution from report to positive specimen date, and the second is from
 positive specimen date to infection onset date.
 
 An important aspect of our methods is that deconvolution is not the same as a
-shift. Simply shifting cases back in time and increasing them by some
-factor fails to capture the temporal dynamics of the pandemic. In our
-situation, reported cases are ``pushed back'' by the delays shown in
-\autoref{fig:chain_events_onset_report}. 
+simple shift. Shifting cases back in time and increasing them by some fixed
+factor fails to capture the temporal dynamics of the pandemic. 
+Therefore, in our situation, we opt for deconvolution 
+to ``push back'' the reported cases by using probability distributions 
+of the delays shown in \autoref{fig:chain_events_onset_report}.
 
 We will start by describing the first type of deconvolution performed from
 report to positive specimen date in detail. For this problem, let $t=1,\ldots,T'$
