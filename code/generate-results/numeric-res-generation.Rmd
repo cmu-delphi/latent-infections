@@ -146,6 +146,55 @@ states_cases_infect_pct_A21 %>%
 
 ```
 
+```{r}
+# Roughly compare the peaks in infection and case rates for the six states
+
+# Infection rates: For roughly the period of Other domination, find the peak in infection rates for each state
+# 1. Other
+inf_top_other = adj_df_O21 %>% 
+  filter(geo_value %in% six_states) %>% 
+  group_by(geo_value) %>% 
+  arrange(desc(adj_inf_rate)) %>% 
+  slice(1) %>% 
+  ungroup()
+
+# Case rates: For roughly the period of Other domination, find the peak in case rates for each state
+case_top_other <- adj_df_O21 %>% 
+  filter(geo_value %in% six_states) %>% 
+  group_by(geo_value) %>% 
+  arrange(desc(cases_rate_7d_av)) %>% 
+  slice(1) %>% 
+  ungroup()
+
+inf_date_vec_other = inf_top_other %>% pull(time_value) 
+case_date_vec_other = case_top_other %>% pull(date) 
+
+case_date_vec_other - inf_date_vec_other
+mean(case_date_vec_other - inf_date_vec_other)
+
+# 2. Delta
+inf_top_delta = adj_df_D21 %>% 
+  filter(geo_value %in% six_states) %>% 
+  group_by(geo_value) %>% 
+  arrange(desc(adj_inf_rate)) %>% 
+  slice(1) %>% 
+  ungroup()
+
+# Case rates: For roughly the period of Delta domination, find the peak in case rates for each state
+case_top_delta <- adj_df_D21 %>% 
+  filter(geo_value %in% six_states) %>% 
+  group_by(geo_value) %>% 
+  arrange(desc(cases_rate_7d_av)) %>% 
+  slice(1) %>% 
+  ungroup()
+
+inf_date_vec_delta = inf_top_delta %>% pull(time_value) 
+case_date_vec_delta = case_top_delta %>% pull(date) 
+
+case_date_vec_delta - inf_date_vec_delta
+mean(case_date_vec_delta - inf_date_vec_delta)
+```
+
 ## The relationship between infections and hospitalizations is complicated.
 
 ```{r inf-case-corr}
