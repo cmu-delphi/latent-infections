@@ -445,57 +445,12 @@ ggsave(filename = here("gfx", "adj_unadj_pi_no_inc_hosp_lag_corr_F24.pdf"),
 
 
 ###############################################################################################################################################
-# IHR (time-varying) calculations
-# Function to get IHR
-
-
+# Rolling window IHR
+# Use 7 day average of infections and hospitalizations
 
 # Use 7 day average of infections and hospitalizations
 hrate_df_no_pop <- hrate_df %>%
   select(-c(population_2020, population_2021, population_2022))
-
-y <- state_infections %>%
-  full_join(hrate_df_no_pop, by = c("geo_value", "time_value")) %>%
-  as_epi_df() %>%
-  select(-c(population_2020, population_2021, population_2022)) %>%
-  left_join(case_prop_df %>% select(time_value, geo_value, case_num, case_num_7_dav), by = c("geo_value", "time_value"))
-
-# Add column for lagged infections by using best_lag
-y <- y %>% group_by(geo_value) %>% mutate(lagged_adj_inf = lag(adj_inf_num_7_dav, n = best_lag),
-                                          lagged_cases = lag(case_num_7_dav, n = best_lag_case))
-
-# Now, calculate IHR for each state
-y <- y %>% mutate(IHR = if_else((out_num_7_dav / lagged_adj_inf) == Inf, NA, out_num_7_dav / lagged_adj_inf),
-                  CHR = if_else((out_num_7_dav / lagged_cases) == Inf, NA, out_num_7_dav / lagged_cases))
-
-# Plot of (single date) IHR for each state
-# Create Faceted LineGraph with Vertical Facets.
-ggplot(y %>% mutate(geo_value = toupper(geo_value)), aes(x = time_value)) +
-  geom_line(aes(y = IHR, color = "IHR")) +
-  geom_line(aes(y = CHR, color = "CHR")) +
-  facet_geo( ~ geo_value, grid = "us_state_without_DC_grid2") +
-  ylab("IHR") +
-  scale_x_date(name = "", date_breaks = "6 month", date_labels = "%m/%y", expand = c(0,0)) +
-  scale_y_continuous(labels = scales::comma, limits = c(0, 0.3), expand = c(0,0), n.breaks = 4) +
-  theme_bw(16) +
-  theme(axis.text.x = element_text(hjust = 0.1, vjust = 2.5, size = 6.4),
-        axis.text.y = element_text(size = 6.4),
-        axis.title.y=element_blank(),
-        axis.title.x=element_blank(),
-        legend.title = element_text(size = 7.5),
-        legend.text = element_text(size = 6.4),
-        legend.position = c(0.9, 0.15),
-        panel.spacing = unit(3, "pt"),
-        strip.text = element_text(size = 6, face = "bold", margin = margin(1, 0, 1, 0, "mm"))) +
-  scale_color_manual(values=c('IHR' = "midnightblue",
-                              'CHR' = "darkorange2"))
-ggsave(filename = here("gfx", "IHR_7dav_F24.pdf"), width = 12, height = 7.9)
-
-
-
-
-# Rolling window IHR
-# Use 7 day average of infections and hospitalizations
 
 ihrs_dat <- state_infections %>%
   full_join(hrate_df_no_pop, by = c("geo_value", "time_value")) %>%
@@ -517,28 +472,3 @@ ihrs_dat <- ihrs_dat %>% mutate(IHR = if_else((roll_out_num_7_dav / roll_lagged_
 ihrs_dat <- ihrs_dat %>% mutate(geo_value = toupper(geo_value))
 # Save off ihrs_dat for plotting
 saveRDS(ihrs_dat, file = here("data", "ihrs_dat.rds"))
-
-# Plot of IHR for each state
-# Create Faceted LineGraph with Vertical Facets.
-ggplot(ihrs_dat, aes(x = time_value)) +
-  geom_line(aes(y = IHR, color = "IHR")) +
-  geom_line(aes(y = CHR, color = "CHR")) +
-  facet_geo( ~ geo_value, grid = "us_state_without_DC_grid2") +
-  # facet_wrap(. ~ toupper(geo_value), ncol = 8) +
-  ylab("IHR") +
-  scale_x_date(name = "", date_breaks = "6 month", date_labels = "%m/%y", expand = c(0,0)) +
-  scale_y_continuous(labels = scales::comma, limits = c(0, 0.3), expand = c(0,0), n.breaks = 4) +
-  theme_bw(16) +
-  theme(axis.text.x = element_text(hjust = 0.1, vjust = 2.5, size = 6.4),
-        axis.text.y = element_text(size = 6.4),
-        axis.title.y=element_blank(),
-        axis.title.x=element_blank(),
-        legend.title = element_text(size = 7.5),
-        legend.text = element_text(size = 6.4),
-        legend.position = c(0.9, 0.15),
-        panel.spacing = unit(3, "pt"),
-        strip.text = element_text(size = 6, face = "bold", margin = margin(1, 0, 1, 0, "mm"))) +
-  scale_color_manual(values=c('IHR' = "midnightblue",
-                              'CHR' = "darkorange2"))
-ggsave(filename = here("gfx", "IHR_7dav_rolling_centered.pdf"),
-       width = 12, height = 7.9)
