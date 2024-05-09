@@ -44,7 +44,6 @@ pop_df <- readRDS(here("data", "pop_df.rds"))
 pop_used <- "population_2020"
 
 six_states = c("MT", "MA", "ID", "LA", "CA", "OH")
-prop_top_circ_df <- read_rds(here("data", "prop_top_circ_df.rds"))
 state_decon_byvar_df <- read_rds(here("data", "state_decon_byvar_df.rds"))
 
 corrs <- read_rds(here("data", "corr_inf_decon_case_lags.rds"))
