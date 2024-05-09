@@ -12,11 +12,12 @@ import math
 #######################################################################################################################
 # Settings
 first_data_date = date(2020, 6, 1)
+path_to_data = "data/"
 
 #######################################################################################################################
 # Read in linelist data
 
-surveil_df = read_csv("cdc_restricted_dataset_Feb8.csv",
+surveil_df = read_csv(path_to_data + "cdc_restricted_dataset_Feb8.csv",
                       usecols=["pos_spec_dt", "cdc_report_dt", "res_state"],
                       parse_dates=["pos_spec_dt", "cdc_report_dt"])
 surveil_df.pos_spec_dt = surveil_df.pos_spec_dt.dt.date
@@ -81,4 +82,4 @@ for month_of_2020 in month_2020_arr:
             linelist = linelist[~((linelist_pos_spec_cond) & (linelist['res_state'] == k) & (linelist['report_delay'] >= bins[j]) & (linelist['report_delay'] < bins[j+1]) & (linelist['cdc_report_dt'].isin(top_rep_dts)))]
 
 # Pruned linelist to csv
-linelist.to_csv("linelist_pruned_Feb8.csv")
+linelist.to_csv(path_to_data + "linelist_pruned_Feb8.csv")

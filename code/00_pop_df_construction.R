@@ -13,5 +13,4 @@ pop_df <- data.frame(geo_value = state.abb,
                                          19677151, 10698973, 779261, 11756058, 4019800, 4240137, 12972008, 1093734, 5282634, 909824, 7051339, 30029572, 3380800, 647064, 8683619, 7785786, 1775156, 5892539, 581381))
 
 # Directory to save pop_df in
-setwd("/Users/admin/Downloads")
-saveRDS(pop_df, "pop_df.RDS")
+saveRDS(pop_df, here::here("data", "pop_df.RDS"))

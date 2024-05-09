@@ -1,20 +1,20 @@
 ############################################################################################################################################
 # Fraction of new infections
 
-start_date = as.Date("2020-06-01") 
-end_date = as.Date("2021-11-29") 
+start_date = as.Date("2020-06-01")
+end_date = as.Date("2021-11-29")
 
 # Fraction of infections that are new infections (according to here https://wwwnc.cdc.gov/eid/article/28/10/22-1045_article(
 March_until_June2020 = 1
 June2020_until_Feb_2021 = 1 - 0.5/100
 Feb_21_to_28_2021 = 1 - 2/100
-March_to_Dec_4_2021 =  1 - 2.7/100 
-Dec_5_to_11_2021 = 1 - 2/100 
+March_to_Dec_4_2021 =  1 - 2.7/100
+Dec_5_to_11_2021 = 1 - 2/100
 
 obs_frac_df <- data.frame(
   start_date = c("2020-06-01", "2021-02-21", "2021-03-01"),#, "2021-12-05", "2021-12-19"),
   end_date = c( "2021-02-20", "2021-02-28", "2021-11-29"),#, "2021-12-11", "2022-02-28"),
-  frac_new_infect = c(June2020_until_Feb_2021, Feb_21_to_28_2021, March_to_Dec_4_2021)) 
+  frac_new_infect = c(June2020_until_Feb_2021, Feb_21_to_28_2021, March_to_Dec_4_2021))
 
 # Function take in the name, start, end, value and generate a df fill as wanted
 # Source: https://stackoverflow.com/questions/66414255/how-to-fill-dates-between-two-dates
@@ -48,5 +48,4 @@ const_interp_obs_frac_df <- const_interp_obs_frac_df %>%
   # Remove Dec. 11 and Dec. 19, 2021 so can add in
   filter(time_value %ni% c("2021-12-11", "2021-12-19"))
 
-setwd("/Users/admin/Downloads")
-saveRDS(const_interp_obs_frac_df, "const_interp_obs_frac_df_J18.RDS")
+saveRDS(const_interp_obs_frac_df, here::here("data", "const_interp_obs_frac_df_J18.RDS"))

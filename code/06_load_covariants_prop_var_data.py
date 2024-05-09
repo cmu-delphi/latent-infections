@@ -7,6 +7,8 @@ from datetime import timedelta
 from us_state_abbrev import us_state_to_abbrev
 from scipy.sparse import diags
 
+path_to_data = "data/"
+
 ########################################################################################################################
 # Helper funs
 
@@ -34,7 +36,7 @@ def deconvolve_biweekly_sums(interp_counts):
 
 ########################################################################################################################
 # Load .json file
-THIS_DIR = os.path.dirname(os.path.realpath(__file__))
+THIS_DIR = path_to_data
 
 SEQCOUNTS_CSV_FILENAME = "perCountryData_asof_Sept423.json"
 SEQCOUNTS_CSV_PATH = os.path.join(THIS_DIR, SEQCOUNTS_CSV_FILENAME)
@@ -110,5 +112,5 @@ seq_df = seq_df.sort_values(by = ['State', 'Date'], ascending=[True, True])
 # Add missing valuesseq_df_filled_Nov5.csv with NAN
 seq_df_filled = seq_df.set_index('Date').groupby('State').resample('1D').mean().reset_index() #['Alpha', 'Beta', 'Epsilon', 'Iota', 'Gamma', 'Delta', 'Omicron', 'Other'].ffill().reset_index()
 
-seq_df_filled.to_csv("seq_df_filled_Nov5.csv")
+seq_df_filled.to_csv(path_to_data + "seq_df_filled_Nov5.csv")
 
