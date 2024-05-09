@@ -37,7 +37,6 @@ library(here)
 
 Data:
 ```{r load-data}
-
 adj_df_list <- readRDS(here("data", "adj_df_list_F24.rds"))
 adj_df <- bind_rows(adj_df_list)
 
