@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(
   warning = FALSE, 
   message = FALSE, 
-  fig.path = "../gfx/",
+  fig.path = here::here("gfx"),
   echo = FALSE,
   dev = "pdf"
 )
@@ -31,26 +31,27 @@ library(geofacet)
 library(usmap)
 library(patchwork)
 library(cowplot)
+library(here)
 # library(viridisLite)
 ```
 
 Data:
 ```{r load-data}
 
-adj_df_list <- readRDS("adj_df_list_F24.rds")
+adj_df_list <- readRDS(here("data", "adj_df_list_F24.rds"))
 adj_df <- bind_rows(adj_df_list)
 
-pop_df <- readRDS("pop_df.rds")
+pop_df <- readRDS(here("data", "pop_df.rds"))
 pop_used <- "population_2020"
 
 six_states = c("MT", "MA", "ID", "LA", "CA", "OH")
-prop_top_circ_df <- read_rds("prop_top_circ_df.rds")
-state_decon_byvar_df <- read_rds("state_decon_byvar_df.rds")
+prop_top_circ_df <- read_rds(here("data", "prop_top_circ_df.rds"))
+state_decon_byvar_df <- read_rds(here("data", "state_decon_byvar_df.rds"))
 
-corrs <- read_rds("corr_inf_decon_case_lags.rds")
-ihrs_dat <- read_rds("ihrs_dat.rds")
-density_data <- read_rds("gamma_density_data.rds")
-ca_interp_list <- read_rds("ca_interp_list.rds")
+corrs <- read_rds(here("data", "corr_inf_decon_case_lags.rds"))
+ihrs_dat <- read_rds(here("data", "ihrs_dat.rds"))
+density_data <- read_rds(here("data", "gamma_density_data.rds"))
+ca_interp_list <- read_rds(here("data", "ca_interp_list.rds"))
 
 variants <- unique(density_data$variant)
 nvar <- length(variants)
