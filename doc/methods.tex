@@ -54,13 +54,14 @@ model.
 \label{sec:delaystop}
 
 We obtain de-identified patient-level line list data on COVID-19 cases from the
-CDC. Although there are both public and restricted versions of the dataset
+CDC \citep{cdc2020caserestr}. 
+Although there are both public and restricted versions of the dataset
 available containing the same patient records \citep{cdc2020casepub,
 cdc2020caserestr}, only the restricted dataset contains information on the state
 of residence. The three key dates of interest are those for symptom onset,
 positive specimen collection, and report to the CDC. Handling missingness and
 imputation in these dates is somewhat complicated and so additional details and
-justifications are deferred to \autoref{sec:linelist-details}.
+justifications are deferred to \autoref{supp:linelist-details}.
 
 We use the line list to estimate the delay distribution for the pairs symptom
 onset to positive specimen and positive specimen to report. We provide the full
@@ -107,6 +108,9 @@ in Supplementary Methods \autoref{supp:est-delays-samp}.
 
 \subsection{Estimating the incubation period distributions} 
 \label{sec:incubation}
+\attn{Daniel, This section could be moved to the supp mat
+if we're looking for stuff to cut from the main body before introducing the models.
+It's up to you.}
 
 To account for the incubation period, the time between infection and symptom
 onset, we use estimates from the existing literature, modified slightly for
@@ -151,6 +155,8 @@ from other rare variants (which is one reason why we may refer to it as the Othe
 
 \subsection{Variant circulation proportions}
 \label{sec:variant-proportions}
+\attn{Daniel, This section could also be moved to the supp mat
+if we're looking for stuff to cut from the main body before introducing the models.}
 
 To estimate the daily proportions of the variants circulating in each state, we
 obtain the GISAID genomic sequencing data from CoVariants.org
@@ -158,7 +164,10 @@ obtain the GISAID genomic sequencing data from CoVariants.org
 number of cases belonging to a particular variant using
 a sample of positive tests over a biweekly period. To estimate the population
 proportion of each variant, we apply multinomial logistic regression 
-for the eight variant categories separately for each state.
+for the eight variant categories separately for each state. 
+Multinomial logistic regression is a standard technique to model the
+frequency of SARS-CoV-2 variants 
+\citep{obermeyer2022analysis, annavajhala2021emergence, figgins2021sars}.
 
 We let $V_{j\ell,t}$ to be the probability of a new cases at time $t$ in location
 $\ell$ corresponding to variant $j$. Let $v_{j\ell,t}$ be the analogous observed
@@ -197,10 +206,11 @@ the deconvolution from report to positive specimen date, and the second is from
 positive specimen date to infection onset date.
 
 An important aspect of our methods is that deconvolution is not the same as a
-shift. Simply shifting cases back in time and increasing them by some
-factor fails to capture the temporal dynamics of the pandemic. In our
-situation, reported cases are ``pushed back'' by the delays shown in
-\autoref{fig:chain_events_onset_report}. 
+simple shift. Shifting cases back in time and increasing them by some fixed
+factor fails to capture the temporal dynamics of the pandemic. 
+Therefore, in our situation, we opt for deconvolution 
+to ``push back'' the reported cases by using probability distributions 
+of the delays shown in \autoref{fig:chain_events_onset_report}.
 
 We will start by describing the first type of deconvolution performed from
 report to positive specimen date in detail. For this problem, let $t=1,\ldots,T'$
@@ -211,7 +221,7 @@ to be the number of new cases reported in location $\ell$ at time $t$, as
 reported by the John Hopkins Center for Systems Science and Engineering (JHU
 CSSE)\citealp{dong2020interactive} and retrieved with the The COVIDcast API
 \citep{reinhart2021open}. Recall that $\widehat{\pi}_{\ell,t}(k)$ is the
-associated probability that these reported cases were collected $k$ days earler. 
+associated probability that these reported cases were collected $k$ days earlier. 
 
 We estimate the deconvolved cases by positive specimen date by solving the
 following optimization problem:
@@ -222,8 +232,8 @@ following optimization problem:
 \end{align}
 
 The two parts of this optimization problem trade data fidelity (the sum of
-squared errors) with smoothness in the resulting estimates (the absolute error
-of the differences of $\mathbf{x}$). The tuning parameter $\lambda$ determines
+squared errors) with smoothness in the resulting estimates (the fourth order
+differences of $\mathbf{x}$). The tuning parameter $\lambda$ determines
 the relative importance of these competing goals. The solution to the problem is
 an adaptive piecewise cubic polynomial \citep{tibshirani2014adaptive,
 tibshirani2022divided} and can be accurately computed with ease
@@ -234,7 +244,7 @@ value that results in the smallest out-of-sample mean squared error is chosen.
 The result of this first deconvolution is $\widehat{x}_{\ell,t}$, case estimates
 by positive specimen date for each state. To continue, pushing back to infection
 estimates, we first need the variant-specific delays from infection to positive
-specimen collectio. These are calculated by convolving the
+specimen collection. These are calculated by convolving the
 location-time-specific symptom-to-test distributions from
 \autoref{sec:delaystop}, denoted by $\{q_{\ell,t}(k) : -3\leq k \leq 21\}$, with
 the variant-specific incubation periods from \autoref{sec:incubation}, denoted
@@ -257,7 +267,7 @@ deconvolved cases} and emphasize that these are those cases that will eventually
 be reported to public health. Because this deconvolution is done separately for
 each location and variant category, we ultimately obtain deconvolved case
 estimates by the date of infection onset that are separated by variant. Finally,
-we will denote the total deconvolved cases at location $\ell$ as
+we denote the total deconvolved cases at location $\ell$ as
 $\widehat{\mathbf{u}}_\ell = \sum_j \widetilde{\mathbf{u}}_{j\ell}$. 
 
 \subsection{Inverse reporting ratio and the antibody prevalence model} 
@@ -277,12 +287,12 @@ reinfection-adjusted deconvolved cases multiplied by
 the inverse reporting ratio at time $t$:
 \begin{align}
 s_{\ell,t+1} & = (1 -\gamma_{\ell}) s_t 
-+ a_{\ell,t} z_{\ell,t} \widehat{u}_{\ell,t} + \epsilon_{\ell,t},
++ a_{\ell,t} (1 - z_{\ell,t}) \widehat{u}_{\ell,t} + \epsilon_{\ell,t},
 \end{align}
 where $\widehat{u}_{\ell,t}$ is deconvolved cases,
-$z_{\ell,t}$ is the percentage of reinfections, $a_{\ell,t}$ is the inverse
+$z_{\ell,t}$ is the fraction of reinfections, $a_{\ell,t}$ is the inverse
 reporting ratio, and $\epsilon_{\ell,t}$ represents noise. Note that
-$\gamma_{\ell}$ is the percentage of people whose level of infection-induced
+$\gamma_{\ell}$ is the fraction of people whose level of infection-induced
 antibodies falls below the detection threshold between time $t$ and time
 $t+1$. Informally, we refer to $\gamma$ as the waning parameter. Unfortunately,
 population seroprevalence is not directly observed, but is estimated through
@@ -309,7 +319,7 @@ r^1_{\ell,m} &= s_{\ell,m} + \tau_{\ell,m},
 r^2_{\ell,m} &= s_{\ell,m} + \varphi_{\ell,m}, 
   & \varphi_{\ell,m} &\sim \textrm{N}(0, w^2_{\ell,m}\sigma^2_{\ell,r}),\\
 s_{\ell,m+1} &= (1 -\gamma_{\ell}) s_{\ell,m} + 
-  a_{\ell,m} z_{\ell,m} \widehat{u}^\Sigma_{\ell,m} + \epsilon_{\ell,m}, 
+  a_{\ell,m} (1 - z_{\ell,m}) \widehat{u}^\Sigma_{\ell,m} + \epsilon_{\ell,m}, 
   & \epsilon_{\ell,m} &\sim \textrm{N}(0, \sigma^2_{\ell,\epsilon}),
 \end{align}
 where $r^1$ and $r^2$ correspond to the two different seroprevalence surveys.

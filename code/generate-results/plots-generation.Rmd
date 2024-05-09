@@ -78,25 +78,22 @@ my_grid$row <- my_grid$row - 1
 
 Plots from this section:
 ```{r adj-unadj-cases-plot, include = FALSE, fig.width = 12, fig.height = 7}
-# Adj. infect. / 100k plot including  unadjusted infections / 100k and cases / 100k for reference
+# Adj. infect. and cases / 100k for all states
 ggplot(adj_df) +
   geom_ribbon(aes(date, ymin = ninetyfive_lowb_rate, ymax = ninetyfive_upb_rate, fill = "95%")) +
   geom_ribbon(aes(date, ymin = eighty_lowb_rate, ymax = eighty_upb_rate, fill = "80%")) +
   geom_ribbon(aes(date, ymin = fifty_lowb_rate, ymax = fifty_upb_rate, fill = "50%")) +
   geom_line(aes(date, adj_inf_rate, color = "Infections"), size = 0.6) +
   geom_line(aes(date, cases_rate_7d_av, color = "Reported cases"), size = 0.4) +
-  geom_line(aes(date, unadj_inf_rate, color = "Deconvolved cases"), size = 0.4, alpha = 0.8) +
   scale_x_date(name = "", breaks = seq(as.Date("2020-07-01"), as.Date("2021-07-01"), by = "6 months"),
                date_labels = "%m/%y", expand = c(0,0)) +
   scale_y_continuous(labels = scales::comma, limits = c(0, 600), expand = c(0,0), n.breaks = 4) + 
   scale_color_manual(name='', # Legend
                      breaks=c('Infections',
-                              'Deconvolved cases',
                               'Reported cases'),
                      values=c('Infections' = "midnightblue",
-                              'Deconvolved cases' = "springgreen4",
                               'Reported cases' = "darkorange2")) +
-  scale_fill_manual(name = 'CI', values = c("skyblue3", "lightskyblue", "lightskyblue1")) +
+  scale_fill_manual(name = 'Interval', values = c("skyblue3", "lightskyblue", "lightskyblue1")) +
   ylab("Incidence per 100K population") +
   facet_geo(~ geo_value, grid = my_grid) +
   theme_bw(16) +
@@ -109,7 +106,7 @@ ggplot(adj_df) +
         legend.position = "bottom",
         legend.box.spacing = unit(-1, "pt"),
         panel.spacing = unit(3, "pt"),
-        strip.text = element_text(size = 4, face = "bold", margin = margin(1, 0, 1, 0, "mm")))
+        strip.text = element_text(size = 6, face = "bold", margin = margin(1, 0, 1, 0, "mm")))
 ```
 
 
@@ -174,37 +171,28 @@ p1 + p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9 + p10 + plot_layout(ncol = 5, guides 
 
 
 ```{r six-cases-decon-infect, include = FALSE}
-# Reported cases, deconvolved cases, and estimates of daily new infections (dark blue line) per 100K inhabitants for a sample of six states
+# Reported cases and estimates of daily new infections (dark blue line) per 100K inhabitants for a sample of six states
 
 six_plt1 <- ggplot(adj_df %>% filter(geo_value %in% six_states)) +
-  geom_rect(data = prop_top_circ_df %>% 
-              filter(State %in% six_states) %>% 
-              rename("geo_value" = "State", Variant = variant), 
-            aes(xmin = Date-0.5, xmax = Date+0.5, ymin = -Inf, ymax = Inf, fill = Variant), alpha = 0.25,
-            inherit.aes = FALSE, show.legend = FALSE) +
-  scale_fill_manual(values = variant_colours) +
-  ggnewscale::new_scale_fill() +
   geom_ribbon(aes(date, ymin = ninetyfive_lowb_rate, ymax = ninetyfive_upb_rate, fill = "95%")) +
   geom_ribbon(aes(date, ymin = eighty_lowb_rate, ymax = eighty_upb_rate, fill = "80%")) +
   geom_ribbon(aes(date, ymin = fifty_lowb_rate, ymax = fifty_upb_rate, fill = "50%")) +
   geom_line(aes(date, adj_inf_rate, color = "Infections"), size = 0.6) +
   geom_line(aes(date, cases_rate_7d_av, color = "Reported cases"), size = 0.4) +
-  geom_line(aes(date, unadj_inf_rate, color = "Deconvolved cases"), size = 0.4, alpha = 0.8) +
   scale_x_date(name = "", breaks = seq(as.Date("2020-07-01"), as.Date("2021-07-01"), by = "6 months"),
                date_labels = "%b %Y", expand = c(0, 0)) +
   #scale_x_date(name = "", date_breaks = "4 month", expand = c(0,0)) +
   scale_y_continuous(labels = scales::comma, limits = c(0, 650), expand = c(0,0)) + 
   scale_color_manual(
     name='', # Legend
-    breaks=c('Infections', 'Deconvolved cases', 'Reported cases'),
+    breaks=c('Infections', 'Reported cases'),
     values=c('Infections' = "midnightblue",
-             'Deconvolved cases' = "springgreen4",
              'Reported cases' = "darkorange2")
   ) +
   scale_fill_manual(
-    name = 'CI', 
+    name = 'Interval', 
     values = c("50%" = "skyblue3", "80%" = "lightskyblue", "95%" = "lightskyblue1"),
-    guide = guide_legend(direction = "horizontal", ncol = 3)
+    guide = guide_legend(direction = "vertical", ncol = 3)
   ) +
   ylab("") +
   facet_wrap(. ~ geo_value, ncol = 3) +
@@ -216,7 +204,7 @@ six_plt1 <- ggplot(adj_df %>% filter(geo_value %in% six_states)) +
         legend.title = element_text(),
         legend.title.position = "top",
         #legend.text = element_text(size = 8.5),
-        legend.position = "right", 
+        legend.position = "bottom", 
         legend.box.spacing = unit(5, "pt"),
         strip.text = element_text(size = 8, face = "bold", margin = margin(1, 0, 1, 0, "mm")))
 ```
@@ -248,10 +236,10 @@ six_plt2 <- ggplot(state_decon_byvar_df, aes(time_value, infect_rate, fill = var
   ylab("Deconvolved cases / 100k") + 
   scale_fill_manual(
     name = "Variant", values = variant_colours,
-    guide = guide_legend(
-      direction = "horizontal", nrow = 4
-    )
-  )
+    guide = guide_legend(nrow = 1)
+  ) +
+theme(legend.position = "bottom")
+
 shared_y_lab <- ggdraw() +
   draw_label("Incidence per 100K population", x = 0, angle = 90) +
   theme(plot.margin = margin(l = 15))
@@ -265,12 +253,11 @@ plot_grid(shared_y_lab, pg, nrow = 1, rel_widths = c(.05, 1))
 
 
 ```{r corr-plot, include = FALSE, fig.width=8, fig.height=5}
-# Infection, deconvolved case, and case average correlation across lags on the same plot
-corrs_df <- list_rbind(corrs[1:3], names_to = "type") |> 
+# Infection and case average correlation across lags on the same plot
+corrs_df <- list_rbind(corrs[1:2], names_to = "type") |> 
   mutate(type = case_when(
     type == "infect_res" ~ "Infections",
-    type == "cases_res" ~ "Reported cases",
-    type == "unadj_infect_res" ~ "Deconvolved cases"
+    type == "cases_res" ~ "Reported cases"
   ))
 ggplot(corrs_df, aes(lag, cor, color = type, group = type)) +
   geom_line() + 
@@ -281,8 +268,7 @@ ggplot(corrs_df, aes(lag, cor, color = type, group = type)) +
   scale_color_manual(
     name = "", 
     values = c("Infections" = "midnightblue", 
-               "Reported cases" = "darkorange2", 
-               "Deconvolved cases" = "skyblue"
+               "Reported cases" = "darkorange2"
     )) +
   labs(x = "Days before from hospitalization", y = "Average correlation") +
   theme_bw(16) +
@@ -309,7 +295,7 @@ ggplot(ihrs_dat, aes(x = time_value)) +
   ylab("Hospitalization to incidence ratio") +
   scale_x_date(name = "", breaks = seq(as.Date("2020-07-01"), as.Date("2021-07-01"), by = "6 months"),
                date_labels = "%m/%y", expand = c(0,0)) +
-  scale_y_continuous(labels = scales::comma, limits = c(0, 0.3), expand = c(0,0), n.breaks = 4) +  
+  coord_cartesian(ylim = c(0, 0.3)) +  
   theme_bw(16) +
   theme(axis.text.x = element_text(hjust = 0.1, vjust = 2.5, size = 6.4),
         axis.text.y = element_text(size = 6.4),
@@ -318,7 +304,7 @@ ggplot(ihrs_dat, aes(x = time_value)) +
         legend.text = element_text(size = 6.4),
         legend.position = c(0.9, 0.15),
         panel.spacing = unit(3, "pt"),
-        strip.text = element_text(size = 6, face = "bold", margin = margin(1, 0, 1, 0, "mm"))) +
+        strip.text = element_text(size = 8, face = "bold", margin = margin(1, 0, 1, 0, "mm"))) +
   scale_color_manual(
     name = "",
     values=c('Infections' = "midnightblue",'Cases' = "darkorange2")
