@@ -128,7 +128,7 @@ states_cases_infect_pct_D21 %>%
 # Cases account for at least 30% of infections during Delta domination
 states_cases_infect_pct_D21 %>%
   filter(cases_over_infect_pct >= 30) %>%
-  arrange(desc(cases_over_infect_pct)) # 11 states, so in 39 states cases account for < 30% infections
+  arrange(desc(cases_over_infect_pct)) 
 
 # 2. Other (considering this category from our start date up to the next dominant variant - whether Alpha or Epsilon or something else)
 states_cases_infect_pct_O21 <- summarise_df_over_period(adj_df_O21)
@@ -151,7 +151,7 @@ states_cases_infect_pct_A21 %>%
 
 # Infection rates: For roughly the period of Other domination, find the peak in infection rates for each state
 # 1. Other
-inf_top_other = adj_df_O21 %>% 
+inf_top_other = adj_df_by_var$adj_df_O21 %>% 
   filter(geo_value %in% six_states) %>% 
   group_by(geo_value) %>% 
   arrange(desc(adj_inf_rate)) %>% 
@@ -159,7 +159,7 @@ inf_top_other = adj_df_O21 %>%
   ungroup()
 
 # Case rates: For roughly the period of Other domination, find the peak in case rates for each state
-case_top_other <- adj_df_O21 %>% 
+case_top_other <- adj_df_by_var$adj_df_O21 %>% 
   filter(geo_value %in% six_states) %>% 
   group_by(geo_value) %>% 
   arrange(desc(cases_rate_7d_av)) %>% 
@@ -170,19 +170,19 @@ inf_date_vec_other = inf_top_other %>% pull(time_value)
 case_date_vec_other = case_top_other %>% pull(date) 
 
 case_date_vec_other - inf_date_vec_other
-mean(case_date_vec_other - inf_date_vec_other)
+mean(case_date_vec_other[-1] - inf_date_vec_other[-1])
 
 # 2. Delta
-inf_top_delta = adj_df_D21 %>% 
-  filter(geo_value %in% six_states) %>% 
+inf_top_delta = adj_df_by_var$adj_df_D21 %>% 
+  filter(geo_value %in% c("LA", "MT")) %>% 
   group_by(geo_value) %>% 
   arrange(desc(adj_inf_rate)) %>% 
   slice(1) %>% 
   ungroup()
 
 # Case rates: For roughly the period of Delta domination, find the peak in case rates for each state
-case_top_delta <- adj_df_D21 %>% 
-  filter(geo_value %in% six_states) %>% 
+case_top_delta <- adj_df_by_var$adj_df_D21 %>% 
+  filter(geo_value %in% c("LA", "MT")) %>% 
   group_by(geo_value) %>% 
   arrange(desc(cases_rate_7d_av)) %>% 
   slice(1) %>% 
@@ -192,7 +192,6 @@ inf_date_vec_delta = inf_top_delta %>% pull(time_value)
 case_date_vec_delta = case_top_delta %>% pull(date) 
 
 case_date_vec_delta - inf_date_vec_delta
-mean(case_date_vec_delta - inf_date_vec_delta)
 ```
 
 ## The relationship between infections and hospitalizations is complicated.
@@ -210,9 +209,5 @@ with(corrs,
      cases_res[which(cases_res$cor == max(cases_res$cor)), ]
 )
 
-# Deconvolved cases
-with(corrs,
-     unadj_infect_res[which(unadj_infect_res$cor == max(unadj_infect_res$cor)), ]
-)
 ```
 

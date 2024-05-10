@@ -51,15 +51,15 @@ cases_df <- covidcast_signal("jhu-csse", "confirmed_incidence_num",
 ####################################################################################################################################
 # Helper functions
 
-make_cmat <- function(conv, daysbefore = 0) {
-  dims <- dim(conv)
-  conv <- conv[,dims[2]:1]
-  ix <- rep(1:dims[1], times = dims[2])
-  jx <- ix + rep(0:(dims[2] - 1), each = dims[1])
-  Cmat <- sparseMatrix(i = ix, j = jx, x = c(conv))
-  Cmat <- Cmat[,-c(1:(dims[2] - 1 - daysbefore))]
-  Cmat <- Cmat[,1:(ncol(Cmat) - daysbefore)]
-  list(drop0(Cmat))
+make_cmat <- function(conv, daysbefore = 0) { 
+  dims <- dim(conv) 
+  jx = rep((1:dims[1]), each = dims[2]) 
+  ix <- rep(1:dims[2], times = dims[1]) 
+  ix <- ix + rep(0:(dims[1] - 1), each = dims[2]) 
+  Cmat <- sparseMatrix(i = ix, j = jx, x = c(t(conv)), dims = c(dims[1] + dims[2] - 1 + daysbefore, dims[1])) 
+  if(daysbefore > 0) Cmat <- Cmat[-c(1:(daysbefore)), ] 
+  Cmat <- Cmat[-(c(1:(dims[2] - 1)) + dims[1]), ] 
+  list(drop0(Cmat)) 
 }
 
 plotter <- function(predmat) {
