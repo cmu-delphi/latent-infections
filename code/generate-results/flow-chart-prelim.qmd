@@ -1,0 +1,144 @@
+---
+title: "Flow chart bits"
+author: "DJM"
+date: "14 May 2024"
+output: pdf_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  warning = FALSE, 
+  message = FALSE, 
+  echo = FALSE,
+  fig.width = 4,
+  fig.height = 3,
+  dev = "svg"
+)
+```
+
+```{r load-packages}
+library(tidyverse)
+library(here)
+```
+
+```{r load-data}
+adj_df_list <- readRDS(here("data", "adj_df_list_F24.rds"))
+adj_df <- bind_rows(adj_df_list)
+
+pop_df <- readRDS(here("data", "pop_df.rds"))
+pop_used <- "population_2020"
+
+six_states = c("MT", "MA", "ID", "LA", "CA", "OH")
+state_decon_byvar_df <- read_rds(here("data", "state_decon_byvar_df.rds"))
+
+corrs <- read_rds(here("data", "corr_inf_decon_case_lags.rds"))
+ihrs_dat <- read_rds(here("data", "ihrs_dat.rds"))
+density_data <- read_rds(here("data", "gamma_density_data.rds"))
+ca_interp_list <- read_rds(here("data", "ca_interp_list.rds"))
+
+variants <- unique(density_data$variant)
+nvar <- length(variants)
+# The below makes them as far apart as possible, assuming they are ordered
+# generator <- 3 # need a co-prime of nvar near nvar/2
+# spaced <- seq(0, by = generator, length = nvar) %% nvar + 1
+# variant_colours <- viridisLite::viridis(length(variants))[spaced]
+# 
+# But for the 6 states, we need Other, Epsilon, Alpha, and Delta to be far
+# So we do it manually
+variant_colours <- viridisLite::viridis(length(variants))[c(1, 4, 5, 8, 2, 7, 6, 3)]
+names(variant_colours) <- variants
+```
+
+
+
+```{r step2}
+#| fig-height: 9
+adj_df |> filter(geo_value == "CA") |>
+  ggplot() + 
+  geom_line(aes(date, cases_rate_7d_av), color = "grey90", linewidth = 1) +
+  geom_line(aes(date, unadj_inf_rate), color = "grey75", linewidth = 1) +
+  geom_ribbon(aes(date, ymin = ninetyfive_lowb_rate, 
+                  ymax = ninetyfive_upb_rate, fill = "95%")) +
+  geom_ribbon(aes(date, ymin = eighty_lowb_rate, 
+                  ymax = eighty_upb_rate, fill = "80%")) +
+  geom_ribbon(aes(date, ymin = fifty_lowb_rate, ymax = fifty_upb_rate, 
+                  fill = "50%")) +
+  geom_line(aes(date, adj_inf_rate), color = "midnightblue", linewidth = 1) +
+  scale_fill_manual(name = 'Interval', values = c("skyblue3", "lightskyblue", "lightskyblue1")) +
+  scale_x_date(expand = expansion()) + scale_y_continuous(expand = expansion()) +
+  coord_cartesian(xlim = ymd(c("2020-06-01","2021-02-01")), ylim = c(0, 375)) +
+  theme_minimal() + 
+  theme(
+    legend.position = "none", 
+    axis.line = element_line(colour = "black", linewidth = 1),
+    axis.text = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.title = element_blank())
+```
+
+
+```{r step1c}
+state_decon_byvar_df |>
+  filter(geo_value == "CA") |>
+  mutate(time_value = time_value - 7L) |>
+  group_by(time_value) |>
+  mutate(tot = sum(infect_rate), geo_value = "CA") |>
+  ungroup() |>
+  left_join(state_decon_byvar_df) |>
+  left_join(adj_df, by = c("time_value" = "date", "geo_value")) |>
+  ggplot(aes(time_value)) +
+  geom_line(aes(time_value, unadj_inf_rate), color = "grey90", linewidth = 1) +
+  geom_line(aes(time_value, cases_rate_7d_av), color = "grey90", linewidth = 1) +
+  geom_line(aes(y = infect_rate, group = variant), 
+            colour = "grey75", linewidth = 1) + 
+  geom_line(aes(y = tot), colour = "orange", linewidth = 1) +
+  scale_x_date(expand = expansion()) + scale_y_continuous(expand = expansion()) +
+  coord_cartesian(xlim = ymd(c("2020-06-01","2021-02-01")), ylim = c(0, 125)) +
+  theme_minimal() + 
+  theme(
+    legend.position = "none", 
+    axis.line = element_line(colour = "black", linewidth = 1),
+    axis.text = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.title = element_blank())
+```
+
+```{r step1b}
+state_decon_byvar_df |>
+  filter(geo_value == "CA") |>
+  mutate(time_value = time_value - 7L) |>
+  left_join(adj_df, by = c("time_value" = "date", "geo_value")) |>
+  ggplot(aes(time_value)) +
+  geom_line(aes(time_value, cases_rate_7d_av), color = "grey90", linewidth = 1) +
+  geom_line(aes(time_value, unadj_inf_rate), color = "grey75", linewidth = 1) +
+  geom_line(aes(y = infect_rate, colour = variant), linewidth = 1) + 
+  scale_x_date(expand = expansion()) + scale_y_continuous(expand = expansion()) +
+  coord_cartesian(xlim = ymd(c("2020-06-01","2021-02-01")), ylim = c(0, 125)) +
+  theme_minimal() + 
+  theme(
+    legend.position = "none", 
+    axis.line = element_line(colour = "black", linewidth = 1),
+    axis.text = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.title = element_blank()) +
+  scale_colour_manual(values = rep(c("mediumseagreen", "mediumpurple"), each = 4))
+```
+
+
+```{r step1a}
+adj_df |>
+  filter(geo_value == "CA") |>
+  ggplot(aes(date)) +
+  geom_line(aes(y = cases_rate_7d_av), color = "grey75", linewidth = 1) +
+  geom_line(aes(y = unadj_inf_rate), color = "red3", linewidth = 1) +
+  scale_x_date(expand = expansion()) + scale_y_continuous(expand = expansion()) +
+  coord_cartesian(xlim = ymd(c("2020-06-01","2021-02-01")), ylim = c(0, 125)) +
+  theme_minimal() + 
+  theme(
+    legend.position = "none", 
+    axis.line = element_line(colour = "black", linewidth = 1),
+    axis.text = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.title = element_blank())
+```
