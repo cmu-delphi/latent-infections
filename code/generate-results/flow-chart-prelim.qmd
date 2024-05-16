@@ -3,6 +3,7 @@ title: "Flow chart bits"
 author: "DJM"
 date: "14 May 2024"
 output: pdf_document
+    
 ---
 
 
@@ -11,6 +12,7 @@ knitr::opts_chunk$set(
   warning = FALSE, 
   message = FALSE, 
   echo = FALSE,
+  fig.path = here::here("gfx/"),
   fig.width = 4,
   fig.height = 3,
   dev = "svg"
@@ -20,125 +22,153 @@ knitr::opts_chunk$set(
 ```{r load-packages}
 library(tidyverse)
 library(here)
+library(cowplot)
 ```
 
 ```{r load-data}
 adj_df_list <- readRDS(here("data", "adj_df_list_F24.rds"))
 adj_df <- bind_rows(adj_df_list)
-
-pop_df <- readRDS(here("data", "pop_df.rds"))
-pop_used <- "population_2020"
-
-six_states = c("MT", "MA", "ID", "LA", "CA", "OH")
+pop <- read_rds(here("data", "pop_df.RDS")) |>
+  filter(geo_value == "CA") |> 
+  pull(population_2020) / 1e5
 state_decon_byvar_df <- read_rds(here("data", "state_decon_byvar_df.rds"))
+deconv_cases <- read_rds(here("data", "CA-final-thetas-pr.rds"))
+deconv_cases <- tibble(
+  deconv_cases = deconv_cases, 
+  time_value = seq(ymd("2020-03-01"), ymd("2023-03-01"), by = "1 day")
+)
 
-corrs <- read_rds(here("data", "corr_inf_decon_case_lags.rds"))
-ihrs_dat <- read_rds(here("data", "ihrs_dat.rds"))
-density_data <- read_rds(here("data", "gamma_density_data.rds"))
-ca_interp_list <- read_rds(here("data", "ca_interp_list.rds"))
-
-variants <- unique(density_data$variant)
-nvar <- length(variants)
-# The below makes them as far apart as possible, assuming they are ordered
-# generator <- 3 # need a co-prime of nvar near nvar/2
-# spaced <- seq(0, by = generator, length = nvar) %% nvar + 1
-# variant_colours <- viridisLite::viridis(length(variants))[spaced]
-# 
-# But for the 6 states, we need Other, Epsilon, Alpha, and Delta to be far
-# So we do it manually
-variant_colours <- viridisLite::viridis(length(variants))[c(1, 4, 5, 8, 2, 7, 6, 3)]
-names(variant_colours) <- variants
+dat <- adj_df |>
+  rename(time_value = date) |>
+  filter(geo_value == "CA", time_value >= ymd("2020-06-01"), 
+         time_value <= ymd("2021-03-01")) |>
+  select(time_value, geo_value, adj_inf_rate, unadj_inf_rate, cases_rate_7d_av,
+         ninetyfive_lowb_rate, ninetyfive_upb_rate, eighty_lowb_rate,
+         eighty_upb_rate, fifty_lowb_rate, fifty_upb_rate) |>
+  as_tibble() |>
+  left_join(deconv_cases, by = "time_value") |>
+  left_join(
+    state_decon_byvar_df |> 
+      select(variant, time_value, geo_value, infect_rate) |>
+      filter(variant %in% c("Epsilon", "Other")),
+    by = join_by(time_value, geo_value)
+  ) |>
+  pivot_wider(names_from = variant, values_from = infect_rate)
 ```
 
 
+```{r step1}
+s1 <- dat |>
+  ggplot(aes(time_value)) +
+  geom_line(aes(y = cases_rate_7d_av), color = "grey75", linewidth = 1) +
+  geom_line(aes(y = deconv_cases / pop), color = "red3", linewidth = 1) +
+  scale_x_date(expand = expansion()) + 
+  scale_y_continuous(expand = expansion(), breaks = 1:5 * 25) +
+  coord_cartesian(xlim = ymd(c("2020-06-01","2021-02-01")), ylim = c(0, 125)) +
+  theme_minimal() + ggtitle("Step 1") +
+  theme(
+    legend.position = "none", 
+    axis.line = element_line(colour = "black", linewidth = 1),
+    axis.text = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.title = element_blank(),
+    title = element_text(face = "bold", size = 20)
+  )
+ggdraw(s1) + 
+  draw_label(
+    "Deconvolve reported cases\nto positive specimen\ncollection date.",
+    x = 0.05, y = 0.8, hjust = 0, vjust = 1, size = 16
+  )
+```
 
 ```{r step2}
-#| fig-height: 9
-adj_df |> filter(geo_value == "CA") |>
-  ggplot() + 
-  geom_line(aes(date, cases_rate_7d_av), color = "grey90", linewidth = 1) +
-  geom_line(aes(date, unadj_inf_rate), color = "grey75", linewidth = 1) +
-  geom_ribbon(aes(date, ymin = ninetyfive_lowb_rate, 
-                  ymax = ninetyfive_upb_rate, fill = "95%")) +
-  geom_ribbon(aes(date, ymin = eighty_lowb_rate, 
-                  ymax = eighty_upb_rate, fill = "80%")) +
-  geom_ribbon(aes(date, ymin = fifty_lowb_rate, ymax = fifty_upb_rate, 
-                  fill = "50%")) +
-  geom_line(aes(date, adj_inf_rate), color = "midnightblue", linewidth = 1) +
-  scale_fill_manual(name = 'Interval', values = c("skyblue3", "lightskyblue", "lightskyblue1")) +
-  scale_x_date(expand = expansion()) + scale_y_continuous(expand = expansion()) +
+s2 <- dat |>
+  ggplot(aes(time_value)) +
+  geom_line(aes(y = cases_rate_7d_av), color = "grey90", linewidth = 1) +
+  geom_line(aes(y = deconv_cases / pop), color = "grey75", linewidth = 1) +
+  geom_line(aes(y = Other), colour = "mediumseagreen", linewidth = 1) + 
+  geom_line(aes(y = Epsilon), colour = "mediumpurple", linewidth = 1) + 
+  scale_x_date(expand = expansion()) + 
+  scale_y_continuous(expand = expansion(), breaks = 1:5 * 25) +
+  coord_cartesian(xlim = ymd(c("2020-06-01","2021-02-01")), ylim = c(0, 125)) +
+  theme_minimal() + ggtitle("Step 2") +
+  theme(
+    legend.position = "none", 
+    axis.line = element_line(colour = "black", linewidth = 1),
+    axis.text = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.title = element_blank(),
+    title = element_text(face = "bold", size = 20)
+  )
+ggdraw(s2) + 
+  draw_label(
+    "Deconvolve positive specimen\ndate to infection onset date,\nseparately per variant.",
+    x = 0.05, y = 0.8, hjust = 0, vjust = 1, size = 16
+  )
+```
+
+```{r step3}
+s3 <- dat |>
+  ggplot(aes(time_value)) +
+  geom_line(aes(y = cases_rate_7d_av), color = "grey90", linewidth = 1) +
+  geom_line(aes(y = deconv_cases / pop), color = "grey90", linewidth = 1) +
+  geom_line(aes(y = Other), colour = "grey75", linewidth = 1) + 
+  geom_line(aes(y = Epsilon), colour = "grey75", linewidth = 1) + 
+  geom_line(aes(y = unadj_inf_rate), colour = "orange", linewidth = 1) +
+  scale_x_date(expand = expansion()) + 
+  scale_y_continuous(expand = expansion(), breaks = 1:5 * 25) +
+  coord_cartesian(xlim = ymd(c("2020-06-01","2021-02-01")), ylim = c(0, 125)) +
+  theme_minimal() + ggtitle("Step 3") +
+  theme(
+    legend.position = "none", 
+    axis.line = element_line(colour = "black", linewidth = 1),
+    axis.text = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.title = element_blank(),
+    title = element_text(face = "bold", size = 20)
+  )
+  
+ggdraw(s3) + 
+  draw_label(
+    "Sum per-variant infection\nonset curves to produce\naggregate onset curve.",
+    x = 0.05, y = 0.8, hjust = 0, vjust = 1, size = 16
+  )
+```
+
+
+```{r step4}
+#| fig-height: 7.75
+s4 <- dat |> 
+  ggplot(aes(time_value)) + 
+  geom_line(aes(y = cases_rate_7d_av), color = "grey90", linewidth = 1) +
+  geom_line(aes(y = deconv_cases / pop), color = "grey90", linewidth = 1) +
+  geom_line(aes(y = Other), colour = "grey90", linewidth = 1) + 
+  geom_line(aes(y = Epsilon), colour = "grey90", linewidth = 1) + 
+  geom_line(aes(y = unadj_inf_rate), colour = "grey75", linewidth = 1) +
+  geom_ribbon(aes(ymin = ninetyfive_lowb_rate, ymax = ninetyfive_upb_rate), 
+              fill = "lightskyblue1") +
+  geom_ribbon(aes(ymin = eighty_lowb_rate, ymax = eighty_upb_rate), 
+              fill = "lightskyblue") +
+  geom_ribbon(aes(ymin = fifty_lowb_rate, ymax = fifty_upb_rate), 
+              fill = "skyblue3") +
+  geom_line(aes(y = adj_inf_rate), color = "midnightblue", linewidth = 1) +
+  scale_x_date(expand = expansion()) + 
+  scale_y_continuous(expand = expansion(), breaks = 1:15 * 25) +
   coord_cartesian(xlim = ymd(c("2020-06-01","2021-02-01")), ylim = c(0, 375)) +
-  theme_minimal() + 
+  theme_minimal() + ggtitle("Step 4") +
   theme(
     legend.position = "none", 
     axis.line = element_line(colour = "black", linewidth = 1),
     axis.text = element_blank(),
     panel.grid.minor = element_blank(),
-    axis.title = element_blank())
-```
+    axis.title = element_blank(),
+    title = element_text(face = "bold", size = 20)
+  )
 
+ggdraw(s4) + 
+  draw_label(
+    "Scale aggregate curve by the\ninverse reporting ratio.",
+    x = 0.05, y = 0.93, hjust = 0, vjust = 1, size = 16
+  )
 
-```{r step1c}
-state_decon_byvar_df |>
-  filter(geo_value == "CA") |>
-  mutate(time_value = time_value - 7L) |>
-  group_by(time_value) |>
-  mutate(tot = sum(infect_rate), geo_value = "CA") |>
-  ungroup() |>
-  left_join(state_decon_byvar_df) |>
-  left_join(adj_df, by = c("time_value" = "date", "geo_value")) |>
-  ggplot(aes(time_value)) +
-  geom_line(aes(time_value, unadj_inf_rate), color = "grey90", linewidth = 1) +
-  geom_line(aes(time_value, cases_rate_7d_av), color = "grey90", linewidth = 1) +
-  geom_line(aes(y = infect_rate, group = variant), 
-            colour = "grey75", linewidth = 1) + 
-  geom_line(aes(y = tot), colour = "orange", linewidth = 1) +
-  scale_x_date(expand = expansion()) + scale_y_continuous(expand = expansion()) +
-  coord_cartesian(xlim = ymd(c("2020-06-01","2021-02-01")), ylim = c(0, 125)) +
-  theme_minimal() + 
-  theme(
-    legend.position = "none", 
-    axis.line = element_line(colour = "black", linewidth = 1),
-    axis.text = element_blank(),
-    panel.grid.minor = element_blank(),
-    axis.title = element_blank())
-```
-
-```{r step1b}
-state_decon_byvar_df |>
-  filter(geo_value == "CA") |>
-  mutate(time_value = time_value - 7L) |>
-  left_join(adj_df, by = c("time_value" = "date", "geo_value")) |>
-  ggplot(aes(time_value)) +
-  geom_line(aes(time_value, cases_rate_7d_av), color = "grey90", linewidth = 1) +
-  geom_line(aes(time_value, unadj_inf_rate), color = "grey75", linewidth = 1) +
-  geom_line(aes(y = infect_rate, colour = variant), linewidth = 1) + 
-  scale_x_date(expand = expansion()) + scale_y_continuous(expand = expansion()) +
-  coord_cartesian(xlim = ymd(c("2020-06-01","2021-02-01")), ylim = c(0, 125)) +
-  theme_minimal() + 
-  theme(
-    legend.position = "none", 
-    axis.line = element_line(colour = "black", linewidth = 1),
-    axis.text = element_blank(),
-    panel.grid.minor = element_blank(),
-    axis.title = element_blank()) +
-  scale_colour_manual(values = rep(c("mediumseagreen", "mediumpurple"), each = 4))
-```
-
-
-```{r step1a}
-adj_df |>
-  filter(geo_value == "CA") |>
-  ggplot(aes(date)) +
-  geom_line(aes(y = cases_rate_7d_av), color = "grey75", linewidth = 1) +
-  geom_line(aes(y = unadj_inf_rate), color = "red3", linewidth = 1) +
-  scale_x_date(expand = expansion()) + scale_y_continuous(expand = expansion()) +
-  coord_cartesian(xlim = ymd(c("2020-06-01","2021-02-01")), ylim = c(0, 125)) +
-  theme_minimal() + 
-  theme(
-    legend.position = "none", 
-    axis.line = element_line(colour = "black", linewidth = 1),
-    axis.text = element_blank(),
-    panel.grid.minor = element_blank(),
-    axis.title = element_blank())
 ```
