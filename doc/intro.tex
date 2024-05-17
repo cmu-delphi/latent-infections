@@ -54,6 +54,21 @@ health to perform a pandemic post-mortem. Estimates of daily incident infections
 are one such way to measure this and can guide understanding of the pandemic
 burden over space and time. 
 
+\begin{figure}[!b]
+\centering
+    \includegraphics[width=.9\textwidth]{li-flowchart.pdf} 
+    \caption{Flowchart of the data and major analysis steps required to get from
+    reported cases to incident infection estimates. In Step 1, we use the CDC
+    linelist to deconvolve reported cases (grey) backward to the date of
+    positive specimen (red). Step 2 separately deconvolves these to the date of
+    infection by variant (Epsilon in Purple, Ancestral in Green), before---Step
+    3---summing across all variants (orange). Finally, we use seroprevalence
+    survey and time-varying reinfection data to scale account for unreported
+    infections.}
+    \label{fig:cases_to_infect_flowchart}
+\end{figure}
+    
+
 In this work, we provide a data-driven reconstruction of daily incident
 infections for each \US state from June 1, 2020 to November 29, 2021. Using
 state-level line list data, we construct time-varying delay distributions for
@@ -62,15 +77,17 @@ case report date. We combine these with variant-specific incubation period
 distributions to deconvolve daily reported COVID-19 cases back to their
 infection onset, removing the effect of the delay. Finally, we adjust for the
 unreported infections by using seroprevalence and reinfection data to account
-for the waning of antigenic immunity over time. We then examine some features of
-our infection estimates and the implications of using them rather than reported
+for the waning of antigenic immunity over time. A graphical depiction of our
+procedure is shown in \Cref{fig:cases_to_infect_flowchart} with methodological
+details deferred to \Cref{sec:methods}. We then examine some features of our
+infection estimates and the implications of using them rather than reported
 cases in assessing the impact of the pandemic. To this end, we produce simple
 time-varying infection-hospitalization ratios (IHRs) for each state and compare
 those to similarly derived case-hospitalization ratios (CHRs). While these
 analyses provide a glimpse into the utility of our infection estimates, we
 believe that there is much more to be explored, and we hope that our work and
 publicly-available estimates will prove an important benchmark for others to
-undertake retrospective analyses. These estimates as well as the R and Python
-code used to produce them can be found at
-\href{https://github.com/cmu-delphi/latent-infections/}{https://github.com/cmu-delphi/latent-infections/}.
+undertake retrospective analyses. These estimates, as well as the R and Python
+code used to produce them, are available on
+\href{https://github.com/cmu-delphi/latent-infections/}{GitHub}.
 

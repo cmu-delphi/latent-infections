@@ -177,6 +177,47 @@ report date.
     \label{fig:delay-plots-samp}
 \end{figure}
 
+\subsection{Variant circulation proportions}
+\label{sec:variant-proportions}
+
+
+To estimate the daily proportions of the variants circulating in each state, we
+obtain the GISAID genomic sequencing data from CoVariants.org
+\citep{hodcroft2021covariants, elbe2017data}. These counts represent the total
+number of cases belonging to a particular variant using
+a sample of positive tests over a biweekly period. To estimate the population
+proportion of each variant, we apply multinomial logistic regression 
+for the eight variant categories separately for each state. 
+Multinomial logistic regression is a standard technique to model the
+frequency of SARS-CoV-2 variants 
+\citep{obermeyer2022analysis, annavajhala2021emergence, figgins2021sars}.
+
+We let $V_{j\ell,t}$ to be the probability of a new cases at time $t$ in location
+$\ell$ corresponding to variant $j$. Let $v_{j\ell,t}$ be the analogous observed
+proportion. Then the nonparametric multinomial logistic regression model is given
+as the system
+\begin{equation}
+\log\left(\frac{V_{j\ell,t}}{1-V_{j\ell,t}}\right) = f_{j\ell}(t),\;\; j=1,\ldots J,\quad
+\textrm{subject to }\sum_{j=1}^J \exp\{f_{j\ell}(t)\} = 1, \;\;\forall t.
+\end{equation}
+The constraint ensures that the estimated proportions will sum to 1 across all
+$J$ variants. To encourage smoothness of the estimated proportions, we specify
+$f_{j\ell}(t)$ as a third-order polynomial in time: that is $f_{j\ell}(t) =
+\beta_{j\ell,0} + \beta_{j\ell,1} t + \beta_{j\ell,2}t^2 + \beta_{j\ell,3}t^3$,
+computed such that the resulting matrix of covariates is orthogonal.
+ \autoref{fig:prop_figs} shows the proportions by variant for California before
+(left) and after (right) the smoothing procedure. 
+
+\begin{figure}[!tb]
+    \centering
+        \includegraphics[width=\linewidth]{var-props-1.pdf}
+        \caption{Left: Original biweekly proportions of the variants in circulation
+        for California. Right: Daily proportions of the variants in circulation for
+        California.}
+        \label{fig:prop_figs}
+    \end{figure}
+    
+
 \subsection{Details about seroprevalence data}
 \label{supp:sero-details}
 

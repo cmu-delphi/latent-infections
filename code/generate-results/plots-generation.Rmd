@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(
   warning = FALSE, 
   message = FALSE, 
-  fig.path = here::here("gfx"),
+  fig.path = here::here("gfx/"),
   echo = FALSE,
   dev = "pdf"
 )
@@ -96,16 +96,16 @@ ggplot(adj_df) +
   ylab("Incidence per 100K population") +
   facet_geo(~ geo_value, grid = my_grid) +
   theme_bw(16) +
-  theme(axis.text.x = element_text(hjust = 0.1, vjust = 3, size = 5.5),
-        axis.text.y = element_text(size = 6.5),
+  theme(axis.text.x = element_text(hjust = 0.1, size = 8),
+        axis.text.y = element_text(size = 8),
         axis.title.y = element_text(),
         title = element_blank(),
-        legend.title = element_text(size = 7.5),
-        legend.text = element_text(size = 6.5),
+        legend.title = element_text(size = 12),
+        legend.text = element_text(size = 12),
         legend.position = "bottom",
         legend.box.spacing = unit(-1, "pt"),
         panel.spacing = unit(3, "pt"),
-        strip.text = element_text(size = 6, face = "bold", margin = margin(1, 0, 1, 0, "mm")))
+        strip.text = element_text(size = 8, face = "bold", margin = margin(1, 0, 1, 0, "mm")))
 ```
 
 
@@ -145,10 +145,11 @@ plot_usmap_fun <- function(plot_date, value, plot_name, max_choro_lim){
   plot_usmap(data = adj_df %>% filter(date == plot_date), values = value, color = "black") +
   scale_fill_viridis_c(name = plot_name, label = scales::comma, limits = c(0, max_choro_lim), option = "C") +
   ggtitle(format(plot_date, format = "%b. %d, %Y")) +
-  theme(legend.title = element_text(size = 8),
+  theme(legend.title = element_text(size = 12),
         legend.position="bottom",
         legend.justification="right",
-        plot.title = element_text(size = 8, vjust = 0))
+        legend.text = element_text(size = 12),
+        plot.title = element_text(size = 12, vjust = 0))
 }
 # Adjusted infection rates plots
 p1 <- plot_usmap_fun(first_date, "adj_inf_rate", "Infections", max_choro_lim_inf) 
@@ -251,7 +252,7 @@ plot_grid(shared_y_lab, pg, nrow = 1, rel_widths = c(.05, 1))
 
 
 
-```{r corr-plot, include = FALSE, fig.width=8, fig.height=5}
+```{r corr-plot, include = FALSE, fig.width=6, fig.height=4}
 # Infection and case average correlation across lags on the same plot
 corrs_df <- list_rbind(corrs[1:2], names_to = "type") |> 
   mutate(type = case_when(
@@ -296,12 +297,12 @@ ggplot(ihrs_dat, aes(x = time_value)) +
                date_labels = "%m/%y", expand = c(0,0)) +
   coord_cartesian(ylim = c(0, 0.3)) +  
   theme_bw(16) +
-  theme(axis.text.x = element_text(hjust = 0.1, vjust = 2.5, size = 6.4),
-        axis.text.y = element_text(size = 6.4),
-        axis.title.x=element_blank(),
-        legend.title = element_text(size = 7.5),
-        legend.text = element_text(size = 6.4),
+  theme(axis.text.x = element_text(hjust = 0.1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.x = element_blank(),
+        legend.text = element_text(size = 12),
         legend.position = c(0.9, 0.15),
+        legend.key.size = unit(0.5, "cm"),
         panel.spacing = unit(3, "pt"),
         strip.text = element_text(size = 8, face = "bold", margin = margin(1, 0, 1, 0, "mm"))) +
   scale_color_manual(
