@@ -23,10 +23,10 @@ released on June 6, 2022. We consider this version to be finalized in that it
 well-beyond our study end date such that the dataset is unlikely to be subject
 to further significant revisions.
 
-\autoref{tab:order-events-table} presents the percent of pairwise occurrences
+\Cref{tab:order-events-table} presents the percent of pairwise occurrences
 for the different possible permutations of events in the line list. Essentially,
 most cases follow the idealized ordering shown by
-\autoref{fig:chain_events_onset_report} and so we adhere to this construction as
+\Cref{fig:chain_events_onset_report} and so we adhere to this construction as
 much as possible.
 
 We observe that the line list is prone to high percentages of missing data,
@@ -40,7 +40,7 @@ imputed with the same date for a case. However, we only actually deal with
 select pairs of events; we do not use all three at once in our construction of
 the delay distributions or anywhere else in our analysis. Therefore, we restrict
 our investigation of missingness to the pairs of events.
-\autoref{fig:prop-cc} suggests that this issue impacts states
+\Cref{fig:prop-cc} suggests that this issue impacts states
 differentially due to the inconsistent proportions of zero delay between
 positive specimen and report date across states. 
 
@@ -68,7 +68,7 @@ individual is aware that they have been exposed to an infected individual.
 For the same release date, the restricted line list contains 74,849,225 cases
 (rows) in total compared to 84,714,805 cases reported by the JHU CSSE; that is,
 line list is missing about 10 million cases. The extent that this issue impacts
-each state is shown in \autoref{fig:prop-cc}, from which it is clear
+each state is shown in \Cref{fig:prop-cc}, from which it is clear
 the fraction of missing cases is substantial for many states, often surpassing
 50\% \citep{jahja2022real}. In addition, the probability of being missing does
 not appear to be the same for states, so there is likely bias introduced from
@@ -102,13 +102,17 @@ it to 500 for the remaining bins. A similar trial and error approach is used to
 set the bin size (to 50 days).
 
 \subsection{Table on the percent pairwise occurrence of events in the CDC line list}
+
+\attn{Rachel, note the use of booktabs commands so this looks OK. See, e.g., \url{https://people.inf.ethz.ch/markusp/teaching/guides/guide-tables.pdf}}
 \begin{table}[h!]
-\begin{tabular}{|l|l|l|}
-\hline
-\textbf{Order of events}                              & \textbf{Percent pairwise occurrence}                                                                                    & \textbf{Handling}                                                                                                                                                                                                                                                                                                                                                          \\ \hline
-IO $\rightarrow$ SO $\rightarrow$ PS $\rightarrow$ RE & \begin{tabular}[c]{@{}l@{}}PS $\geq$ SO: 97.1 \\ PS = SO: 33.6\\ PS \textgreater RE: 1.74\\  PS = RE: 14.6\end{tabular} & \begin{tabular}[c]{@{}l@{}}This is the idealized order of events and so we \\ built the current support sets for \\ SO $\rightarrow$ PS and PS $\rightarrow$ RE \\ delay distribution constructions around this \\ such that IO comes first by construction, \\ SO typically precedes PS, but may be the same \\ or come before, and RE comes after PS and SO\end{tabular} \\ \hline
-IO $\rightarrow$ PS $\rightarrow$ SO $\rightarrow$ RE & \begin{tabular}[c]{@{}l@{}}PS \textless SO: 2.91 \\ SO $\leq$ RE: 99.3 \\ SO \textless RE: 86.1\end{tabular}            & \begin{tabular}[c]{@{}l@{}}Allowed for negative delays up to the largest \\ non-outlier value for the 0.05 quantile of delay\\ from PS to SO by state\end{tabular}                                                                                                                                                                                                         \\ \hline
-IO $\rightarrow$ PS $\rightarrow$ RE $\rightarrow$ SO & \begin{tabular}[c]{@{}l@{}}RE \textless SO: 0.7 \\ RE \textless PS: 1.7\end{tabular}                                    & \begin{tabular}[c]{@{}l@{}}Nothing because current handling of the CDC \\ of the line list ensures that the most concerning \\ cases are handled where \\ SO = PO = RE, SO = RE and PO = RE\end{tabular}                                                                                                                                                                   \\ \hline
+    \centering
+\begin{tabular}{@{}lp{3cm}p{8.5cm}@{}}
+\toprule
+\textbf{Order of events}& \textbf{Percent pairwise occurrence} &
+\textbf{Handling}\\ \midrule \addlinespace
+IO $\rightarrow$ SO $\rightarrow$ PS $\rightarrow$ RE & \begin{tabular}[t]{@{}l@{}}PS $\geq$ SO: 97.1 \\ PS = SO: 33.6\\ PS \textgreater\ RE: 1.74\\  PS = RE: 14.6\end{tabular} & This is the idealized order of events and so the  support sets for  SO $\rightarrow$ PS and PS $\rightarrow$ RE delay distribution constructions around this such that IO comes first by construction, SO typically precedes PS, but may be the same  or come before, and RE comes after PS and SO \\ \addlinespace
+IO $\rightarrow$ PS $\rightarrow$ SO $\rightarrow$ RE & \begin{tabular}[t]{@{}l@{}}PS \textless\ SO: 2.91 \\ SO $\leq$ RE: 99.3 \\ SO \textless\ RE: 86.1\end{tabular}            & Allowed for negative delays up to the largest non-outlier value for the 0.05 quantile of delay from PS to SO by state                                                                                                                                         \\ \addlinespace
+IO $\rightarrow$ PS $\rightarrow$ RE $\rightarrow$ SO & \begin{tabular}[t]{@{}l@{}}RE \textless\ SO: 0.7 \\ RE \textless\ PS: 1.7\end{tabular}                                    & Current handling by the CDC of the line list ensures that the most concerning cases are handled where SO = PO = RE, SO = RE and PO = RE                                                                                                                                                \\ \addlinespace\bottomrule
 \end{tabular}
 \caption{Percent pairwise occurrence for the different permutations of events considered in the restricted CDC line list. The abbreviation IO stands for infection onset, SO is symptom onset, PS is positive specimen, and RE is report date. We consider a restricted set of permutations because we assume that IO must come first and that PS must precede report date for a case to be legitimate. Finally, the underlying assumption for the percent pairwise occurrence calculations is that the cases must have both elements present (not missing).}
 \label{tab:order-events-table}
@@ -116,6 +120,8 @@ IO $\rightarrow$ PS $\rightarrow$ RE $\rightarrow$ SO & \begin{tabular}[c]{@{}l@
 
 \subsection{Justifications for delay distribution calculations}
 \label{supp:delay-justifications}
+
+\attn{Rachel: does this notation all match the manuscript?}
 
 Let $y_t$ denote the count of new cases reported at time $t$ and $x_t$ denote
 the count of deconvolved cases with positive specimen at $t$. For all cases in
@@ -129,7 +135,7 @@ y_t = \sum_{s=1}^{t} \sum_{i=1}^{x_s}\indicator \left ( \text{the }i\th\text{ po
 \end{align*}
 Taking the conditional expectation of the above yields
 \begin{align*}
-\E(y_t \mid x_s, s \leq t) = \sum_{s=1}^{t} \pi_t(s) x_s ,
+\E[y_t \mid x_s, s \leq t] = \sum_{s=1}^{t} \pi_t(s) x_s ,
 \end{align*}
 where $\pi_t(s) = \P(\text{case report at }t \mid \text{positive specimen date
 at }s)$ for each $s \leq t$ are the delay probabilities and the $\{ \pi_t(s) : s
@@ -146,7 +152,7 @@ probability of zero delay is zero, which stems from the contamination of
 zero-delay in the line list. We update the
 conditional expectation formula to reflect these two assumptions as in \citep{jahja2022real}: 
 \begin{align*}
-\E(y_t \mid x_s, s \leq t) = \sum_{k=1}^{60} p_t(k) x_{t-k}
+\E[y_t \mid x_s, s \leq t] = \sum_{k=1}^{60} p_t(k) x_{t-k}
 \end{align*}
 where for $k = 1, \dots, 60$,
 \begin{align*}
@@ -164,6 +170,61 @@ for the affected state (such instances were isolated to the state of New
 Hampshire). Aside from these modifications, the construction of the delay
 distribution proceeds in precisely the same manner as for positive specimen to
 report date. 
+
+\attn{Rachel: some text that was in methods} Estimating the delay from symptom
+onset to positive specimen date follows the same procedure with a few minor
+adjustments. First, we allow $k$ to range from $-3$ to $21$ (rather than 1 to
+60). These upper and lower bounds are based on the largest delay values for the
+state-wide 0.05 and 0.95 quantiles. This is reasonable because the median delay
+is very short at approximately 2 days, and an asymptomatic individual may test
+positive following a known exposure, before the onset of symptoms.
+
+\subsection{Estimating the incubation period distributions} 
+\label{sec:incubation}
+
+To account for the incubation period, the time between infection and symptom
+onset, we use estimates from the existing literature, modified slightly for
+coherence with each other: we model each incubation as a gamma distribution with
+different parameters. We focus on the following eight variants, which dominated
+at various points during our study period: Ancestral/Other, Alpha, Beta, Epsilon,
+Iota, Gamma, Delta, and Omicron. Alpha, Beta, Delta, Gamma, and Omicron are all
+variants of concern \citep{who2021tracking}, while we include the Epsilon
+(California) and Iota (New York) variants because of large impact on those and
+neighbouring states \citep{yang2022investigation, duerr2021dominance}.
+
+The Ancestral variant has been modelled as a gamma distribution
+\citep{tindale2020evidence}, so we simply use the reported shape and scale parameters. For the
+Alpha, Beta, Gamma, Delta and Omicron variants, we use the reported mean and
+standard deviation of the number of days of incubation \citep{tanaka2022shorter,
+grant2022impact, ogata2022shorter}. To match these moments to the gamma
+distribution, we solve the same moment equations described in \attn{described where?}
+\Cref{sec:delaystop}. Then, we discretize each resulting density shown in \Cref{fig:inc_gammas} to the
+support set, which is taken to be from 1 and 21 days. This range assumes that
+symptoms require at least 1 day to develop \citealp{phcan2021covid} and that an
+asymptomatic infection will resolve within 21 days
+\citep{zaki2021estimations,cortes2022sars}.
+
+We were unable to locate incubation period estimates for the geo-specific
+Epsilon and Iota variants, so we use the incubation period for Beta because
+Epsilon, Iota, and Beta are all children from the same parent in the
+phylogenetic tree of the Nextstrain Clades \citep{hodcroft2021covariants}. All
+other circulating variants are grouped together with the Ancestral variant.
+There was little available sequencing data prior to Alpha-emergence, but
+unfortunately, later in the pandemic, it is impossible to separate Ancestral
+from other rare variants (which is one reason why we may refer to it as the Other category).
+
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=0.6\linewidth]{inc-gammas-1.pdf}
+    \caption{Gamma density for the incubation period of each of the eight
+    variant categories. Note that the Ancestral variant directly utilizes the
+    available gamma shape and scale parameters, while the remaining variants use
+    the method of moments to estimate the gamma parameters.}
+    \label{fig:inc_gammas}
+\end{figure}
+
+
+
 
 \subsection{Estimated delays for a sample of six states}
 \label{supp:est-delays-samp}
@@ -205,7 +266,7 @@ $J$ variants. To encourage smoothness of the estimated proportions, we specify
 $f_{j\ell}(t)$ as a third-order polynomial in time: that is $f_{j\ell}(t) =
 \beta_{j\ell,0} + \beta_{j\ell,1} t + \beta_{j\ell,2}t^2 + \beta_{j\ell,3}t^3$,
 computed such that the resulting matrix of covariates is orthogonal.
- \autoref{fig:prop_figs} shows the proportions by variant for California before
+ \Cref{fig:prop_figs} shows the proportions by variant for California before
 (left) and after (right) the smoothing procedure. 
 
 \begin{figure}[!tb]
@@ -240,7 +301,7 @@ antibodies against the virus \citep{bajema2021estimated, cdc2020data,
 jones2021estimated}. Adjustments were made in both for age and sex to account
 for the demographic differences between the sampled and the target populations.
 However, both datasets are incomplete and they differ in the number and the
-timing of the data points for each state (\autoref{fig:sero-blood-comm-compar}).
+timing of the data points for each state (\Cref{fig:sero-blood-comm-compar}).
 Such limitations indicate that reliance upon only one seroprevalence survey is
 inadvisable. For example, in the commercial dataset, the last estimate for North
 Dakota is in September 2020. In the blood donor dataset, Arkansas does not have
@@ -280,7 +341,47 @@ where $m$ indicates the Monday relative to our June 1, 2020 start date.
 Since we operate with weekly data where the weeks are designated by Monday, we set the 
 end date to be November 29, 2021. 
 
-\subsection{State space representation of the antibody prevalence model}\label{supp:ssapm} 
+\subsection{State space representation of the antibody prevalence
+model}\label{supp:ssapm} 
+
+\attn{Rachel: Please take a stab at revising/simplifying this whole section.These next paragraphs were removed from the manuscript, so you can use some of it here if needed.}
+
+In order to account for different surveys occurring on different dates with
+noisy estimates, we estimate the model on the weekly frequency, observed on
+Monday, and treat $s_{\ell,t}$ as a latent variable. Therefore, we write,
+\begin{align}
+\label{eq:waningpr}
+r^1_{\ell,m} &= s_{\ell,m} + \tau_{\ell,m}, 
+  & \tau_{\ell,m} &\sim \textrm{N}(0, w^1_{\ell,m}\sigma^2_{\ell,r}),\\
+r^2_{\ell,m} &= s_{\ell,m} + \varphi_{\ell,m}, 
+  & \varphi_{\ell,m} &\sim \textrm{N}(0, w^2_{\ell,m}\sigma^2_{\ell,r}),\\
+s_{\ell,m+1} &= (1 -\gamma_{\ell}) s_{\ell,m} + 
+  a_{\ell,m} (1 - z_{\ell,m}) \widehat{u}^\Sigma_{\ell,m} + \epsilon_{\ell,m}, 
+  & \epsilon_{\ell,m} &\sim \textrm{N}(0, \sigma^2_{\ell,\epsilon}),
+\end{align}
+where $r^1$ and $r^2$ correspond to the two different seroprevalence surveys.
+These surveys each have measurement errors with variance $\sigma^2_r$ that scale
+proportional to the observed confidence intervals for the estimates,
+respectively $w^1_{\ell,m}$ and $w^2_{\ell,m}$. We denote
+$\widehat{u}^\Sigma_{\ell,m} = \sum_{t=m}^{m+1} \widehat{u}_{\ell,t}$. Finally,
+to ensure that $\mathbf{a}_\ell$ is smooth over time, we complete the model with
+an additional equation that enforces smoothness,
+\begin{align}
+a_{\ell,m+1} &= 3a_{\ell,m} - 3a_{\ell,m-1} + a_{\ell,m-2} + \eta_{\ell,m}, 
+  &\eta_{\ell,m}  &\sim \textrm{N}(0, \sigma^2_{\eta}).
+\end{align}
+    
+This antibody prevalence model is a state-space model with latent variables
+$\mathbf{s}_{\ell}$ and $\mathbf{a}_{\ell}$ and unknown parameters $\gamma_\ell$,
+$\sigma^2_r$, $\sigma^2_\epsilon$, and $\sigma^2_\eta$. This model
+allows for convenient handling of missing data, extrapolation
+before and after the period of observed seroprevalence measurements, and maximum
+likelihood estimates of the errors. Details of this
+methodology and the computation of the associated uncertainty measurements are
+deferred to Supplementary Methods \Cref{supp:ssapm}.
+
+\attn{End of copy.}
+
 
 The antibody prevalence model is conceptualized
 as a Gaussian state space model (as in \citealp{durbin2012time, helske2017kfas}).
@@ -503,7 +604,7 @@ deconvolved case estimates); 4. those from applying the antibody prevalence
 model to produce estimates for both the reported and the unreported cases (the
 infection estimates).
 
-The results of this study are shown in \autoref{fig:abl-lag-cor}. From
+The results of this study are shown in \Cref{fig:abl-lag-cor}. From
 this, we can see that the deconvolved case and infection estimates from the
 intermediate steps are all leading indicators of hospitalizations. However, the
 degree that each such set of estimates lead hospitalizations depend on its
