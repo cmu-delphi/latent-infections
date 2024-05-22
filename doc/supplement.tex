@@ -5,7 +5,7 @@ This section contains additional information about the datasets used and the est
 \subsection{A general description and depiction of convolution}
 \label{supp:convol}
 
-In general, the goal of convolution is to propagate the input signal forward in time using a distribution of probabilities. In the 2D and discrete context, it is simply the elementwise multiplication of the signal for some time by a forward-facing distribution of probabilities, which are then summed to get a value for the outcome. Figure~\ref{fig:convol} presents a depiction of the convolution procedure for the signal of smoothed cases (orange line). Essentially, to push the cases forward in time, we take the appropriately aligned (forward-in-time) delay distribution and convolve or multiply the case counts by it to get the distribution of convolved case estimates (blue line). This process is repeated as we march forward in time, as shown through the stop-motion panels, such that it eventually covers the entire line of cases. An important takeaway from this is that convolution is not the same as a simple shift of the data points, but rather it utilizes the most relevant probabilities to propagate the data points forward in time. Deconvolution proceeds in the same fashion, but in the opposite direction to go back in time. 
+In general, the goal of convolution is to propagate the input signal forward in time using a distribution of probabilities. In the 2D and discrete context, it is simply the elementwise multiplication of the signal for some time by a forward-facing distribution of probabilities, which are then summed to get a value for the outcome. \Cref{fig:convol} presents a depiction of the convolution procedure for the signal of smoothed cases (orange line). Essentially, to push the cases forward in time, we take the appropriately aligned (forward-in-time) delay distribution and convolve or multiply the case counts by it to get the distribution of convolved case estimates (blue line). This process is repeated as we march forward in time, as shown through the stop-motion panels, such that it eventually covers the entire line of cases. An important takeaway from this is that convolution is not the same as a simple shift of the data points, but rather it utilizes the most relevant probabilities to propagate the data points forward in time. Deconvolution proceeds in the same fashion, but in the opposite direction to go back in time. 
 
 \begin{figure}[H]
 \centering
@@ -103,7 +103,6 @@ set the bin size (to 50 days).
 
 \subsection{Table on the percent pairwise occurrence of events in the CDC line list}
 
-\attn{Rachel, note the use of booktabs commands so this looks OK. See, e.g., \url{https://people.inf.ethz.ch/markusp/teaching/guides/guide-tables.pdf}}
 \begin{table}[h!]
     \centering
 \begin{tabular}{@{}lp{3cm}p{8.5cm}@{}}
@@ -118,125 +117,43 @@ IO $\rightarrow$ PS $\rightarrow$ RE $\rightarrow$ SO & \begin{tabular}[t]{@{}l@
 \label{tab:order-events-table}
 \end{table}
 
-\subsection{Justifications for delay distribution calculations}
+\subsection{Justifications and details for delay distribution calculations}
 \label{supp:delay-justifications}
 
-\attn{Rachel: does this notation all match the manuscript?}
-
 Let $y_t$ denote the count of new cases reported at time $t$ and $x_t$ denote
-the count of deconvolved cases with positive specimen at $t$. For all cases in
-the line list that had both a positive specimen and a report date, we can count
+the count of deconvolved cases with positive specimen at $t$. 
+For all cases in the line list that had both a positive specimen and a report date, we can count
 the those that are reported at time $t$ by enumerating them according to
 positive specimen date (similar to how symptom onset date was used in
-\citealp{jahja2022real}):
-\begin{align*}
-y_t = \sum_{s=1}^{t} \sum_{i=1}^{x_s}\indicator \left ( \text{the }i\th\text{ positive specimen at }
-    s \text{ gets reported at }t \right ).
-\end{align*}
-Taking the conditional expectation of the above yields
-\begin{align*}
-\E[y_t \mid x_s, s \leq t] = \sum_{s=1}^{t} \pi_t(s) x_s ,
-\end{align*}
-where $\pi_t(s) = \P(\text{case report at }t \mid \text{positive specimen date
-at }s)$ for each $s \leq t$ are the delay probabilities and the $\{ \pi_t(s) : s
-\leq t \}$ sequence comprises the delay distribution at time $t$. Notice that
-there are no time restrictions placed on the positive specimen date, except that
-it must have been between the start of the pandemic and the report date,
-inclusive. This is unlikely to be a realistic assumption to make as $t$ moves
-farther away from $s$. 
+\citealp{jahja2022real}).
 
-Thus, we make three key assumptions about these distributions. First, positive
-specimen tests that are reported to the CDC are always reported within $d = 60$
+We start with no time restrictions placed on the positive specimen date, except that
+it must have been between the start of the pandemic and the report date,
+inclusive. However, 
+this is unlikely to be a realistic assumption to make as the date of report moves
+farther away from the date of positive specimen collection.
+
+Therefore, we make three key assumptions about the positive specimen to report delay distributions. 
+First, positive specimen tests that are reported to the CDC are always reported within $d = 60$
 days, which is true for the majority of the reported cases. Second, the
 probability of zero delay is zero, which stems from the contamination of
-zero-delay in the line list. We update the
-conditional expectation formula to reflect these two assumptions as in \citep{jahja2022real}: 
+zero-delay in the line list. The following conditional expectation reflects these two assumptions 
+(similar to \citep{jahja2022real}): 
 \begin{align*}
-\E[y_t \mid x_s, s \leq t] = \sum_{k=1}^{60} p_t(k) x_{t-k}
+\E[y_t \mid x_s, s \leq t] = \sum_{k=1}^{60} \pi_{t-k}(k) x_{t-k}
 \end{align*}
-where for $k = 1, \dots, 60$,
+where for each of $k = 1, \dots, 60$,
 \begin{align*}
-p_t(k) = \P(\text{case report at }t \mid \text{positive specimen at }t-k).
+\pi_{t-k}(k) = \P(\text{case report at }t \mid \text{positive specimen at }t-k).
 \end{align*}
 
-
-Thirdly, there are times where the empirical probability
-was observed to be precisely 1 at zero delay and the proportion of CDC relative
-to JHU cases used for the weight was also 1. Since we believe that having zero
+Thirdly, there are instances of anomalous behaviour where the empirical probability 
+is precisely 1 at zero delay and the proportion of CDC relative
+to JHU cases used for the weight is also 1. Since we believe that having zero
 delay for all cases is unrealistic and unlikely to be representative of all
 cases for the state, we inject a small amount of variance manually by setting
 the the CDC-to-JHU proportion to be the minimum shrinkage proportion observed
-for the affected state (such instances were isolated to the state of New
-Hampshire). Aside from these modifications, the construction of the delay
-distribution proceeds in precisely the same manner as for positive specimen to
-report date. 
-
-\attn{Rachel: some text that was in methods} Estimating the delay from symptom
-onset to positive specimen date follows the same procedure with a few minor
-adjustments. First, we allow $k$ to range from $-3$ to $21$ (rather than 1 to
-60). These upper and lower bounds are based on the largest delay values for the
-state-wide 0.05 and 0.95 quantiles. This is reasonable because the median delay
-is very short at approximately 2 days, and an asymptomatic individual may test
-positive following a known exposure, before the onset of symptoms.
-
-\subsection{Estimating the incubation period distributions} 
-\label{sec:incubation}
-
-To account for the incubation period, the time between infection and symptom
-onset, we use estimates from the existing literature, modified slightly for
-coherence with each other: we model each incubation as a gamma distribution with
-different parameters. We focus on the following eight variants, which dominated
-at various points during our study period: Ancestral/Other, Alpha, Beta, Epsilon,
-Iota, Gamma, Delta, and Omicron. Alpha, Beta, Delta, Gamma, and Omicron are all
-variants of concern \citep{who2021tracking}, while we include the Epsilon
-(California) and Iota (New York) variants because of large impact on those and
-neighbouring states \citep{yang2022investigation, duerr2021dominance}.
-
-The Ancestral variant has been modelled as a gamma distribution
-\citep{tindale2020evidence}, so we simply use the reported shape and scale parameters. For the
-Alpha, Beta, Gamma, Delta and Omicron variants, we use the reported mean and
-standard deviation of the number of days of incubation \citep{tanaka2022shorter,
-grant2022impact, ogata2022shorter}. To match these moments to the gamma
-distribution, we solve the same moment equations described in \attn{described where?}
-\Cref{sec:delaystop}. Then, we discretize each resulting density shown in \Cref{fig:inc_gammas} to the
-support set, which is taken to be from 1 and 21 days. This range assumes that
-symptoms require at least 1 day to develop \citealp{phcan2021covid} and that an
-asymptomatic infection will resolve within 21 days
-\citep{zaki2021estimations,cortes2022sars}.
-
-We were unable to locate incubation period estimates for the geo-specific
-Epsilon and Iota variants, so we use the incubation period for Beta because
-Epsilon, Iota, and Beta are all children from the same parent in the
-phylogenetic tree of the Nextstrain Clades \citep{hodcroft2021covariants}. All
-other circulating variants are grouped together with the Ancestral variant.
-There was little available sequencing data prior to Alpha-emergence, but
-unfortunately, later in the pandemic, it is impossible to separate Ancestral
-from other rare variants (which is one reason why we may refer to it as the Other category).
-
-\begin{figure}[!tb]
-\centering
-    \includegraphics[width=0.6\linewidth]{inc-gammas-1.pdf}
-    \caption{Gamma density for the incubation period of each of the eight
-    variant categories. Note that the Ancestral variant directly utilizes the
-    available gamma shape and scale parameters, while the remaining variants use
-    the method of moments to estimate the gamma parameters.}
-    \label{fig:inc_gammas}
-\end{figure}
-
-
-
-
-\subsection{Estimated delays for a sample of six states}
-\label{supp:est-delays-samp}
-
-\begin{figure}[H]
-\centering
-    \includegraphics[width=.90\textwidth]{delay_plots.pdf} 
-    \caption{Depictions of the estimated discretized delay from symptom onset to 
-    positive specimen date (left) and from positive specimen date to report date (right)
-    for a sample of six states over several dates.}
-    \label{fig:delay-plots-samp}
-\end{figure}
+for the affected state (such instances are isolated to the state of New Hampshire).
 
 \subsection{Variant circulation proportions}
 \label{sec:variant-proportions}
@@ -277,7 +194,97 @@ computed such that the resulting matrix of covariates is orthogonal.
         California.}
         \label{fig:prop_figs}
     \end{figure}
+
+
+\subsection{Estimating the incubation period distributions} 
+\label{sec:incubation}
+
+To account for the incubation period, the time between infection and symptom
+onset, we use estimates from the existing literature, modified slightly for
+coherence with each other: we model each incubation as a gamma distribution with
+different parameters. We focus on the following eight variants, which dominated
+at various points during our study period: Ancestral/Other, Alpha, Beta, Epsilon,
+Iota, Gamma, Delta, and Omicron. Alpha, Beta, Delta, Gamma, and Omicron are all
+variants of concern \citep{who2021tracking}, while we include the Epsilon
+(California) and Iota (New York) variants because of large impact on those and
+neighbouring states \citep{yang2022investigation, duerr2021dominance}.
+
+The incubation period of the Ancestral variant has been modelled as a gamma distribution
+\citep{tindale2020evidence}, so we simply use the reported shape and scale parameters. For the
+Alpha, Beta, Gamma, Delta and Omicron variants, the mean and standard deviation are reported
+\citep{tanaka2022shorter, grant2022impact, ogata2022shorter}. 
+Therefore, we use method of moments to match the mean and variance to estimate the gamma parameters. 
+Then, we discretize each resulting density shown in \Cref{fig:inc_gammas} to the
+support set, which is taken to be from 1 and 21 days. This range assumes that
+symptoms require at least 1 day to develop \citealp{phcan2021covid} and that an
+asymptomatic infection will resolve within 21 days
+\citep{zaki2021estimations,cortes2022sars}.
+
+We were unable to locate incubation period estimates for the geo-specific
+Epsilon and Iota variants, so we use the incubation period for Beta because
+Epsilon, Iota, and Beta are all children from the same parent in the
+phylogenetic tree of the Nextstrain Clades \citep{hodcroft2021covariants}. All
+other circulating variants are grouped together with the Ancestral variant.
+There was little available sequencing data prior to Alpha-emergence, but
+unfortunately, later in the pandemic, it is impossible to separate Ancestral
+from other rare variants (which is one reason why we may refer to it as the Other category).
+
+\begin{figure}[!tb]
+\centering
+    \includegraphics[width=0.6\linewidth]{inc-gammas-1.pdf}
+    \caption{Gamma density for the incubation period of each of the eight
+    variant categories. Note that the Ancestral variant directly utilizes the
+    available gamma shape and scale parameters, while the remaining variants use
+    the method of moments to estimate the gamma parameters.}
+    \label{fig:inc_gammas}
+\end{figure}
     
+
+
+\subsection{Details on estimating the delay distributions for symptom onset to positive specimen}
+\label{supp:delay-sops}
+
+Estimating the delay from symptom onset to positive specimen date follows the
+procedure as for positive specimen to report with a few minor adjustments. 
+First, we allow $k$ to range from
+$-3$ to $21$ (rather than $1$ to $60$). These upper and lower bounds are based on
+the largest delay values for the state-wide 0.05 and 0.95 quantiles. This is
+reasonable because the median delay is very short at approximately 2 days, and
+an asymptomatic individual may test positive following a known exposure, before
+the onset of symptoms. We show
+both types of delays for a sample of states over several dates
+in Section \Cref{supp:est-delays-samp}.
+
+
+\subsection{Estimated delays for a sample of six states}
+\label{supp:est-delays-samp}
+
+\begin{figure}[H]
+\centering
+    \includegraphics[width=.90\textwidth]{delay_plots.pdf} 
+    \caption{Depictions of the estimated discretized delay from symptom onset to 
+    positive specimen date (left) and from positive specimen date to report date (right)
+    for a sample of six states over several dates.}
+    \label{fig:delay-plots-samp}
+\end{figure}
+
+
+\subsection{Details on constructing the infection-to-test distributions}
+\label{supp:details-conv}
+
+The result of the first type of deconvolution performed is $\widehat{x}_{\ell,t}$, case estimates
+by positive specimen date for each state. To continue, pushing this back to infection
+estimates, we need the variant-specific delays from infection to positive
+specimen collection. These are calculated by convolving the
+location-time-specific symptom-to-positive-test distributions from
+\ref{supp:delay-sops}, denoted by $\{q_{\ell,t}(k) : -3\leq k \leq 21\}$, with
+the variant-specific incubation periods from \ref{sec:incubation}, denoted
+by $\{i_{j}(k) : 0 < k \leq 21\}$. The convolution of these yields a
+distribution $\mathbf{q}_{\ell,t}*\mathbf{i}_j = \{\tau_{j\ell,t}(k): -3 \leq k
+\leq 42\}$. However, only a fraction of $\widehat{x}_{\ell,t}$ corresponds to
+each variant, so we must weight them by the variant proportions
+$\widehat{v}_{j\ell,t}$ described in \ref{sec:variant-proportions}.
+
 
 \subsection{Details about seroprevalence data}
 \label{supp:sero-details}
@@ -344,45 +351,6 @@ end date to be November 29, 2021.
 \subsection{State space representation of the antibody prevalence
 model}\label{supp:ssapm} 
 
-\attn{Rachel: Please take a stab at revising/simplifying this whole section.These next paragraphs were removed from the manuscript, so you can use some of it here if needed.}
-
-In order to account for different surveys occurring on different dates with
-noisy estimates, we estimate the model on the weekly frequency, observed on
-Monday, and treat $s_{\ell,t}$ as a latent variable. Therefore, we write,
-\begin{align}
-\label{eq:waningpr}
-r^1_{\ell,m} &= s_{\ell,m} + \tau_{\ell,m}, 
-  & \tau_{\ell,m} &\sim \textrm{N}(0, w^1_{\ell,m}\sigma^2_{\ell,r}),\\
-r^2_{\ell,m} &= s_{\ell,m} + \varphi_{\ell,m}, 
-  & \varphi_{\ell,m} &\sim \textrm{N}(0, w^2_{\ell,m}\sigma^2_{\ell,r}),\\
-s_{\ell,m+1} &= (1 -\gamma_{\ell}) s_{\ell,m} + 
-  a_{\ell,m} (1 - z_{\ell,m}) \widehat{u}^\Sigma_{\ell,m} + \epsilon_{\ell,m}, 
-  & \epsilon_{\ell,m} &\sim \textrm{N}(0, \sigma^2_{\ell,\epsilon}),
-\end{align}
-where $r^1$ and $r^2$ correspond to the two different seroprevalence surveys.
-These surveys each have measurement errors with variance $\sigma^2_r$ that scale
-proportional to the observed confidence intervals for the estimates,
-respectively $w^1_{\ell,m}$ and $w^2_{\ell,m}$. We denote
-$\widehat{u}^\Sigma_{\ell,m} = \sum_{t=m}^{m+1} \widehat{u}_{\ell,t}$. Finally,
-to ensure that $\mathbf{a}_\ell$ is smooth over time, we complete the model with
-an additional equation that enforces smoothness,
-\begin{align}
-a_{\ell,m+1} &= 3a_{\ell,m} - 3a_{\ell,m-1} + a_{\ell,m-2} + \eta_{\ell,m}, 
-  &\eta_{\ell,m}  &\sim \textrm{N}(0, \sigma^2_{\eta}).
-\end{align}
-    
-This antibody prevalence model is a state-space model with latent variables
-$\mathbf{s}_{\ell}$ and $\mathbf{a}_{\ell}$ and unknown parameters $\gamma_\ell$,
-$\sigma^2_r$, $\sigma^2_\epsilon$, and $\sigma^2_\eta$. This model
-allows for convenient handling of missing data, extrapolation
-before and after the period of observed seroprevalence measurements, and maximum
-likelihood estimates of the errors. Details of this
-methodology and the computation of the associated uncertainty measurements are
-deferred to Supplementary Methods \Cref{supp:ssapm}.
-
-\attn{End of copy.}
-
-
 The antibody prevalence model is conceptualized
 as a Gaussian state space model (as in \citealp{durbin2012time, helske2017kfas}).
 
@@ -399,18 +367,6 @@ there is independence amongst $\alpha_1$, $\epsilon_t$ and $\eta_t$
 \citep{helske2017kfas, durbin2012time}. For notational
 compactness, we let $\alpha = \left ( \alpha_1^\top, \dots, \alpha_n^\top \right )$
 and $y = \left ( y_1^\top, \dots, y_n^\top \right )$.
-
-The observation equation can be viewed as a linear regression model with the
-time-varying coefficient $\alpha_t$, while the second equation is a first-order
-autoregressive model, which is Markovian in nature \citep{durbin2012time}. 
-
-The underlying idea behind the two equations is that we are assuming that the
-system evolves according to $\alpha_t$ (as in the second equation), but since
-those states are not directly observed, we turn to the observations $y_t$ and
-use their relationship with $\alpha_t$ (as in the first equation) to drive the
-system forward \citep{durbin2012time}. So the objective of state space modeling
-is to obtain the latent states $\alpha$ based on the observations $y$ and this
-is achieved through Kalman filtering and smoothing. 
 
 Kalman filtering gives the following one-step-ahead predictions of the states
 \begin{align*}
@@ -435,7 +391,8 @@ our model.
 % unevenly spaced time series (refer to \citealp{durbin2012time} for further details).
 
 To express the antibody prevalence model in state space form, we define
- the components in Equations \ref{eq:ss1} and \ref{eq:ss2} as follows:
+ the components in Equations \ref{eq:ss1} and \ref{eq:ss2} as follows 
+ (omitting the notation for location for brevity):
 
 % Probably move the below specification to the appendix
 
@@ -451,8 +408,8 @@ Z &= \begin{bmatrix}
 0 & 1 & 0 & 0 
 \end{bmatrix} &\qquad 
 H_m &= \begin{bmatrix} %%
-w_{m,c}\sigma^2_o & 0 \\ 
-0 & w_{m,b}\sigma^2_o
+w^1_{m}\sigma^2_r & 0 \\ 
+0 & w^2_{m}\sigma^2_r
 \end{bmatrix} \\
 \alpha_m &= \begin{bmatrix}
 s_{m}\\
@@ -461,14 +418,14 @@ a_{m-1}\\
 a_{m-2}
 \end{bmatrix} & 
 T_m &= \begin{bmatrix}
- \gamma & C_{m-1}^m z_m & 0 & 0\\ 
+(1 - \gamma) & \widehat{u}^\Sigma_{m} (1 - z_m) & 0 & 0\\ 
  0 & 3 & -3 & 1 \\ 
  0 & 1 & 0 & 0\\ 
  0 & 0 & 1 & 0
 \end{bmatrix}  & 
 Q &= \begin{bmatrix} 
-\sigma^2_s & 0  \\ 
-0 & \sigma^2_a
+\sigma^2_\epsilon & 0  \\ 
+0 & \sigma^2_\eta
 \end{bmatrix} \\
 a_1 &= \begin{bmatrix}
 \tilde{s}_{1}\\ 
@@ -483,12 +440,12 @@ P_{1} &= \begin{bmatrix}
 0 & 0 & 0 & \sigma^2_{\tilde{a}_1}
 \end{bmatrix} 
 \end{alignat*}
-where $\sigma^2_o$ is the variance of observations, $\sigma^2_s$ is the variance
-of the seroprevalence estimates, and $\sigma^2_a$ is the trend variance. Since
+where $\sigma^2_r$ is the variance of observations, $\sigma^2_\epsilon$ is the variance
+of the seroprevalence estimates, and $\sigma^2_\eta$ is the trend variance. Since
 we expect the inverse ratios to be more variable than the seroprevalence
-estimates, we enforce that the estimate of $\sigma^2_a$ is a multiple of
-$\sigma^2_s$. Letting the subscripts $b$ and $c$ denote the blood donor and
-commercial datasets, $w_{m,c}$ and $w_{m,b}$ are the time-varying inverse
+estimates, we enforce that the estimate of $\sigma^2_\eta$ is a multiple of
+$\sigma^2_\epsilon$. Letting the subscripts $b$ and $c$ denote the blood donor and
+commercial datasets, $w^1_{m}$ and $w^2_{m}$ are the time-varying inverse
 variance weights computed from the commercial and blood donor datasets,
 respectively. 
 
@@ -496,15 +453,12 @@ For each source, we compute the weights for the observed seroprevalence
 estimates using the standard formula for the standard error of a proportion.
 These weights are then re-scaled so they sum to the number of observed
 seroprevalence measurements for the source. All days that are unobserved (i.e.,
-lack seroprevalence measurements) are given weights of one. Finally, the ratio
-of the average observed weights for the sources is used as a multiplier to scale
-all of the weights for one source. For example, if the average weight of the
-commercial source is double the average weight of the blood donor source (for an
-arbitrary state), then we scale all of the weights in the commercial source
-(including the ones) by two. The main purpose of this step is to ensure that
-the source with a greater sample size contributes more weight in the model on
-average. % Last sentence - Or is it simply that the source with larger
-%weights on average will have more weight? 
+lack seroprevalence measurements) are given weights of one. Finally, the ratio 
+of the average observed weights from the two sources is used to scale all weights
+for the commercial source (doubling them, for example, if the average weight
+of the commercial source is twice that of the blood donor source for the state). 
+This helps to ensure that the source with the greater sample size contributes 
+more weight in the model on average.
 
 The prior distribution for $\alpha_1$ is estimated using both data-driven
 constraints and externally sourced information. To obtain the initial value of
@@ -512,25 +466,25 @@ the seroprevalence component, $\tilde{s}_{1}$, we extract the first observed
 seroprevalence measurement from each source, round down to two decimal places,
 and take the average to be $\tilde{s}_{1}$. The corresponding initial variance
 estimate, $\sigma^2_{\tilde{s}_{1}}$, is taken to be the mean of the standard
-errors of the two seroprevalence estimates. For all of the initial values of the
+errors of the two seroprevalence estimates. For the initial values of the
 trend components, we use the inverse of the ascertainment ratio estimate as of
 June 1, 2020 for each state from Table 1 in \citep{unwin2020state} and denote
 this by $\tilde{a}_1$. The initial variance estimate of $\sigma^2_{\tilde{a}_1}$
-is based on the variance implied by the given inverse ascertainment ratio
+is based on that implied by the given inverse ascertainment ratio
 distribution.
 % standard deviation implied by the interval in that table.  
 % Update this last sentence if end up going with the standard deviation implied by the interval in Table 1
 % instead of the variance implied by u_m ~ Beta(12,5) from the unwin2020state paper
 
-The initial $\sigma^2_o$ is taken to be the average of the estimated variances
+The initial $\sigma^2_r$ is taken to be the average of the estimated variances
 from the linear models for the sources where the observed seroprevalence
 measurements are regressed on the enumerated dates. The initial value of 
-the multiplier is set to be $100$ for all states. The $\sigma^2_s$ and $\gamma$ 
+the multiplier is set to be $100$ for all states. The $\sigma^2_\epsilon$ and $\gamma$ 
 values are fixed and from averaging the estimated values for all states on the real line
-(obtained under the starting conditions $\sigma^2_s = 3\times
+(obtained under the starting conditions $\sigma^2_\epsilon = 3\times
 10^{-6}$,% 0.000003 
 $\gamma = 0.99$,
-and $\sigma^2_o$ as described).
+and $\sigma^2_r$ as described).
 
 Following the maximum likelihood estimation of the two non-fixed parameters we
 use the Kalman filtering and smoothing to obtain the smoothed estimates of the

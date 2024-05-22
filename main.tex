@@ -7,8 +7,10 @@
 \newcommand{\beginsupplement}{
   \setcounter{table}{0}  
   \renewcommand{\thetable}{S\arabic{table}} 
+  \renewcommand{\theHtable}{S\arabic{table}} 
   \setcounter{figure}{0} 
   \renewcommand{\thefigure}{S\arabic{figure}}
+    \renewcommand{\theHfigure}{S\arabic{figure}} 
   \setcounter{section}{0} 
   \renewcommand{\thesection}{S\arabic{section}}
 } 
@@ -70,8 +72,6 @@ prior to the onset of Omicron and its descendants.
 
 
 \section*{Data availability}
-
-\attn{Rachel: in other articles, do people just list bare links like this? I don't like it. Also, please make sure that the (non-private) raw data is in the repo as .rds files.}
 
 The Nationwide Commercial Laboratory Seroprevalence Survey 
 and 2020-2021 Nationwide Blood Donor Seroprevalence Survey 
