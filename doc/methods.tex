@@ -40,7 +40,7 @@ that these reported cases at time $t$ were collected $k$ days earlier. Then, we
 model $y_{\ell,t}$ as Gaussian with mean 
 \begin{align}
   \label{eq:cases-model}
-  \mathbb{E}[y_{\ell,t}] =\sum_{k} \pi_{\ell,t-k}(k)x_{\ell,t-k},
+  \mathbb{E}[y_{\ell,t} \mid x_{\ell,s}, s \leq t ] =\sum_{k} \pi_{\ell,t-k}(k)x_{\ell,t-k},
 \end{align}
 a probability weighted sum of the number of positive specimens
 collected $k$ days earlier, $x_{\ell,t-k}$.
@@ -141,7 +141,7 @@ Analogous to
 \Crefrange{eq:cases-model}{eq:cases-deconvolved}, for each variant $j$, we model
 the variant-specific, deconvolved cases as Gaussian with mean
 \begin{align}
-  \mathbb{E}\left[\widehat{v}_{j\ell,t}\widehat{x}_{\ell,t}\right] = \sum_k \tau_{j\ell,t-k}(k) u_{j\ell,t-k} 
+  \mathbb{E}\left[\widehat{v}_{j\ell,t}\widehat{x}_{\ell,t} \mid u_{j\ell,s}, s \leq t  \right] = \sum_k \tau_{j\ell,t-k}(k) u_{j\ell,t-k} 
 \end{align}
 and estimate $\mathbf{u}_{j\ell}$ by minimizing the negative loglikelihood with
 a penalty to encourage smoothness:
@@ -187,8 +187,8 @@ Mondays). Therefore, the observed seroprevalence survey measurements $r^1_m$ and
 $r^2_m$ are modelled as Gaussian,
 \begin{align}
 \label{eq:sero-measurements}
-r^1_{\ell,m} \mid s_{\ell,m},\ \tau_{\ell,m} &\sim \textrm{N}(s_{\ell,m},\ w^1_{\ell,m}\sigma^2_{\ell,r}),\\
-r^2_{\ell,m} \mid s_{\ell,m},\  \varphi_{\ell,m}
+r^1_{\ell,m} \mid s_{\ell,m},\ w^1_{\ell,m} &\sim \textrm{N}(s_{\ell,m},\ w^1_{\ell,m}\sigma^2_{\ell,r}),\\
+r^2_{\ell,m} \mid s_{\ell,m},\  w^2_{\ell,m}
   &\sim \textrm{N}(s_{\ell,m},\ w^2_{\ell,m}\sigma^2_{\ell,r}),
 \end{align}
 with source-specific measurement errors that scale proportional to the reported
