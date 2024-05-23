@@ -68,6 +68,13 @@ The following supplementary files that are necessary to run the experiments are 
   simply load the [variant-deconvolve package](https://github.com/dajmcdon/variant-deconvolve),
   which is publicly available on Github
 
+### Generate results
+
+The generate results folder contains two .Rmd files - one to produce the figures and one
+to produce the numerical results in the paper. The data used to generate these results is 
+contained in the data folder (which also contains the public data inputs and the derived 
+state-specific convolution-mat-list.rds files that are central to the deconvolutions).
+
 
 ## Credit
 This repository follows and builds off of code from
