@@ -36,7 +36,7 @@ Define $y_{\ell,t}$ to be the number of new cases reported in location $\ell$ at
 time $t$, as reported by the John Hopkins Center for Systems Science and
 Engineering (JHU CSSE)\citealp{dong2020interactive} and retrieved with the
 COVIDcast API \citep{reinhart2021open}. Let $\pi_{\ell,t}(k)$ be the probability
-that these reported cases at time $t$ were collected $k$ days earlier. Then, we
+that cases with positive specimen collection on time $t-k$ are reported at $t$. Then, we
 model $y_{\ell,t}$ as Gaussian with mean 
 \begin{align}
   \label{eq:cases-model}
@@ -152,7 +152,7 @@ a penalty to encourage smoothness:
     \sum_k \tau_{j\ell,t-k}(k) u_{t-k} 
 \right)^2 
 + \lambda\ \sum_{t} \big|u_{t} - 4u_{t-1} + 6u_{t-2} -4u_{t-3}+ u_{t-4}\big|.
-\end{align}
+\end{align} 
 We call the solution $\widetilde{\mathbf{u}}_{j\ell}$ the \emph{variant-specific
 deconvolved cases} and emphasize that these are cases that will eventually
 be reported to public health. Because this deconvolution is done separately for
