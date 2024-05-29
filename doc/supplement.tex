@@ -1,11 +1,32 @@
-\section{Supplementary Methods}
+\section{Additional details on data and methodology}
 
-This section contains additional information about the datasets used and the estimation methodology.
+This section contains additional information about the data used as well as
+details about statistical methodology.
 
 \subsection{A general description and depiction of convolution}
 \label{supp:convol}
 
-In general, the goal of convolution is to propagate the input signal forward in time using a distribution of probabilities. In the 2D and discrete context, it is simply the elementwise multiplication of the signal for some time by a forward-facing distribution of probabilities, which are then summed to get a value for the outcome. \Cref{fig:convol} presents a depiction of the convolution procedure for the signal of smoothed cases (orange line). Essentially, to push the cases forward in time, we take the appropriately aligned (forward-in-time) delay distribution and convolve or multiply the case counts by it to get the distribution of convolved case estimates (blue line). This process is repeated as we march forward in time, as shown through the stop-motion panels, such that it eventually covers the entire line of cases. An important takeaway from this is that convolution is not the same as a simple shift of the data points, but rather it utilizes the most relevant probabilities to propagate the data points forward in time. Deconvolution proceeds in the same fashion, but in the opposite direction to go back in time. 
+In general, the goal of convolution is to propagate the input signal forward in
+time using a probability distribution. In the 1D and discrete context, it is
+simply a rolling, weighted average of the past. So for an input sequence
+$\{x_t\}_{t=1}^n$ and time-constant weights $\{z(k)\}_{k=-\infty}^0$, the output
+sequence $\{y_t\}_{t=1}^n$ is given by
+\begin{equation}
+    y_t = \sum_{s=0}^t z(s)x_{t-s}.
+\end{equation}
+\Cref{fig:convol} presents a depiction of the convolution procedure for an
+example signal $x_t$ (smoothed cases, orange line). Essentially, to push the
+cases forward in time, we take the appropriately aligned (forward-in-time) delay
+distribution $z(s)$ (blue shaded region) and convolve it with the smoothed cases
+signal counts by it to get the convolved  estimates (blue line). This process is
+repeated as we march forward in time, as shown through the stop-motion panels,
+such that it eventually covers the entire line of cases. An important takeaway
+from this is that convolution is not the same as a simple shift of the data.
+A shift is a special case: when $z(d)=1$ and $z(s)=0$, $s\neq d$, we shift $x$
+forward by $d$. Rather, convolution generally weights the entire past by
+non-zero probabilities. Deconvolution proceeds in the same fashion, but in the
+opposite direction, going backward in time and undoing the effect of a
+convolution. 
 
 \begin{figure}[H]
 \centering
@@ -17,40 +38,51 @@ In general, the goal of convolution is to propagate the input signal forward in 
 \subsection{Additional details on the date fields in the CDC line list}
 \label{supp:linelist-details}
 
-Since the restricted dataset is updated
-monthly and cases may undergo revision, we use a single version of it that was
-released on June 6, 2022. We consider this version to be finalized in that it
-well-beyond our study end date such that the dataset is unlikely to be subject
-to further significant revisions.
+Because the CDC line list is updated monthly and cases may undergo revision, we
+use a single version of it that was released on June 6, 2022. We consider this
+version to be finalized in that it is well-beyond our study end date such that
+the dataset is unlikely to be subject to further significant revisions.
 
-\Cref{tab:order-events-table} presents the percent of pairwise occurrences
-for the different possible permutations of events in the line list. Essentially,
+\Cref{tab:order-events-table} presents the percent of pairwise occurrences for
+the different possible permutations of events in the line list. Essentially,
 most cases follow the idealized ordering shown by
 \Cref{fig:chain_events_onset_report} and so we adhere to this construction as
-much as possible.
-
-We observe that the line list is prone to high percentages of missing data,
+much as possible. Unfortunately, the line list has significant missing data,
 notably with respect to our variables of interest. Approximately 62.3\% of cases
 are missing the symptom onset date, 55.4\% are missing positive specimen date,
-and 8.96\% of cases are missing the report date. Relatedly,
-cases with
-missing report or positive specimen dates may be filled with their symptom onset date
-\citep{jahja2022real}. So it is possible that all three variables may be
-imputed with the same date for a case. However, we only actually deal with
-select pairs of events; we do not use all three at once in our construction of
-the delay distributions or anywhere else in our analysis. Therefore, we restrict
-our investigation of missingness to the pairs of events.
-\Cref{fig:prop-cc} suggests that this issue impacts states
-differentially due to the inconsistent proportions of zero delay between
-positive specimen and report date across states. 
+and 8.96\% of cases are missing the report date. Furthermore, cases with missing
+report or positive specimen dates may be filled with their symptom onset date
+\citep{jahja2022real}. So it is possible that all three variables may have the
+same date for a case. However, we only actually deal with pairs of these events;
+we do not use all three at once in our construction of the delay distributions.
+Therefore, we restrict our investigation of coincident missingness to the possible pairs.
+% \Cref{fig:prop-cc} suggests that this issue impacts states differentially due to
+% the inconsistent proportions of zero delay between positive specimen and report
+% date across states. 
 
-Due to the contamination in the zero delay cases (the true extent of which is
-unknown to us), we omit all such cases where the positive specimen and report
+\begin{table}[t!]
+    \centering
+\begin{tabular}{@{}lp{3cm}p{8.5cm}@{}}
+\toprule
+\textbf{Order of events}& \textbf{Percent pairwise occurrence} &
+\textbf{Handling}\\ \midrule \addlinespace
+IO $\rightarrow$ SO $\rightarrow$ PS $\rightarrow$ RE & \begin{tabular}[t]{@{}l@{}}PS $\geq$ SO: 97.1 \\ PS = SO: 33.6\\ PS \textgreater\ RE: 1.74\\  PS = RE: 14.6\end{tabular} & This is the idealized order of events and so the  support sets for  SO $\rightarrow$ PS and PS $\rightarrow$ RE delay distribution constructions around this such that IO comes first by construction, SO typically precedes PS, but may be the same  or come before, and RE comes after PS and SO \\ \addlinespace
+IO $\rightarrow$ PS $\rightarrow$ SO $\rightarrow$ RE & \begin{tabular}[t]{@{}l@{}}PS \textless\ SO: 2.91 \\ SO $\leq$ RE: 99.3 \\ SO \textless\ RE: 86.1\end{tabular}            & Allowed for negative delays up to the largest non-outlier value for the 0.05 quantile of delay from PS to SO by state                                                                                                                                         \\ \addlinespace
+IO $\rightarrow$ PS $\rightarrow$ RE $\rightarrow$ SO & \begin{tabular}[t]{@{}l@{}}RE \textless\ SO: 0.7 \\ RE \textless\ PS: 1.7\end{tabular}                                    & Current handling by the CDC of the line list ensures that the most concerning cases are handled where SO = PO = RE, SO = RE and PO = RE                                                                                                                                                \\ \addlinespace\bottomrule
+\end{tabular}
+\caption{Percent pairwise occurrence for the different permutations of events considered in the restricted CDC line list. The abbreviation IO stands for infection onset, SO is symptom onset, PS is positive specimen, and RE is report date. We consider a restricted set of permutations because we assume that IO must come first and that PS must precede report date for a case to be legitimate. Finally, the underlying assumption for the percent pairwise occurrence calculations is that the cases must have both elements present (not missing).}
+\label{tab:order-events-table}
+\end{table}
+
+
+Due to the contamination in the zero delay cases (those whose symptom onset was
+used to fill missing positive specimen or report date, the true extent of which
+is unknown to us), we omit all cases where the positive specimen and report
 dates have zero delay from our analysis. We choose to allow for zero and
 negative delay for symptom onset to report because correspondence with the CDC
-confirms the distinct possibility that a person could test positive before
-symptom onset and it is a reasonable ordering to expect if, for example, the
-individual is aware that they have been exposed to an infected individual.
+confirms the possibility that a person could test positive before symptom onset
+and it is a reasonable ordering to expect if, for example, the individual is
+aware that they have been exposed to an infected individual.
 
 \begin{figure}[!tb]
 \centering
@@ -65,27 +97,37 @@ individual is aware that they have been exposed to an infected individual.
 \label{fig:prop-cc}
 \end{figure}
 
-For the same release date, the restricted line list contains 74,849,225 cases
-(rows) in total compared to 84,714,805 cases reported by the JHU CSSE; that is,
-line list is missing about 10 million cases. The extent that this issue impacts
-each state is shown in \Cref{fig:prop-cc}, from which it is clear
-the fraction of missing cases is substantial for many states, often surpassing
-50\% \citep{jahja2022real}. In addition, the probability of being missing does
-not appear to be the same for states, so there is likely bias introduced from
-using the complete case line list data. We consider such bias to be unavoidable
-in our analysis due to a lack of alternative line list sources.
+The CDC restricted line list contains 74,849,225 cases (rows) in total compared
+to 84,714,805 cases reported by the JHU CSSE; that is, line list is missing
+about 10 million cases. The extent that this issue impacts each state is shown
+in \Cref{fig:prop-cc}, from which it is clear the fraction of missing cases is
+substantial for many states, often surpassing 50\% \citep{jahja2022real}. In
+addition, the probability of being missing does not appear to be the same for
+states, so there is likely bias introduced from using the complete case line
+list data. We consider such bias to be unavoidable in our analysis due to a lack
+of alternative line list sources. 
+
+
+
+%\subsection{Table on the percent pairwise occurrence of events in the CDC line list}
+
+
+\subsection{Additional details on delay distribution calculations}
+\label{supp:delay-justifications}
 
 In the line list, we observe unusual jarring spikes in reporting in 2020
-compared to 2021. Upon plotting by report date, we find that a few states are
-contributing unusually large case counts on isolated days very late in the
-reporting process (usually well beyond 50 days). We strongly suspect that these
-large accumulations of cases over time are due breakdowns of the reporting
-pipeline (which may be expected to occur more frequently in the year following
-its instantiation than later in time). Such anomalies are not likely to be
-reliable indicators of the delay from positive specimen to case report.
-Therefore, we devise a simple, ad hoc approach to detect and prune these
-reporting backlogs.
+compared to 2021. When stratified by report date, a few states are seen to
+contribute unusually large case counts on isolated dates very late in the
+reporting process (well beyond 100 days following specimen collection). These
+large accumulations of cases over time are likely due breakdowns of the
+reporting pipeline. Such anomalies are not likely to be reliable indicators of
+the delay from positive specimen to case report. Therefore, we prune these
+reporting backlogs systematically. The heuristic is to find any large batches of
+cases that were all simultaneously reported on the same date with a lengthy
+delay (as would happen if a state "found" a tranche of previously unreported
+positive tests).
 
+\attn{@Rachel, I don't understand the description that follows. Can you take a stab at simplifying/clarifying? Maybe enumerate the steps or use math.}
 First, we obtain the part of the line list intended for the positive specimen to
 case report delay estimation, where both such dates are present and where zero
 and negative delay cases have been omitted. Then, for each of the three dates of
@@ -101,59 +143,15 @@ intuition, we set the threshold to 2000 for the first two bins, and then lower
 it to 500 for the remaining bins. A similar trial and error approach is used to
 set the bin size (to 50 days).
 
-\subsection{Table on the percent pairwise occurrence of events in the CDC line list}
 
-\begin{table}[h!]
-    \centering
-\begin{tabular}{@{}lp{3cm}p{8.5cm}@{}}
-\toprule
-\textbf{Order of events}& \textbf{Percent pairwise occurrence} &
-\textbf{Handling}\\ \midrule \addlinespace
-IO $\rightarrow$ SO $\rightarrow$ PS $\rightarrow$ RE & \begin{tabular}[t]{@{}l@{}}PS $\geq$ SO: 97.1 \\ PS = SO: 33.6\\ PS \textgreater\ RE: 1.74\\  PS = RE: 14.6\end{tabular} & This is the idealized order of events and so the  support sets for  SO $\rightarrow$ PS and PS $\rightarrow$ RE delay distribution constructions around this such that IO comes first by construction, SO typically precedes PS, but may be the same  or come before, and RE comes after PS and SO \\ \addlinespace
-IO $\rightarrow$ PS $\rightarrow$ SO $\rightarrow$ RE & \begin{tabular}[t]{@{}l@{}}PS \textless\ SO: 2.91 \\ SO $\leq$ RE: 99.3 \\ SO \textless\ RE: 86.1\end{tabular}            & Allowed for negative delays up to the largest non-outlier value for the 0.05 quantile of delay from PS to SO by state                                                                                                                                         \\ \addlinespace
-IO $\rightarrow$ PS $\rightarrow$ RE $\rightarrow$ SO & \begin{tabular}[t]{@{}l@{}}RE \textless\ SO: 0.7 \\ RE \textless\ PS: 1.7\end{tabular}                                    & Current handling by the CDC of the line list ensures that the most concerning cases are handled where SO = PO = RE, SO = RE and PO = RE                                                                                                                                                \\ \addlinespace\bottomrule
-\end{tabular}
-\caption{Percent pairwise occurrence for the different permutations of events considered in the restricted CDC line list. The abbreviation IO stands for infection onset, SO is symptom onset, PS is positive specimen, and RE is report date. We consider a restricted set of permutations because we assume that IO must come first and that PS must precede report date for a case to be legitimate. Finally, the underlying assumption for the percent pairwise occurrence calculations is that the cases must have both elements present (not missing).}
-\label{tab:order-events-table}
-\end{table}
-
-\subsection{Justifications and details for delay distribution calculations}
-\label{supp:delay-justifications}
-
-Let $y_t$ denote the count of new cases reported at time $t$ and $x_t$ denote
-the count of deconvolved cases with positive specimen at $t$. 
-For all cases in the line list that had both a positive specimen and a report date, we can count
-the those that are reported at time $t$ by enumerating them according to
-positive specimen date (similar to how symptom onset date was used in
-\citealp{jahja2022real}).
-
-We start with no time restrictions placed on the positive specimen date, except that
-it must have been between the start of the pandemic and the report date,
-inclusive. However, 
-this is unlikely to be a realistic assumption to make as the date of report moves
-farther away from the date of positive specimen collection.
-
-Therefore, we make three key assumptions about the positive specimen to report delay distributions. 
-First, positive specimen tests that are reported to the CDC are always reported within $d = 60$
-days, which is true for the majority of the reported cases. Second, the
-probability of zero delay is zero, which stems from the contamination of
-zero-delay in the line list. The following conditional expectation reflects these two assumptions 
-(similar to \citep{jahja2022real}): 
-\begin{align*}
-\E[y_t \mid x_s, s \leq t] = \sum_{k=1}^{60} \pi_{t-k}(k) x_{t-k}
-\end{align*}
-where for each of $k = 1, \dots, 60$,
-\begin{align*}
-\pi_{t-k}(k) = \P(\text{case report at }t \mid \text{positive specimen at }t-k).
-\end{align*}
-
-Thirdly, there are instances of anomalous behaviour where the empirical probability 
-is precisely 1 at zero delay and the proportion of CDC relative
-to JHU cases used for the weight is also 1. Since we believe that having zero
-delay for all cases is unrealistic and unlikely to be representative of all
-cases for the state, we inject a small amount of variance manually by setting
-the the CDC-to-JHU proportion to be the minimum shrinkage proportion observed
-for the affected state (such instances are isolated to the state of New Hampshire).
+Finally, in New Hampshire, for a small handful of report dates, all cases
+reported by JHU appear in the CDC line list, and all are recorded as having
+positive specimen collection date equal to the report date. The resulting
+estimate of the delay distribution (see \Cref{sec:step1})
+$\widetilde{p}_{\textrm{NH},t}(k)$ would be a point mass at $k=0$ and the weight
+$\alpha_{\textrm{NH},t}=1$ resulting $\widehat\pi_{\textrm{NH},t}(k)$ also being a
+point mass at $k=0$. In this specific case, we force $\alpha_{\textrm{NH},t} =
+\min_{\ell\neq\textrm{NH}} \alpha_{\ell,t}$.
 
 \subsection{Variant circulation proportions}
 \label{sec:variant-proportions}
@@ -172,17 +170,14 @@ frequency of SARS-CoV-2 variants
 
 We let $V_{j\ell,t}$ to be the probability of a new cases at time $t$ in location
 $\ell$ corresponding to variant $j$. Let $v_{j\ell,t}$ be the analogous observed
-proportion. Then the nonparametric multinomial logistic regression model is given
+proportion. Then nonparametric multinomial logistic regression models the log odds
 as the system
 \begin{equation}
-\log\left(\frac{V_{j\ell,t}}{1-V_{j\ell,t}}\right) = f_{j\ell}(t),\;\; j=1,\ldots J,\quad
-\textrm{subject to }\sum_{j=1}^J \exp\{f_{j\ell}(t)\} = 1, \;\;\forall t.
+\log\left(\frac{V_{j\ell,t}}{1-V_{j\ell,t}}\right) = \beta_{j\ell,0} + \beta_{j\ell,1} t + \beta_{j\ell,2}t^2 + \beta_{j\ell,3}t^3,\;\; j=1,\ldots J.
 \end{equation}
-The constraint ensures that the estimated proportions will sum to 1 across all
-$J$ variants. To encourage smoothness of the estimated proportions, we specify
-$f_{j\ell}(t)$ as a third-order polynomial in time: that is $f_{j\ell}(t) =
-\beta_{j\ell,0} + \beta_{j\ell,1} t + \beta_{j\ell,2}t^2 + \beta_{j\ell,3}t^3$,
-computed such that the resulting matrix of covariates is orthogonal.
+This is estimated along with a constraint to ensure that the estimated proportions will sum to 1 across all
+$J$ variants. The specification of the log odds as a third-order polynomial in
+time produces smoothness of the estimated proportions.
  \Cref{fig:prop_figs} shows the proportions by variant for California before
 (left) and after (right) the smoothing procedure. 
 
@@ -196,29 +191,46 @@ computed such that the resulting matrix of covariates is orthogonal.
     \end{figure}
 
 
-\subsection{Estimating the incubation period distributions} 
+    
+
+
+\subsection{Constructing the delay from infection to test}
+\label{supp:delay-sops}
+
+The result of Step 1 (\Cref{sec:step1}) is $\widehat{x}_{\ell,t}$, case
+estimates by positive specimen date for each state. To continue, pushing this
+back to infection estimates, we need the variant-specific delays from infection
+to positive specimen collection. As shown in \Cref{fig:chain_events_onset_report}, this delay can be broken into two separate pieces: (1) the
+delay from infection to symptom onset, and (2) the delay from symptom onset to
+positive specimen collection. The first requires different methods and is
+specific to the variant causing the infection, while the second is estimable from the CDC line
+list.
+
+\subsubsection{Estimating the incubation period distributions} 
 \label{sec:incubation}
 
 To account for the incubation period, the time between infection and symptom
 onset, we use estimates from the existing literature, modified slightly for
 coherence with each other: we model each incubation as a gamma distribution with
-different parameters. We focus on the following eight variants, which dominated
-at various points during our study period: Ancestral/Other, Alpha, Beta, Epsilon,
+different parameters. We focus on the following eight variants (shown in
+\Cref{fig:prop_figs}), which saw significant circulation in one of the \US states
+during our study period: Ancestral/Other, Alpha, Beta, Epsilon,
 Iota, Gamma, Delta, and Omicron. Alpha, Beta, Delta, Gamma, and Omicron are all
 variants of concern \citep{who2021tracking}, while we include the Epsilon
 (California) and Iota (New York) variants because of large impact on those and
 neighbouring states \citep{yang2022investigation, duerr2021dominance}.
 
-The incubation period of the Ancestral variant has been modelled as a gamma distribution
-\citep{tindale2020evidence}, so we simply use the reported shape and scale parameters. For the
-Alpha, Beta, Gamma, Delta and Omicron variants, the mean and standard deviation are reported
-\citep{tanaka2022shorter, grant2022impact, ogata2022shorter}. 
-Therefore, we use method of moments to match the mean and variance to estimate the gamma parameters. 
-Then, we discretize each resulting density shown in \Cref{fig:inc_gammas} to the
-support set, which is taken to be from 1 and 21 days. This range assumes that
-symptoms require at least 1 day to develop \citealp{phcan2021covid} and that an
-asymptomatic infection will resolve within 21 days
-\citep{zaki2021estimations,cortes2022sars}.
+The incubation period of the Ancestral variant has been modelled as a gamma
+distribution \citep{tindale2020evidence}, so we simply use the reported shape
+and scale parameters. For the Alpha, Beta, Gamma, Delta and Omicron variants,
+the mean and standard deviation are reported \citep{tanaka2022shorter,
+grant2022impact, ogata2022shorter}. Therefore, we use method of moments to match
+the mean and variance to estimate the gamma parameters, using the moment
+equations given in \Cref{sec:step1}. Then, we discretize each resulting density
+shown in \Cref{fig:inc_gammas} to the support set, which is taken to be from 1
+and 21 days. This range assumes that symptoms require at least 1 day to develop
+\citealp{phcan2021covid} and that an asymptomatic infection will resolve within
+21 days \citep{zaki2021estimations,cortes2022sars}.
 
 We were unable to locate incubation period estimates for the geo-specific
 Epsilon and Iota variants, so we use the incubation period for Beta because
@@ -227,92 +239,102 @@ phylogenetic tree of the Nextstrain Clades \citep{hodcroft2021covariants}. All
 other circulating variants are grouped together with the Ancestral variant.
 There was little available sequencing data prior to Alpha-emergence, but
 unfortunately, later in the pandemic, it is impossible to separate Ancestral
-from other rare variants (which is one reason why we may refer to it as the Other category).
+from other rare variants, though these also saw minimal circulation after
+the middle of 2021.
 
 \begin{figure}[!tb]
 \centering
     \includegraphics[width=0.6\linewidth]{inc-gammas-1.pdf}
     \caption{Gamma density for the incubation period of each of the eight
-    variant categories. Note that the Ancestral variant directly utilizes the
-    available gamma shape and scale parameters, while the remaining variants use
-    the method of moments to estimate the gamma parameters.}
+    variant categories. Note that the Ancestral variant uses reported shape and
+    scale parameters \citep{tindale2020evidence}, while the remaining variants
+    convert reported estimates for the mean and variance
+    \citep{tanaka2022shorter,grant2022impact,ogata2022shorter} using the method
+    of moments to produce the gamma parameters.}
     \label{fig:inc_gammas}
 \end{figure}
-    
 
 
-\subsection{Details on estimating the delay distributions for symptom onset to positive specimen}
+
+
+
+\subsubsection{Estimating the delay distributions for symptom onset to positive specimen}
 \label{supp:delay-sops}
 
-Estimating the delay from symptom onset to positive specimen date follows the
-procedure as for positive specimen to report with a few minor adjustments. 
-First, we allow $k$ to range from
-$-3$ to $21$ (rather than $1$ to $60$). These upper and lower bounds are based on
-the largest delay values for the state-wide 0.05 and 0.95 quantiles. This is
-reasonable because the median delay is very short at approximately 2 days, and
-an asymptomatic individual may test positive following a known exposure, before
-the onset of symptoms. We show
-both types of delays for a sample of states over several dates
-in Section \Cref{supp:est-delays-samp}.
+
+Estimating the delay from symptom onset to positive specimen date follows a
+similar procedure as described in \Cref{sec:step1} with a minor
+adjustment. Here, we allow $k$ to range from $-3$ to $21$ (rather than $1$ to
+$60$). These upper and lower bounds are based on the largest delay values for
+the state-wide 0.05 and 0.95 quantiles. The median
+delay is very short at approximately 2 days, and an asymptomatic individual may
+test positive following a known exposure, before the onset of symptoms. We show
+both types of delays for a sample of states over several dates in
+\Cref{fig:delay-plots-samp}. Unlike the delay from positive specimen collection
+to report, the delay from symptoms to positive specimen can conceivably be
+negative. The most obvious reason for this would be if a person knew they had been
+exposed to an infectious individual and so got tested prior to the development
+of symptoms. Required regular testing for jobs in health care settings,
+construction, or the film industry could also produce negative delays.
 
 
-\subsection{Estimated delays for a sample of six states}
-\label{supp:est-delays-samp}
-
-\begin{figure}[H]
+\begin{figure}[t!]
 \centering
     \includegraphics[width=.90\textwidth]{delay_plots.pdf} 
-    \caption{Depictions of the estimated discretized delay from symptom onset to 
-    positive specimen date (left) and from positive specimen date to report date (right)
-    for a sample of six states over several dates.}
+    \caption{Depictions of the estimated delay from symptom onset to
+    positive specimen date (left) and from positive specimen date to report date
+    (right) for a sample of six states over several dates.}
     \label{fig:delay-plots-samp}
 \end{figure}
 
-
-\subsection{Details on constructing the infection-to-test distributions}
+\subsubsection{Details on constructing the infection-to-test distributions}
 \label{supp:details-conv}
 
-The result of the first type of deconvolution performed is $\widehat{x}_{\ell,t}$, case estimates
-by positive specimen date for each state. To continue, pushing this back to infection
-estimates, we need the variant-specific delays from infection to positive
-specimen collection. These are calculated by convolving the
-location-time-specific symptom-to-positive-test distributions from
-\ref{supp:delay-sops}, denoted by $\{q_{\ell,t}(k) : -3\leq k \leq 21\}$, with
-the variant-specific incubation periods from \ref{sec:incubation}, denoted
-by $\{i_{j}(k) : 0 < k \leq 21\}$. The convolution of these yields a
+Finally, to produce the delay from infection to positive specimen collection we
+convolve the variant-specific incubation periods from \Cref{sec:incubation},
+denoted by $\{i_{j}(k) : 0 < k \leq 21\}$ with the location-time-specific
+symptom-to-positive-test distributions from \Cref{supp:delay-sops}, denoted by
+$\{q_{\ell,t}(k) : -3\leq k \leq 21\}$. The convolution of these yields a
 distribution $\mathbf{q}_{\ell,t}*\mathbf{i}_j = \{\tau_{j\ell,t}(k): -3 \leq k
-\leq 42\}$. However, only a fraction of $\widehat{x}_{\ell,t}$ corresponds to
-each variant, so we must weight them by the variant proportions
-$\widehat{v}_{j\ell,t}$ described in \ref{sec:variant-proportions}.
+\leq 42\}$. \Cref{fig:delay-plots-samp} shows the delays used for a sample of 6
+states: symptom to positive specimen (left column) and positive specimen to report
+(right column). The convolution distribution $\tau_{j\ell,t}$ requires
+convolving the distribution in the left column with the variant-specific
+incubation periods shown in \Cref{fig:inc_gammas}.
+
+
+
 
 
 \subsection{Details about seroprevalence data}
 \label{supp:sero-details}
 
-In the former, the CDC
+We use two major contemporaneous surveys to estimate the proportion of the
+population with evidence of previous infection in each state over time: the
+2020--2021 Blood Donor Seroprevalence Survey and the Nationwide Commercial Lab
+Seroprevalence Survey \citep{cdc2021blood, cdc2021comm}. In the former, the CDC
 collaborated with 17 blood collection organizations in the largest nationwide
 COVID-19 seroprevalence survey to date \citep{cdc2021blood}. The blood donation
 samples were used to construct monthly seroprevalence estimates for nearly all
 states from July 2020 to December 2021 \citep{jones2021estimated}. In the latter
-survey, the CDC collaborated with two private commercial laboratories and used
-blood samples to test for the antibodies to the virus from people that were in
-for routine or clinical management (presumably unrelated to COVID-19
-\citealp{bajema2021estimated}). The resulting dataset contains seroprevalence
-estimates for a number of multi-week collection periods starting in July 2020 to
-February 2022. 
+survey, the CDC collaborated with two private commercial laboratories to test
+blood samples from people that were in for routine or clinical management
+(presumably unrelated to COVID-19 \citealp{bajema2021estimated}) for the
+antibodies to the virus. The resulting dataset contains seroprevalence estimates
+for a number of multi-week collection periods starting in July 2020 to February
+2022. 
 
-Both datasets are based on repeated, cross-sectional studies that aimed, at
-least in part, to estimate the percentage of people who were previously infected
-with COVID-19 using the percentage of people from a convenience sample who had
-antibodies against the virus \citep{bajema2021estimated, cdc2020data,
-jones2021estimated}. Adjustments were made in both for age and sex to account
-for the demographic differences between the sampled and the target populations.
-However, both datasets are incomplete and they differ in the number and the
-timing of the data points for each state (\Cref{fig:sero-blood-comm-compar}).
-Such limitations indicate that reliance upon only one seroprevalence survey is
-inadvisable. For example, in the commercial dataset, the last estimate for North
-Dakota is in September 2020. In the blood donor dataset, Arkansas does not have
-estimates available until October 2020. 
+Both datasets are based on repeated, cross-sectional studies that estimate the
+percentage of people who were previously infected with COVID-19 using the
+percentage of people from a convenience sample who had antibodies against the
+virus \citep{bajema2021estimated, cdc2020data, jones2021estimated}. Adjustments
+were made in both for age and sex to account for the demographic differences
+between the sampled and the target populations. However, both datasets are
+incomplete and they differ in the number and the timing of the data points for
+each state (\Cref{fig:sero-blood-comm-compar}). For example, in the
+commercial dataset, the last estimate for North Dakota is in September 2020. In
+the blood donor dataset, Arkansas does not have estimates available until
+October 2020. 
 
 \begin{figure}[!tb]
 \centering
@@ -325,36 +347,26 @@ estimates available until October 2020.
     \label{fig:sero-blood-comm-compar}
 \end{figure}
     
-The date variables that come with the two seroprevalence datasets are different
-and so the date variables that we are able to construct from them are not the
-same. For the commercial dataset, we use the midpoint of the provided specimen
-collection date variable. A major difference in the structure of the two
-datasets is that the commercial dataset always has the seroprevalence estimates
-at the level of the state, while the blood donor dataset can either have
-estimates for the state or for multiple separate regions within the state. For
-the blood donor dataset, we use the median donation date if the seroprevalence
-estimates are designated to be for entire state. If they are instead for regions
-in the state, since there is reliably one measurement per region per month, we
-aggregate the measurements into one per month per state by using a weighted
-average (to account for the given sample sizes of the regions). The median of
-the median dates is taken to be the date for the weighted average.
-
-To adapt to the sparseness in the seroprevalence data, we convert our daily data
-to weekly by summing the reported infections and shifting the observed
-seroprevalence measurements to the nearest Monday. If there are multiple
+A major difference in the structure of the two datasets is that the commercial
+dataset always has the seroprevalence estimates at the level of the state, while
+the blood donor dataset can either have estimates for the state or for multiple
+separate regions within the state. For the commercial dataset, we use the
+midpoint of the provided specimen collection date variable.  For the blood donor
+dataset, we use the median donation date if the seroprevalence estimates are
+designated to be for entire state. If they are instead for regions in the state,
+since there is reliably one measurement per region per month, we aggregate the
+measurements into one per month per state by using a weighted average (to
+account for the given sample sizes of the regions). The median of the median
+dates is taken to be the date for the weighted average. If there are multiple
 measurements in a week from a seroprevalence source, then the average is used.
-We denote these changes by changing the time-based subscript from $t$ to $m$
-where $m$ indicates the Monday relative to our June 1, 2020 start date.
-Since we operate with weekly data where the weeks are designated by Monday, we set the 
-end date to be November 29, 2021. 
+
 
 \subsection{State space representation of the antibody prevalence
 model}\label{supp:ssapm} 
 
-The antibody prevalence model is conceptualized
-as a Gaussian state space model (as in \citealp{durbin2012time, helske2017kfas}).
-
-In general, for $t = 1, \dots, n$, let $\alpha_t$ be the $m \times 1$ vector of
+The antibody prevalence model described in \Cref{sec:report-ratio} can be expressed
+as a linear Gaussian state space model \citep{durbin2012time}.
+For $t = 1, \dots, n$, let $\alpha_t$ be the $m \times 1$ vector of
 latent state processes at time $t$ and $y_t$ be the $p \times 1$ vector of
 observations at time $t$. Under the assumption that $\eta$ is a $k \times 1$
 vector, the form of the linear Gaussian state space model is 
@@ -368,21 +380,21 @@ there is independence amongst $\alpha_1$, $\epsilon_t$ and $\eta_t$
 compactness, we let $\alpha = \left ( \alpha_1^\top, \dots, \alpha_n^\top \right )$
 and $y = \left ( y_1^\top, \dots, y_n^\top \right )$.
 
-Kalman filtering gives the following one-step-ahead predictions of the states
-\begin{align*}
-a_{t+1} &= \E[\alpha_{t+1}\given y_t, \dots, y_1] 
-\end{align*} with covariance,
-\begin{align*}
-P_{t+1} &= \Var(\alpha_{t+1} \given y_t, \dots, y_1).
-\end{align*}
-Then, the Kalman smoother works backwards to the first time to give
-\begin{align}
-\hat{a}_t &= \E[\alpha_{t}\given y_n, \dots, y_1] \label{eq:hatat}\\
-V_t &= \Var(\alpha_{t}\given y_n, \dots, y_1). \label{eq:Vt}
-\end{align}
-The filtering and smoothing steps are based on recursions that are described in
-Appendix A of \citep{helske2017kfas} as we use the R package KFAS to estimate
-our model.
+% Kalman filtering gives the following one-step-ahead predictions of the states
+% \begin{align*}
+% a_{t+1} &= \E[\alpha_{t+1}\given y_t, \dots, y_1] 
+% \end{align*} with covariance,
+% \begin{align*}
+% P_{t+1} &= \Var(\alpha_{t+1} \given y_t, \dots, y_1).
+% \end{align*}
+% Then, the Kalman smoother works backwards to the first time to give
+% \begin{align}
+% \hat{a}_t &= \E[\alpha_{t}\given y_n, \dots, y_1] \label{eq:hatat}\\
+% V_t &= \Var(\alpha_{t}\given y_n, \dots, y_1). \label{eq:Vt}
+% \end{align}
+% The filtering and smoothing steps are based on recursions that are described in
+% Appendix A of \citep{helske2017kfas} as we use the R package KFAS to estimate
+% our model.
 
 % For our situation, the Kalman filter and smoothing approach offers a number of
 % advantages over the penalized regression approach. Perhaps most notably,
@@ -390,9 +402,9 @@ our model.
 % parameter tuning is not necessary). Another major benefit is that it can handle 
 % unevenly spaced time series (refer to \citealp{durbin2012time} for further details).
 
-To express the antibody prevalence model in state space form, we define
- the components in Equations \ref{eq:ss1} and \ref{eq:ss2} as follows 
- (omitting the notation for location for brevity):
+To express the antibody prevalence model in state space form, we define the
+components in \Cref{eq:ss1,eq:ss2} as follows (omitting the location subscript
+for simplicity):
 
 % Probably move the below specification to the appendix
 
@@ -450,15 +462,12 @@ variance weights computed from the commercial and blood donor datasets,
 respectively. 
 
 For each source, we compute the weights for the observed seroprevalence
-estimates using the standard formula for the standard error of a proportion.
-These weights are then re-scaled so they sum to the number of observed
-seroprevalence measurements for the source. All days that are unobserved (i.e.,
-lack seroprevalence measurements) are given weights of one. Finally, the ratio 
-of the average observed weights from the two sources is used to scale all weights
-for the commercial source (doubling them, for example, if the average weight
-of the commercial source is twice that of the blood donor source for the state). 
-This helps to ensure that the source with the greater sample size contributes 
-more weight in the model on average.
+estimates using the formula for the standard error of a proportion. These
+weights are then re-scaled so they sum to the number of observed seroprevalence
+measurements for the source. Finally, the ratio of the average observed weights
+from the two sources is used to scale all weights relative the commercial
+source. This helps to ensure that the source with the greater sample size
+contributes more weight in the model on average.
 
 The prior distribution for $\alpha_1$ is estimated using both data-driven
 constraints and externally sourced information. To obtain the initial value of
@@ -466,40 +475,32 @@ the seroprevalence component, $\tilde{s}_{1}$, we extract the first observed
 seroprevalence measurement from each source, round down to two decimal places,
 and take the average to be $\tilde{s}_{1}$. The corresponding initial variance
 estimate, $\sigma^2_{\tilde{s}_{1}}$, is taken to be the mean of the standard
-errors of the two seroprevalence estimates. For the initial values of the
-trend components, we use the inverse of the ascertainment ratio estimate as of
-June 1, 2020 for each state from Table 1 in \citep{unwin2020state} and denote
-this by $\tilde{a}_1$. The initial variance estimate of $\sigma^2_{\tilde{a}_1}$
-is based on that implied by the given inverse ascertainment ratio
-distribution.
+errors of the two seroprevalence estimates. For the initial values of the trend
+components, we use the inverse of the ascertainment ratio estimate as of June 1,
+2020 for each state from Table 1 in \citep{unwin2020state} and denote this by
+$\tilde{a}_1$. The initial variance estimate of $\sigma^2_{\tilde{a}_1}$ is
+based on that implied by the given inverse ascertainment ratio distribution.
 % standard deviation implied by the interval in that table.  
 % Update this last sentence if end up going with the standard deviation implied by the interval in Table 1
 % instead of the variance implied by u_m ~ Beta(12,5) from the unwin2020state paper
 
 The initial $\sigma^2_r$ is taken to be the average of the estimated variances
-from the linear models for the sources where the observed seroprevalence
-measurements are regressed on the enumerated dates. The initial value of 
-the multiplier is set to be $100$ for all states. The $\sigma^2_\epsilon$ and $\gamma$ 
-values are fixed and from averaging the estimated values for all states on the real line
-(obtained under the starting conditions $\sigma^2_\epsilon = 3\times
-10^{-6}$,% 0.000003 
-$\gamma = 0.99$,
-and $\sigma^2_r$ as described).
+from the observed seroprevalence measurements regressed linearly on the time.
+The initial value of the multiplier is set to be $100$ for all states. The
+$\sigma^2_\epsilon$ and $\gamma$ values are estimated separately for each state,
+then fixed to their averages on the log-scale.
 
-Following the maximum likelihood estimation of the two non-fixed parameters we
-use the Kalman filtering and smoothing to obtain the smoothed estimates of the
-weekly inverse reporting ratios and their covariance matrices as shown in
-Equations \ref{eq:hatat} and \ref{eq:Vt}. Forwards and backwards extrapolation
-is then used to estimate the ratios and covariance outside of the observed
-seroprevalence range \citep{durbin2012time}, followed by linear interpolation to
-fill-in estimates for each day in our considered time period. After we obtain
-one vector of inverse reporting ratios for each state in this way, we take each
-inverse reporting ratio and multiply it by the corresponding deconvolved case
-estimate (that has undergone linear interpolation to correct instances of $0$
-reported infections) to obtain an estimate of new infections. We are able to
-convert these numbers of infections to infections per $100,000$ population by
-simple re-scaling (enabled by the fact that normality is preserved under linear
-transformations).
+Following maximum likelihood estimation of remaining parameters we use the
+Kalman filter to obtain the smoothed point estimates and variances of the weekly
+inverse reporting ratios. We use forward and backward extrapolation to extend
+these estimates outside of the observed seroprevalence range
+\citep{durbin2012time}, followed by linear interpolation to produce daily
+values. After we obtain one vector of inverse reporting ratios for each state in
+this way, we take each inverse reporting ratio and multiply it by the
+corresponding deconvolved case estimate (that has undergone linear interpolation
+to correct instances of $0$ reported infections) to obtain an estimate of new
+infections. We are able to convert these numbers of infections to infections per
+$100,000$ population by re-scaling.
 
 The $50$, $80$, and $95\%$ confidence intervals are constructed by taking a
 Bayesian view of the antibody prevalence model (refer to \ref{supp:bayeswaning} 
@@ -543,46 +544,46 @@ populations as of July 1 of 2020 and 2021 are taken from the Dec.
 Unless otherwise specified, we use the July 1, 2020 estimates.
 
 
-\subsection{Ablation analysis of infection-hospitalization correlations}
+% \subsection{Ablation analysis of infection-hospitalization correlations}
 
-To better understand the contribution of the intermediate steps to the lagged
-correlation analysis, we carry out a brief ablation study in which we calculate
-the lagged correlation using the following infection estimates: 1. those from
-the deconvolution procedure under the assumption that the infection onset is the
-same as the positive specimen date (i.e., excluding the positive specimen to
-infection onset data and deconvolution); 2. those from the deconvolution
-procedure under the assumption that the infection onset is the same as the
-symptom onset date (excluding the incubation period data); 3. those from the
-deconvolution procedure when utilizing all incubation period and delay data (the
-deconvolved case estimates); 4. those from applying the antibody prevalence
-model to produce estimates for both the reported and the unreported cases (the
-infection estimates).
+% To better understand the contribution of the intermediate steps to the lagged
+% correlation analysis, we carry out a brief ablation study in which we calculate
+% the lagged correlation using the following infection estimates: 1. those from
+% the deconvolution procedure under the assumption that the infection onset is the
+% same as the positive specimen date (i.e., excluding the positive specimen to
+% infection onset data and deconvolution); 2. those from the deconvolution
+% procedure under the assumption that the infection onset is the same as the
+% symptom onset date (excluding the incubation period data); 3. those from the
+% deconvolution procedure when utilizing all incubation period and delay data (the
+% deconvolved case estimates); 4. those from applying the antibody prevalence
+% model to produce estimates for both the reported and the unreported cases (the
+% infection estimates).
 
-The results of this study are shown in \Cref{fig:abl-lag-cor}. From
-this, we can see that the deconvolved case and infection estimates from the
-intermediate steps are all leading indicators of hospitalizations. However, the
-degree that each such set of estimates lead hospitalizations depend on its
-location in the sequence of deconvolution steps and how close the estimates are to infection
-onset. For example, the deconvolved cases by positive specimen date tend to
-precede hospitalizations by about $11$ days, while those for the subsequent step
-indicate that the deconvolved cases by symptom onset tend to precede
-hospitalizations by a longer time of $13$ days. Finally, after adding the
-variant-specific incubation period data into the deconvolution and obtaining the
-deconvolved case estimates, we can observe that the reported infections precede
-hospitalizations by about $19$ days. 
+% The results of this study are shown in \Cref{fig:abl-lag-cor}. From
+% this, we can see that the deconvolved case and infection estimates from the
+% intermediate steps are all leading indicators of hospitalizations. However, the
+% degree that each such set of estimates lead hospitalizations depend on its
+% location in the sequence of deconvolution steps and how close the estimates are to infection
+% onset. For example, the deconvolved cases by positive specimen date tend to
+% precede hospitalizations by about $11$ days, while those for the subsequent step
+% indicate that the deconvolved cases by symptom onset tend to precede
+% hospitalizations by a longer time of $13$ days. Finally, after adding the
+% variant-specific incubation period data into the deconvolution and obtaining the
+% deconvolved case estimates, we can observe that the reported infections precede
+% hospitalizations by about $19$ days. 
 
-\begin{figure}[H]
-\centering
-    \includegraphics[width=.78\textwidth]{adj_unadj_pi_no_inc_hosp_lag_corr_F24.pdf} 
-    \caption{Lagged Spearman's correlation between the infection and
-    hospitalization rates per 100,000 averaged for each lag across \US states
-    and days over June 1, 2020 to November 29, 2021, and taken over a rolling
-    window of 61 days. The infection rates are based on the counts for the
-    deconvolved case and infection estimates as well as the reported infections
-    by symptom onset and when the report is symptom onset. Note that each such
-    set of infection counts is subject to a center-aligned 7-day averaging to
-    remove spurious day of the week effects. The dashed lines indicate the lags
-    for which the highest average correlation is attained.}
-    \label{fig:abl-lag-cor}
-\end{figure}
+% \begin{figure}[H]
+% \centering
+%     \includegraphics[width=.78\textwidth]{adj_unadj_pi_no_inc_hosp_lag_corr_F24.pdf} 
+%     \caption{Lagged Spearman's correlation between the infection and
+%     hospitalization rates per 100,000 averaged for each lag across \US states
+%     and days over June 1, 2020 to November 29, 2021, and taken over a rolling
+%     window of 61 days. The infection rates are based on the counts for the
+%     deconvolved case and infection estimates as well as the reported infections
+%     by symptom onset and when the report is symptom onset. Note that each such
+%     set of infection counts is subject to a center-aligned 7-day averaging to
+%     remove spurious day of the week effects. The dashed lines indicate the lags
+%     for which the highest average correlation is attained.}
+%     \label{fig:abl-lag-cor}
+% \end{figure}
  
