@@ -35,7 +35,8 @@ lvec <- c("sp" = "Symptom onset to positive specimen",
           "pr" = "Positive specimen to report")
 ggplot(dat, aes(delay, prob, colour = date)) +
   geom_line() +
-  facet_grid(geo_value ~ type, scales = "free", labeller = labeller(.cols = lvec)) +
+  facet_grid(geo_value ~ factor(type, levels = c("sp", "pr")),
+             scales = "free", labeller = labeller(.cols = lvec)) +
   theme_bw() +
   scale_x_continuous(expand = expansion()) +
   scale_y_continuous(expand = expansion(c(0, 0.05))) +
