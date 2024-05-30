@@ -366,19 +366,15 @@ model}\label{supp:ssapm}
 
 The antibody prevalence model described in \Cref{sec:report-ratio} can be expressed
 as a linear Gaussian state space model \citep{durbin2012time}.
-For $t = 1, \dots, n$, let $\alpha_t$ be the $m \times 1$ vector of
-latent state processes at time $t$ and $y_t$ be the $p \times 1$ vector of
-observations at time $t$. Under the assumption that $\eta$ is a $k \times 1$
-vector, the form of the linear Gaussian state space model is 
+For $m = 1, \dots, M$, let $\alpha_m$ be a vector of
+latent state processes at time $m$ and $y_m$ be a vector of
+observations at time $m$. The form of the (general) linear Gaussian state space model is 
 \begin{align}
-y_t &= Z\alpha_t + \epsilon_t, \qquad \epsilon_t \sim N(0, H_t) \label{eq:ss1}\\
-\alpha_{t+1} &= T_t\alpha_t + R_t\eta_t, \quad \eta_t \sim N(0, Q_t) \label{eq:ss2}
+y_m &= Z\alpha_m + \sigma^2_r\epsilon_m, \qquad \epsilon_m \sim N(0, H_m) \label{eq:ss1}\\
+\alpha_{m+1} &= T_m\alpha_m + R\eta_m, \quad \eta_m \sim N(0, Q) \label{eq:ss2}
 \end{align}
 where $\alpha_1 \sim N(a_1, P_1)$ and 
-there is independence amongst $\alpha_1$, $\epsilon_t$ and $\eta_t$
-\citep{helske2017kfas, durbin2012time}. For notational
-compactness, we let $\alpha = \left ( \alpha_1^\top, \dots, \alpha_n^\top \right )$
-and $y = \left ( y_1^\top, \dots, y_n^\top \right )$.
+$\epsilon_m$ and $\eta_m$ are mutually and serially independent.
 
 % Kalman filtering gives the following one-step-ahead predictions of the states
 % \begin{align*}
@@ -402,90 +398,57 @@ and $y = \left ( y_1^\top, \dots, y_n^\top \right )$.
 % parameter tuning is not necessary). Another major benefit is that it can handle 
 % unevenly spaced time series (refer to \citealp{durbin2012time} for further details).
 
-To express the antibody prevalence model in state space form, we define the
-components in \Cref{eq:ss1,eq:ss2} as follows (omitting the location subscript
-for simplicity):
+To express the antibody prevalence model in state space form, we relate the
+model in \Crefrange{eq:sero-measurements}{eq:report-ratio} to the components in
+\Cref{eq:ss1,eq:ss2} as follows (omitting the location subscript for
+simplicity):
 
 % Probably move the below specification to the appendix
 
-\begin{alignat*}{3}
-R &= \begin{bmatrix}
-1 & 0  \\ 
-0 & 1 \\ 
-0 & 0 \\ 
-0 & 0 
-\end{bmatrix} &\qquad 
-Z &= \begin{bmatrix}
-1 & 0 & 0 & 0 \\ 
-0 & 1 & 0 & 0 
-\end{bmatrix} &\qquad 
-H_m &= \begin{bmatrix} %%
-w^1_{m}\sigma^2_r & 0 \\ 
-0 & w^2_{m}\sigma^2_r
-\end{bmatrix} \\
-\alpha_m &= \begin{bmatrix}
-s_{m}\\
-a_m\\ 
-a_{m-1}\\ 
-a_{m-2}
-\end{bmatrix} & 
-T_m &= \begin{bmatrix}
-(1 - \gamma) & \widehat{u}^\Sigma_{m} (1 - z_m) & 0 & 0\\ 
- 0 & 3 & -3 & 1 \\ 
- 0 & 1 & 0 & 0\\ 
- 0 & 0 & 1 & 0
-\end{bmatrix}  & 
-Q &= \begin{bmatrix} 
-\sigma^2_\epsilon & 0  \\ 
-0 & \sigma^2_\eta
-\end{bmatrix} \\
-a_1 &= \begin{bmatrix}
-\tilde{s}_{1}\\ 
-\tilde{a}_1\\ 
-\tilde{a}_1 \\
-\tilde{a}_1
-\end{bmatrix} & 
-P_{1} &= \begin{bmatrix}
-\sigma^2_{\tilde{s}_{1}} & 0 & 0 & 0 \\ 
-0 & \sigma^2_{\tilde{a}_1} & 0 & 0\\ 
-0 & 0 & \sigma^2_{\tilde{a}_1} & 0 \\ 
-0 & 0 & 0 & \sigma^2_{\tilde{a}_1}
-\end{bmatrix} 
-\end{alignat*}
-where $\sigma^2_r$ is the variance of observations, $\sigma^2_\epsilon$ is the variance
-of the seroprevalence estimates, and $\sigma^2_\eta$ is the trend variance. Since
-we expect the inverse ratios to be more variable than the seroprevalence
-estimates, we enforce that the estimate of $\sigma^2_\eta$ is a multiple of
-$\sigma^2_\epsilon$. Letting the subscripts $b$ and $c$ denote the blood donor and
-commercial datasets, $w^1_{m}$ and $w^2_{m}$ are the time-varying inverse
-variance weights computed from the commercial and blood donor datasets,
-respectively. 
+\begin{align*}
+    Z &= \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \end{bmatrix} &
+    H_m &= \begin{bmatrix}w^1_{m} & 0 \\ 0 & w^2_{m} \end{bmatrix} \\
+    \alpha_m &= \begin{bmatrix}s_{m} \\ a_m \\ a_{m-1}\\ a_{m-2} \end{bmatrix} & 
+    T_m &= \begin{bmatrix}(1 - \gamma) & \widehat{u}^\Sigma_{m} (1 - z_m) & 0 & 0\\ 
+        0 & 3 & -3 & 1 \\ 0 & 1 & 0 & 0\\ 0 & 0 & 1 & 0 \end{bmatrix}  & 
+    R &= \begin{bmatrix}1 & 0  \\ 0 & 1 \\ 0 & 0 \\ 0 & 0 \end{bmatrix}\\
+    Q &= \begin{bmatrix} \sigma^2_\epsilon & 0  \\ 0 & \sigma^2_\eta \end{bmatrix} &
+    a_1 &= \begin{bmatrix} \tilde{s}_{1}\\ \tilde{a}_1\\ \tilde{a}_1 \\ \tilde{a}_1 \end{bmatrix} & 
+    P_{1} &= \begin{bmatrix} \sigma^2_{\tilde{s}_{1}} & 0 & 0 & 0 \\ 
+    0 & \sigma^2_{\tilde{a}_1} & 0 & 0\\ 0 & 0 & \sigma^2_{\tilde{a}_1} & 0 \\ 
+    0 & 0 & 0 & \sigma^2_{\tilde{a}_1} \end{bmatrix} 
+\end{align*}
+where $\sigma^2_r$ is the variance of observations, $\sigma^2_\epsilon$ is the
+variance of the seroprevalence estimates, $\sigma^2_\eta$ is the trend variance,
+and $\widehat{u}^\Sigma_{m}$ denotes the new deconvolved cases between $m$ and
+$m+1$. Because the inverse reporting ratios should be more variable than the
+seroprevalence estimates, we enforce that the estimate of $\sigma^2_\eta$ is a
+multiple of $\sigma^2_\epsilon$. 
 
-For each source, we compute the weights for the observed seroprevalence
-estimates using the formula for the standard error of a proportion. These
-weights are then re-scaled so they sum to the number of observed seroprevalence
-measurements for the source. Finally, the ratio of the average observed weights
-from the two sources is used to scale all weights relative the commercial
-source. This helps to ensure that the source with the greater sample size
-contributes more weight in the model on average.
+Finally, $w^1_{m}$ and $w^2_{m}$ are the time-varying inverse variance weights
+computed from the commercial and blood donor datasets, respectively. For each
+source, we compute the weights for the observed seroprevalence estimates using
+the formula for the standard error of a proportion. These weights are then
+re-scaled to sum to the number of observed seroprevalence measurements for the
+source. Finally, the ratio of the average observed weights from the two sources
+is used to scale all weights relative the commercial source. This transformation
+is done purely for computational purposes to make estimation of the unknown
+parameters easier.
 
 The prior distribution for $\alpha_1$ is estimated using both data-driven
-constraints and externally sourced information. To obtain the initial value of
-the seroprevalence component, $\tilde{s}_{1}$, we extract the first observed
-seroprevalence measurement from each source, round down to two decimal places,
-and take the average to be $\tilde{s}_{1}$. The corresponding initial variance
-estimate, $\sigma^2_{\tilde{s}_{1}}$, is taken to be the mean of the standard
-errors of the two seroprevalence estimates. For the initial values of the trend
-components, we use the inverse of the ascertainment ratio estimate as of June 1,
-2020 for each state from Table 1 in \citep{unwin2020state} and denote this by
-$\tilde{a}_1$. The initial variance estimate of $\sigma^2_{\tilde{a}_1}$ is
-based on that implied by the given inverse ascertainment ratio distribution.
-% standard deviation implied by the interval in that table.  
-% Update this last sentence if end up going with the standard deviation implied by the interval in Table 1
-% instead of the variance implied by u_m ~ Beta(12,5) from the unwin2020state paper
+constraints and externally sourced information. The initial value of the
+seroprevalence component, $\tilde{s}_{1}$ is the average of the initial
+seroprevalence measurements from each source rounded down to two decimal places,
+The corresponding initial variance estimate, $\sigma^2_{\tilde{s}_{1}}$, is
+taken to be the mean of the standard errors of the two seroprevalence estimates.
+For the initial values of the trend components, we use the inverse of the
+ascertainment ratio estimate for each as of June 1, 2020 from Table 1 in
+\citep{unwin2020state}: the mean for $\tilde{a}_1$ and half the width of the
+confidence interval converted to the inverse for
+$\sigma^2_{\tilde{a}_1}$.
 
 The initial $\sigma^2_r$ is taken to be the average of the estimated variances
-from the observed seroprevalence measurements regressed linearly on the time.
+from the observed seroprevalence measurements regressed linearly on time.
 The initial value of the multiplier is set to be $100$ for all states. The
 $\sigma^2_\epsilon$ and $\gamma$ values are estimated separately for each state,
 then fixed to their averages on the log-scale.
@@ -495,53 +458,49 @@ Kalman filter to obtain the smoothed point estimates and variances of the weekly
 inverse reporting ratios. We use forward and backward extrapolation to extend
 these estimates outside of the observed seroprevalence range
 \citep{durbin2012time}, followed by linear interpolation to produce daily
-values. After we obtain one vector of inverse reporting ratios for each state in
-this way, we take each inverse reporting ratio and multiply it by the
-corresponding deconvolved case estimate (that has undergone linear interpolation
-to correct instances of $0$ reported infections) to obtain an estimate of new
-infections. We are able to convert these numbers of infections to infections per
-$100,000$ population by re-scaling.
-
-The $50$, $80$, and $95\%$ confidence intervals are constructed by taking a
-Bayesian view of the antibody prevalence model (refer to \ref{supp:bayeswaning} 
-for the Bayesian specification of the model). 
-That is, for each time, $t$, we obtain an estimate of the
-posterior variance of $a_t$, apply the deconvolved case estimate as a constant
-multiplier, and then use resulting variance to build a normal confidence
-interval about the infection estimate. We additionally enforce that the lower
-bound must be at least the deconvolved case estimate for the time under consideration.
-
-
-\subsection{Bayesian specification of the antibody prevalence
-model}\label{supp:bayeswaning} 
-In brief, the antibody prevalence model where we let
-$\beta = \left \{  \gamma, a_1,\dots, a_t \right \}$ and $X$ be the design
-matrix, corresponds to a Bayesian model with prior 
-\begin{align*}
-    \beta \sim N \left( 0,  \frac{\sigma^2 }{ \lambda} \left( A^TD^TDA 
-    \right)^{-1}  \right)
-\end{align*} and likelihood 
-\begin{align*}
-    s|X,\beta \sim N \left( X\beta, \sigma^2W^{-1} \right),
-\end{align*} where $A$ is indicator matrix save for the first column of $0$s 
-(corresponding to $\gamma$), $D$ represents the discrete derivative matrix of 
-order $3$, and $W$ is the inverse variance weights matrix. Then, the posterior 
-on $a_t$ is normally distributed with mean 
-\begin{align*}
-    \left ( X^TWX + \lambda A^TD^TDA \right )^{-1}X^TWs
-\end{align*} 
-and variance 
-\begin{align*}
-    \sigma^2 (X^TWX + \lambda A^TD^TDA)^{-1}.
-\end{align*}
-
-
-\subsection{Scaling by population}
-
-Annual estimates of the resident state
-populations as of July 1 of 2020 and 2021 are taken from the Dec.
+values. We then multiply these by the
+corresponding deconvolved case estimates before converting to per-capita values.
+Annual estimates of the state
+populations as of July 1 of 2020 are taken from the Dec.\
 2022 press release from the \US Census Bureau \citep{uscensus2022annual}.
-Unless otherwise specified, we use the July 1, 2020 estimates.
+
+
+% The $50$, $80$, and $95\%$ confidence intervals are constructed by taking a
+% Bayesian view of the antibody prevalence model (refer to \ref{supp:bayeswaning} 
+% for the Bayesian specification of the model). 
+% That is, for each time, $t$, we obtain an estimate of the
+% posterior variance of $a_t$, apply the deconvolved case estimate as a constant
+% multiplier, and then use resulting variance to build a normal confidence
+% interval about the infection estimate. We additionally enforce that the lower
+% bound must be at least the deconvolved case estimate for the time under consideration.
+
+
+% \subsection{Bayesian specification of the antibody prevalence
+% model}\label{supp:bayeswaning} 
+% In brief, the antibody prevalence model where we let
+% $\beta = \left \{  \gamma, a_1,\dots, a_t \right \}$ and $X$ be the design
+% matrix, corresponds to a Bayesian model with prior 
+% \begin{align*}
+%     \beta \sim N \left( 0,  \frac{\sigma^2 }{ \lambda} \left( A^TD^TDA 
+%     \right)^{-1}  \right)
+% \end{align*} and likelihood 
+% \begin{align*}
+%     s|X,\beta \sim N \left( X\beta, \sigma^2W^{-1} \right),
+% \end{align*} where $A$ is indicator matrix save for the first column of $0$s 
+% (corresponding to $\gamma$), $D$ represents the discrete derivative matrix of 
+% order $3$, and $W$ is the inverse variance weights matrix. Then, the posterior 
+% on $a_t$ is normally distributed with mean 
+% \begin{align*}
+%     \left ( X^TWX + \lambda A^TD^TDA \right )^{-1}X^TWs
+% \end{align*} 
+% and variance 
+% \begin{align*}
+%     \sigma^2 (X^TWX + \lambda A^TD^TDA)^{-1}.
+% \end{align*}
+
+
+% \subsection{Scaling by population}
+
 
 
 % \subsection{Ablation analysis of infection-hospitalization correlations}
