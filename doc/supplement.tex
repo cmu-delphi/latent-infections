@@ -115,30 +115,26 @@ of alternative line list sources.
 \subsection{Additional details on delay distribution calculations}
 \label{supp:delay-justifications}
 
-In the line list, we observe unusual spikes in reporting in 2020
-in comparison to majority of 2021. When stratified by report date, a few states are seen to
-contribute unusually large case counts on isolated dates very late in the
-reporting process (well beyond 100 days following specimen collection). These
-large accumulations of cases over time are likely due breakdowns of the
-reporting pipeline. Such anomalies are not likely to be reliable indicators of
-the delay from positive specimen to case report. Therefore, we prune these
-reporting backlogs systematically. The heuristic is to find any large batches of
-cases that were all simultaneously reported on the same date with a lengthy
-delay (as would happen if a state "found" a tranche of previously unreported
-positive tests).
+In the line list, we observe unusual spikes in reporting in 2020 in comparison
+to majority of 2021. When stratified by report date, a few states contribute
+unusually large case counts on isolated dates very late in the reporting process
+(well beyond 100 days following specimen collection). These large accumulations
+of cases over time are likely due breakdowns of the reporting pipeline. Such
+anomalies are not likely to be reliable indicators of the delay from positive
+specimen to case report. Therefore, we prune these reporting backlogs
+systematically. The heuristic is to find large batches of cases that were all
+simultaneously reported on the same date with a lengthy delay (as would happen
+if a state "found" a tranche of previously unreported positive tests).
 
-For this, we operate only on part of the line list intended for the positive specimen to
-case report delay estimation (as this is where we use case reports from the line list).
- 
-Then, we divide this line list into three roughly evenly-spaced and 
-non-overlapping intervals over 2020 and early 2021
-(the interval end points on July 16, 2020, October 16, 2020, and January 15, 2021). 
-For each interval, we 
-separate the cases with reporting delays that are at least 50 days long into 
-equally-sized bins of 50 days.
-
-Then, for each interval and bin, we perform the following pruning procedure:
-\begin{enumerate}
+For this, we operate only on part of the line list intended for the positive
+specimen to case report delay estimation (as this is where we use case reports
+from the line list). Then, we divide this line list into three roughly
+evenly-spaced and non-overlapping intervals over 2020 and early 2021 (the
+interval end points on July 16, 2020, October 16, 2020, and January 15, 2021).
+For each interval, we separate the cases with reporting delays that are at least
+50 days long into equally-sized bins of 50 days. Then, for each interval and
+bin, we perform the following pruning procedure:
+\begin{enumerate}[noitemsep]
 \item Obtain the total count of these delays for each state. 
 \item Check whether each such count on the log scale is at
 least the median (for the bin) plus 1.5 times the interquartile range. Retain
@@ -301,7 +297,7 @@ convolve the variant-specific incubation periods from \Cref{sec:incubation},
 denoted by $\{i_{j}(k) : 0 < k \leq 21\}$ with the location-time-specific
 symptom-to-positive-test distributions from \Cref{supp:delay-sops}, denoted by
 $\{q_{\ell,t}(k) : -3\leq k \leq 21\}$. The convolution of these yields a
-distribution $\mathbf{q}_{\ell,t}*\mathbf{i}_j = \{\tau_{j\ell,t}(k): -3 \leq k
+distribution $\{\tau_{j\ell,t}(k): -3 \leq k
 \leq 42\}$. \Cref{fig:delay-plots-samp} shows the delays used for a sample of 6
 states: symptom to positive specimen (left column) and positive specimen to report
 (right column). The convolution distribution $\tau_{j\ell,t}$ requires
