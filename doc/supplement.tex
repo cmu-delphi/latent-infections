@@ -115,8 +115,8 @@ of alternative line list sources.
 \subsection{Additional details on delay distribution calculations}
 \label{supp:delay-justifications}
 
-In the line list, we observe unusual jarring spikes in reporting in 2020
-compared to 2021. When stratified by report date, a few states are seen to
+In the line list, we observe unusual spikes in reporting in 2020
+in comparison to majority of 2021. When stratified by report date, a few states are seen to
 contribute unusually large case counts on isolated dates very late in the
 reporting process (well beyond 100 days following specimen collection). These
 large accumulations of cases over time are likely due breakdowns of the
@@ -127,22 +127,28 @@ cases that were all simultaneously reported on the same date with a lengthy
 delay (as would happen if a state "found" a tranche of previously unreported
 positive tests).
 
-\attn{@Rachel, I don't understand the description that follows. Can you take a stab at simplifying/clarifying? Maybe enumerate the steps or use math.}
-First, we obtain the part of the line list intended for the positive specimen to
-case report delay estimation, where both such dates are present and where zero
-and negative delay cases have been omitted. Then, for each of the three dates of
-June 1, September 1, and December 1, 2020, we bin the reporting delays occurring
-from 50 days up to the maximum observed delay. For each bin, we obtain the total
-delay count for each state. We check whether each count on the log scale is at
-least the median (for the bin) plus 1.5 times the interquartile range and retain
-only those that exceed this criterion as potential candidates for pruning. Next,
-we compute the counts by report date for each candidate state. If there is a
-report date with a count greater than or equal to the pre-specified threshold,
-then we remove those cases from the line list. Based on inspection and
-intuition, we set the threshold to 2000 for the first two bins, and then lower
-it to 500 for the remaining bins. A similar trial and error approach is used to
-set the bin size (to 50 days).
+For this, we operate only on part of the line list intended for the positive specimen to
+case report delay estimation (as this is where we use case reports from the line list).
+ 
+Then, we divide this line list into three roughly evenly-spaced and 
+non-overlapping intervals over 2020 and early 2021
+(the interval end points on July 16, 2020, October 16, 2020, and January 15, 2021). 
+For each interval, we 
+separate the cases with reporting delays that are at least 50 days long into 
+equally-sized bins of 50 days.
 
+Then, for each interval and bin, we perform the following pruning procedure:
+\begin{enumerate}
+\item Obtain the total count of these delays for each state. 
+\item Check whether each such count on the log scale is at
+least the median (for the bin) plus 1.5 times the interquartile range. Retain
+only those that exceed this criterion as candidates for pruning. 
+\item For the candidate states, compute the case counts by report date. 
+\item If there is a report date for a candidate state with a case count greater 
+than or equal to a pre-specified threshold, then remove/prune those cases from the line list. 
+We set the threshold to be 2000 cases for the first two bins, and then lower
+it to 500 for the remaining bins based on inspection.
+\end{enumerate}
 
 Finally, in New Hampshire, for a small handful of report dates, all cases
 reported by JHU appear in the CDC line list, and all are recorded as having
