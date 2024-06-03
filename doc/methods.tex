@@ -25,7 +25,8 @@ not the same as a simple shift, rather it involves the distribution of delays
 (specific to each state and date), as estimated from de-identified patient-level
 line list data on COVID-19 cases from the CDC \citep{cdc2020caserestr}. Simply
 shifting cases back in time would fail to reflect the fact that some cases take
-much longer to be reported than others (see \Cref{supp:convol} for further details).
+much longer to be reported than others 
+(see Supplementary Methods \Cref{supp:convol} for further details).
 
 We will start by describing how the model for deconvolution infers the likely
 dates of positive specimen collection from reported cases before describing how
@@ -74,7 +75,7 @@ cdc2020caserestr}. The line list contains three key dates of interest for many
 cases that will eventually appear in case reports: symptom onset,
 positive specimen collection, and report to the CDC. Handling missingness and
 imputation in these dates requires careful attention, and so additional details and
-justifications are provided in the Supplement, \Cref{supp:linelist-details}.
+justifications are provided in Supplementary Methods \Cref{supp:linelist-details}.
 Define $z_{\ell,t}$ to be a case report occurring at time $t$ in
 location $\ell$, and let $\pi_{\ell,t}(k)$ be the probability that
 $z_{\ell,t}$ has a positive specimen collected $k$ days earlier. We assume that
@@ -104,7 +105,7 @@ best-fitting gamma distribution by solving the moment equations $m_{\ell,t} =
 $\theta_{\ell,t}$. Finally, we discretize the resulting gamma density to the
 original support to produce an estimate $\widehat{\pi}_{\ell,t}(k)$ of the delay
 distribution $\pi_{\ell,t}(k)$. Additional minor details and justification for
-the delay distribution calculations are deferred to
+the delay distribution calculations are deferred to Supplementary Methods
 \Cref{supp:delay-justifications}.
  
 \subsection{From positive specimen collection to infection onset}
@@ -125,7 +126,7 @@ circulating in each state, we use GISAID genomic sequencing data from
 CoVariants.org \citep{hodcroft2021covariants, elbe2017data}, and estimate a
 multinomial logistic regression model. This procedure is now standard
 \citep{obermeyer2022analysis, annavajhala2021emergence, figgins2021sars}, so we
-defer details to the Supplement, \Cref{sec:variant-proportions}. The resulting
+defer details to Supplementary Materials \Cref{sec:variant-proportions}. The resulting
 estimated probability of variant $j$ is given by $\hat{v}_{j\ell,t}$.
 
 To estimate variant-specific delays from infection to positive specimen
@@ -133,7 +134,7 @@ collection, we convolve the location-time-specific symptom-to-test distributions
 (that are estimated from the CDC line list in the same way as in \Cref{sec:step1}), 
 with variant-specific incubation periods.
 The convolution of these yields a distribution $\tau_{j\ell,t}(k)$. 
-Details on the convolution and its inputs are deferred to the Supplement, 
+Details on the convolution and its inputs are deferred to Supplementary Methods
 \Cref{supp:delay-sops,sec:incubation,supp:details-conv}. 
 
 Analogous to \Cref{eq:cases-model,eq:cases-deconvolved}, for each variant $j$,
@@ -178,7 +179,7 @@ We use two major contemporaneous surveys to estimate the proportion of the
 population with evidence of previous infection in each state over time: the
 2020--2021 Blood Donor Seroprevalence Survey and the Nationwide Commercial Lab
 Seroprevalence Survey \citep{cdc2021blood, cdc2021comm}. See Supplementary
-Methods, \Cref{supp:sero-details} for additional details. Each of these provides
+Methods \Cref{supp:sero-details} for additional details. Each of these provides
 seroprevalence estimates along with confidence intervals. In order to account
 for different surveys occurring on different dates with roughly weekly
 availability and measurement error, we treat actual seroprevalence $s_{\ell,m}$
@@ -229,7 +230,7 @@ measurements, extrapolation of the estimated latent quantities before and after
 the period of observed seroprevalence measurements, and maximum likelihood
 estimates of the latent variables and all unknown parameters. Details of
 this methodology and the computation of the associated uncertainty measurements
-are deferred to the Supplementary Methods, \Cref{supp:ssapm}.
+are deferred to Supplementary Methods \Cref{supp:ssapm}.
 
 
 
