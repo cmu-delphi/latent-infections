@@ -118,33 +118,48 @@ of alternative line list sources.
 In the line list, we observe unusual spikes in reporting in 2020 in comparison
 to majority of 2021. When stratified by report date, a few states contribute
 unusually large case counts on isolated dates very late in the reporting process
-(well beyond 100 days following specimen collection). These large accumulations
-of cases over time are likely due breakdowns of the reporting pipeline. Such
-anomalies are not likely to be reliable indicators of the delay from positive
-specimen to case report. Therefore, we prune these reporting backlogs
-systematically. The heuristic is to find large batches of cases that were all
-simultaneously reported on the same date with a lengthy delay (as would happen
-if a state "found" a tranche of previously unreported positive tests).
+(often more than 100 days following specimen collection). These large
+accumulations of cases over time are likely due breakdowns of the reporting
+pipeline. Such anomalies are not likely to be reliable indicators of the delay
+from positive specimen to case report. Therefore, we prune these reporting
+backlogs systematically. The heuristic is to find large batches of cases that
+were all simultaneously reported on the same date with a lengthy delay (as would
+happen if a state ``found'' a tranche of previously unreported positive tests).
+Let $x_{\ell t}(d)$ be the number of cases in state $\ell$ with positive
+specimen collection date $t$ and delay $d$. For each $j=1,2,\ldots$, 
+define 
+$
+z_{\ell bj} = \sum_{d = 50j}^{50(j+1)}\sum_t x_{\ell
+t}(d).$ Then, locate the collection of
+potentially problematic combinations 
+$$
+\cH = \{(\ell, b, j) : \log(z_{\ell bj}) >
+\textrm{median}_{\ell}(\log(z_{\ell bj})) + 1.5
+\times\textrm{IQR}_\ell(\log(z_{\ell bj}))\}.
+$$
+Remove any case reports from the line list in $\cH$ where the total number of
+cases with the same report date exceeds 2000 if $j=1$ or 500 otherwise.
 
-For this, we operate only on part of the line list intended for the positive
-specimen to case report delay estimation (as this is where we use case reports
-from the line list). Then, we divide this line list into three roughly
-evenly-spaced and non-overlapping intervals over 2020 and early 2021 (the
-interval end points on July 16, 2020, October 16, 2020, and January 15, 2021).
-For each interval, we separate the cases with reporting delays that are at least
-50 days long into equally-sized bins of 50 days. Then, for each interval and
-bin, we perform the following pruning procedure:
-\begin{enumerate}[noitemsep]
-\item Obtain the total count of these delays for each state. 
-\item Check whether each such count on the log scale is at
-least the median (for the bin) plus 1.5 times the interquartile range. Retain
-only those that exceed this criterion as candidates for pruning. 
-\item For the candidate states, compute the case counts by report date. 
-\item If there is a report date for a candidate state with a case count greater 
-than or equal to a pre-specified threshold, then remove/prune those cases from the line list. 
-We set the threshold to be 2000 cases for the first two bins, and then lower
-it to 500 for the remaining bins based on inspection.
-\end{enumerate}
+
+% For this, we operate only on part of the line list intended for the positive
+% specimen to case report delay estimation (as this is where we use case reports
+% from the line list). Then, we divide this line list into three roughly
+% evenly-spaced and non-overlapping intervals over 2020 and early 2021 (the
+% interval end points on July 16, 2020, October 16, 2020, and January 15, 2021).
+% For each interval, we separate the cases with reporting delays that are at least
+% 50 days long into equally-sized bins of 50 days. Then, for each interval and
+% bin, we perform the following pruning procedure:
+% \begin{enumerate}[noitemsep]
+% \item Obtain the total count of these delays for each state. 
+% \item Check whether each such count on the log scale is at
+% least the median (for the bin) plus 1.5 times the interquartile range. Retain
+% only those that exceed this criterion as candidates for pruning. 
+% \item For the candidate states, compute the case counts by report date. 
+% \item If there is a report date for a candidate state with a case count greater 
+% than or equal to a pre-specified threshold, then remove/prune those cases from the line list. 
+% We set the threshold to be 2000 cases for the first two bins, and then lower
+% it to 500 for the remaining bins based on inspection.
+% \end{enumerate}
 
 Finally, in New Hampshire, for a small handful of report dates, all cases
 reported by JHU appear in the CDC line list, and all are recorded as having
