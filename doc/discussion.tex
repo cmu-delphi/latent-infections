@@ -24,10 +24,16 @@ state-specific seroprevalence data allows the reporting ratio estimates to
 similarly vary over space and time, a departure from existing work
 \citep{unwin2020state, uga2020covid19}. Unlike previous approaches that use a
 single delay distribution to generate estimates for all states
-\citep{chitwood2022reconstructing, jahja2022real}, our work avoids this
+\citep{chitwood2022reconstructing, jahja2022real, miller2022statistical}, our work avoids this
 assumption of geographic invariance, an assumption that is far from realistic
-due to differences in reporting pipelines, pandemic response, and variants in
-circulation, among other issues. 
+due to differences in the reporting pipelines, pandemic response, and variants in
+circulation, among other things. Similarly, prior methodology relies on only one incubation
+period distribution \citep{miller2022statistical}, 
+whereas our method incorporates variant-specific incubation periods.
+This enhances our infection onset estimation by accounting for
+the differences across variants--specifically, 
+that newer variants tend to have shorter incubation periods
+\citep{tanaka2022shorter, ogata2022shorter, wu2022incubation}.
 
 Another limitation of previous approaches to estimate infections is that they
 often fail to account for reinfections. While reinfections constitute a small
