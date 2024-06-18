@@ -29,10 +29,10 @@ library(cowplot)
 adj_df_list <- readRDS(here("data", "adj_df_list_F24.rds"))
 adj_df <- bind_rows(adj_df_list)
 pop <- read_rds(here("data", "pop_df.RDS")) |>
-  filter(geo_value == "NJ") |> 
+  filter(geo_value == "CA") |> 
   pull(population_2020) / 1e5
-state_decon_byvar_df <- read_rds(here("data", "NJ-state_decon_byvar_df.rds"))
-deconv_cases <- read_rds(here("data", "NJ-final-thetas-pr.rds"))
+state_decon_byvar_df <- read_rds(here("data", "state_decon_byvar_df.rds"))
+deconv_cases <- read_rds(here("data", "CA-final-thetas-pr.rds"))
 deconv_cases <- tibble(
   deconv_cases = deconv_cases, 
   time_value = seq(ymd("2020-03-01"), ymd("2023-03-01"), by = "1 day")
@@ -40,8 +40,8 @@ deconv_cases <- tibble(
 
 dat <- adj_df |>
   rename(time_value = date) |>
-  filter(geo_value == "NJ", time_value >= ymd("2020-09-01"), 
-         time_value <= ymd("2021-06-01")) |>
+  filter(geo_value == "CA", time_value >= ymd("2020-06-01"), 
+         time_value <= ymd("2021-03-01")) |>
   select(time_value, geo_value, adj_inf_rate, unadj_inf_rate, cases_rate_7d_av,
          ninetyfive_lowb_rate, ninetyfive_upb_rate, eighty_lowb_rate,
          eighty_upb_rate, fifty_lowb_rate, fifty_upb_rate) |>
@@ -50,7 +50,7 @@ dat <- adj_df |>
   left_join(
     state_decon_byvar_df |> 
       select(variant, time_value, geo_value, infect_rate) |>
-      filter(variant %in% c("Iota", "Other")),
+      filter(variant %in% c("Epsilon", "Other")),
     by = join_by(time_value, geo_value)
   ) |>
   pivot_wider(names_from = variant, values_from = infect_rate)
@@ -64,7 +64,7 @@ s1 <- dat |>
   geom_line(aes(y = deconv_cases / pop), color = "red3", linewidth = 1) +
   scale_x_date(expand = expansion()) + 
   scale_y_continuous(expand = expansion(), breaks = 1:5 * 25) +
-  coord_cartesian(xlim = ymd(c("2020-09-01","2021-05-01")), ylim = c(0, 125)) +
+  coord_cartesian(xlim = ymd(c("2020-06-01","2021-02-01")), ylim = c(0, 125)) +
   theme_minimal() + ggtitle("Step 1") +
   theme(
     legend.position = "none", 
@@ -87,10 +87,10 @@ s2 <- dat |>
   geom_line(aes(y = cases_rate_7d_av), color = "grey90", linewidth = 1) +
   geom_line(aes(y = deconv_cases / pop), color = "grey75", linewidth = 1) +
   geom_line(aes(y = Other), colour = "mediumseagreen", linewidth = 1) + 
-  geom_line(aes(y = Iota), colour = "mediumpurple", linewidth = 1) + 
+  geom_line(aes(y = Epsilon), colour = "mediumpurple", linewidth = 1) + 
   scale_x_date(expand = expansion()) + 
   scale_y_continuous(expand = expansion(), breaks = 1:5 * 25) +
-  coord_cartesian(xlim = ymd(c("2020-09-01","2021-05-01")), ylim = c(0, 125)) +
+  coord_cartesian(xlim = ymd(c("2020-06-01","2021-02-01")), ylim = c(0, 125)) +
   theme_minimal() + ggtitle("Step 2") +
   theme(
     legend.position = "none", 
@@ -113,11 +113,11 @@ s3 <- dat |>
   geom_line(aes(y = cases_rate_7d_av), color = "grey90", linewidth = 1) +
   geom_line(aes(y = deconv_cases / pop), color = "grey90", linewidth = 1) +
   geom_line(aes(y = Other), colour = "grey75", linewidth = 1) + 
-  geom_line(aes(y = Iota), colour = "grey75", linewidth = 1) + 
+  geom_line(aes(y = Epsilon), colour = "grey75", linewidth = 1) + 
   geom_line(aes(y = unadj_inf_rate), colour = "orange", linewidth = 1) +
   scale_x_date(expand = expansion()) + 
   scale_y_continuous(expand = expansion(), breaks = 1:5 * 25) +
-  coord_cartesian(xlim = ymd(c("2020-09-01","2021-05-01")), ylim = c(0, 125)) +
+  coord_cartesian(xlim = ymd(c("2020-06-01","2021-02-01")), ylim = c(0, 125)) +
   theme_minimal() + ggtitle("Step 3") +
   theme(
     legend.position = "none", 
@@ -143,7 +143,7 @@ s4 <- dat |>
   geom_line(aes(y = cases_rate_7d_av), color = "grey90", linewidth = 1) +
   geom_line(aes(y = deconv_cases / pop), color = "grey90", linewidth = 1) +
   geom_line(aes(y = Other), colour = "grey90", linewidth = 1) + 
-  geom_line(aes(y = Iota), colour = "grey90", linewidth = 1) + 
+  geom_line(aes(y = Epsilon), colour = "grey90", linewidth = 1) + 
   geom_line(aes(y = unadj_inf_rate), colour = "grey75", linewidth = 1) +
   geom_ribbon(aes(ymin = ninetyfive_lowb_rate, ymax = ninetyfive_upb_rate), 
               fill = "lightskyblue1") +
@@ -154,7 +154,7 @@ s4 <- dat |>
   geom_line(aes(y = adj_inf_rate), color = "midnightblue", linewidth = 1) +
   scale_x_date(expand = expansion()) + 
   scale_y_continuous(expand = expansion(), breaks = 1:15 * 25) +
-  coord_cartesian(xlim = ymd(c("2020-09-01","2021-05-01")), ylim = c(0, 375)) +
+  coord_cartesian(xlim = ymd(c("2020-06-01","2021-02-01")), ylim = c(0, 375)) +
   theme_minimal() + ggtitle("Step 4") +
   theme(
     legend.position = "none", 
@@ -170,4 +170,5 @@ ggdraw(s4) +
     "Scale aggregate curve by the\ninverse reporting ratio.",
     x = 0.05, y = 0.93, hjust = 0, vjust = 1, size = 16
   )
+
 ```
