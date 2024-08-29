@@ -4,19 +4,23 @@
 \def\TimesFont{} 
 \graphicspath{{gfx/}}
 
-\newcommand{\beginsupplement}{
-  \setcounter{table}{0}  
-  \renewcommand{\thetable}{S\arabic{table}} 
-  \renewcommand{\theHtable}{S\arabic{table}} 
-  \setcounter{figure}{0} 
-  \renewcommand{\thefigure}{S\arabic{figure}}
-    \renewcommand{\theHfigure}{S\arabic{figure}} 
-  \setcounter{section}{0} 
-  \renewcommand{\thesection}{S\arabic{section}}
-} 
-\font\supptitlefont=cmr12 at 16pt 
+% \newcommand{\beginsupplement}{
+%   \setcounter{table}{0}  
+%   \renewcommand{\thetable}{S\arabic{table}} 
+%   \renewcommand{\theHtable}{S\arabic{table}} 
+%   \setcounter{figure}{0} 
+%   \renewcommand{\thefigure}{S\arabic{figure}}
+%     \renewcommand{\theHfigure}{S\arabic{figure}} 
+%   \setcounter{section}{0} 
+%   \renewcommand{\thesection}{S\arabic{section}}
+% } 
+% \font\supptitlefont=cmr12 at 16pt 
 \newcommand{\attn }[1]{\textcolor{red}{ATTN: #1}}
 \renewcommand{\bibfont}{\doublespacing}
+
+\crefname{appendix}{supplement}{supplements}
+\Crefname{appendix}{Supplement}{Supplements}
+% \usepackage{autonum}
 
 \begin{document}
 \title{Retrospective estimation of latent COVID-19 infections before Omicron in the \US}
@@ -66,8 +70,19 @@
 \newpage 
 \begin{abstract}
 
-\noindent \textbf{Background:} The true timing and magnitude of COVID-19 infections are of interest to both the public and public health, but these are challenging to pin down due to the underdetection of asymptomatic cases and delays in reporting. Retrospective estimation of COVID-19 infections can improve our understanding of the size and scope of the pandemic and provide more meaningful quantification of disease patterns and burden. \newline
-\textbf{Methodology:} We retrospectively estimate daily incident infections for each \US state prior to Omicron. First, the reported COVID-19 cases are deconvolved to their date of infection onset using delay distributions estimated from the CDC line list. Then, a novel serology-driven model is used to scale the deconvolved cases to account for the unreported infections. The resulting daily infection estimates incorporate variant-specific incubation periods, time-varying reinfection estimates, and waning antigenic immunity. \newline
+\noindent \textbf{Background:} The timing and magnitude of COVID-19
+infections are of interest to the public and to public health, but these are
+challenging to discern due to the volume of undetected asymptomatic cases and
+reporting delays. Retrospective estimation of COVID-19 infections improves
+our understanding of the size and scope of the pandemic and provides more
+meaningful quantification of disease patterns and burden. \newline
+\textbf{Methodology:} We retrospectively estimate daily incident infections for
+each \US state prior to Omicron. Reported COVID-19 cases are
+deconvolved to their date of infection onset using delay distributions estimated
+from the CDC line list. Then, we develop a serology-driven model to scale the
+deconvolved cases and account for unreported infections. The resulting daily
+infection estimates incorporate variant-specific incubation periods,
+time-varying reinfection estimates, and waning antigenic immunity. \newline
 \textbf{Results:} The disease burden from infections emerges earlier and more extensively than is reflected by cases. Notably, infections were severely underreported during the Delta wave, with an estimated reporting rate as low as 6.3\% in New Jersey, 7.3\% in Maryland, and 8.4\% in Nevada. Moreover, in 44 states, fewer than 30\% of infections were eventually reported as cases during this period. \newline
 \textbf{Conclusions:} While reported cases offer a convenient proxy of disease burden, they fail to capture the full extent of infections. Our estimates of infections enhance the understanding of the progression of the pandemic in the \US prior to the onset of Omicron and its descendants. \newline
 
@@ -170,9 +185,16 @@ The authors declare no competing interests.
 
 \clearpage
 % Eventually make the supplement a separate document with its own title page 
-\beginsupplement
-\title{\supptitlefont\noindent Supplementary Information: Retrospective estimation of latent COVID-19 infections before Omicron in the \US}
-\maketitle
+\appendix
+\begin{center}
+\Huge{Supplement for:}
+\vspace*{11pt}
+
+
+\Large{Retrospective estimation of latent COVID-19 infections before Omicron in the \US}
+\end{center}
+
+\vspace{11pt}
 
 \input{doc/supplement.tex}
 
