@@ -1,8 +1,8 @@
 \section{Discussion}
 
 We retrospectively estimated daily incident infections for each \US state over
-the period June 1, 2020 to November 29, 2021. Our estimates suggest, confirming
-the intuition, that the pandemic impacted states earlier and at a larger scale
+the period June 1, 2020 to November 29, 2021. Our estimates support the
+intuition that the pandemic impacted states earlier and at a larger scale
 than is indicated by reported cases. They also emphasize that using cases as a
 proxy for infections can lead to erroneous conclusions about trends in infections.
 More importantly, we observe outbreaks in infections that are missed from
@@ -11,7 +11,7 @@ New Jersey, Connecticut, and Maryland.
 These sorts of omissions serve to emphasize that cases paint an incomplete
 picture of the pandemic, especially when outbreaks are largely driven by
 unreported infections. Furthermore, since case reports generally follow symptom
-and infection onsets, cases have a built-in temporal bias. This bias is in addition
+and infection onsets, cases have a built-in temporal bias. This is in addition
 to other biases from differences in reporting across states such as temporary
 bottlenecks due influxes of data or more persistent processing issues that
 increase the average time from case detection to report \citep{wash2020dash,
@@ -94,14 +94,14 @@ the population. Therefore, alternative data sources for estimating the
 case-ascertainment ratio must be considered. For example, wastewater
 surveillance data may be complementary to seroprevalence data, especially when
 testing is low, or serve as a substitute when it is unavailable
-\citep{mcmanus2023predicting}. In follow-up work, we extend our
-construction of daily incident infections for the states where sufficient data
-is available to track reinfections and to incorporate wastewater data.
+\citep{mcmanus2023predicting}. %In follow-up work, we extend our
+%construction of daily incident infections for the states where sufficient data
+% is available to track reinfections and to incorporate wastewater data.
 % However, viral detection is inconsistent across
 % locations due to temperature, per-capita water use, and in-sewer travel time
 % \citep{mcmanus2023predicting, hart2020computational, li2023correlation}.
-An alternative approach could use surveillance streams such as those from
-surveys, helplines, or medical records could potentially be integrated if they
+An alternative approach could integrate surveillance streams from
+surveys, helplines, or medical records if they
 offer a sufficiently strong signal of the disease intensity over time
 \citep{reinhart2021open,ecdc2020strategies}.
 
@@ -140,12 +140,11 @@ offer a sufficiently strong signal of the disease intensity over time
 % blauer2022reduce, ren2021asymptomatic}. Consequently, there is an increasing
 % uncertainty over time that is not captured by the model or the estimates.   
 
-
 Our work develops a deconvolution-based approach to inferring infection onset,
 combining available line list data with variant circulation estimates and
 literature derived incubation periods. The result removes the effects of the
 delay from reported cases, pushing them back to infection onset. This approach
-process is complemented with the development of a model that leverages the
+is complemented with the development of a model that leverages the
 measurements of waning detectable antibody levels and seroprevalence surveys.
 The resulting infection estimates as well as their geospatial and temporal
 trends are strongly grounded in both data and statistical models.

@@ -11,9 +11,11 @@ time using a probability distribution. In the 1D and discrete context, it is
 simply a rolling, weighted average of the past. So for an input sequence
 $\{x_t\}_{t=1}^n$ and time-constant weights $\{z(k)\}_{k=-\infty}^0$, the output
 sequence $\{y_t\}_{t=1}^n$ is given by
+\begin{linenomath*}
 \begin{equation}
     y_t = \sum_{s=0}^t z(s)x_{t-s}.
 \end{equation}
+\end{linenomath*}
 \Cref{fig:convol} presents a depiction of the convolution procedure for an
 example signal $x_t$ (smoothed cases, orange line). Essentially, to push the
 cases forward in time, we take the appropriately aligned (forward-in-time) delay
@@ -38,7 +40,7 @@ convolution.
 \subsection{Additional details on the date fields in the CDC line list}
 \label{supp:linelist-details}
 
-Because the CDC line list is updated monthly and cases may undergo revision, we
+Because the restricted CDC line list is updated monthly and cases may undergo revision, we
 use a single version of it that was released on June 6, 2022. We consider this
 version to be finalized in that it is well-beyond our study end date such that
 the dataset is unlikely to be subject to further significant revisions.
@@ -97,8 +99,8 @@ aware that they have been exposed to an infected individual.
 \label{fig:prop-cc}
 \end{figure}
 
-The CDC restricted line list contains 74,849,225 cases (rows) in total compared
-to 84,714,805 cases reported by the JHU CSSE; that is, line list is missing
+The restricted CDC line list contains 74,849,225 cases (rows) in total compared
+to 84,714,805 cases reported by the JHU CSSE; that is, the line list is missing
 about 10 million cases. The extent that this issue impacts each state is shown
 in \Cref{fig:prop-cc}, from which it is clear the fraction of missing cases is
 substantial for many states, often surpassing 50\% \citep{jahja2022real}. In
@@ -114,7 +116,7 @@ of alternative line list sources.
 
 \subsection{Additional details on delay distribution calculations}
 \label{supp:delay-justifications}
-
+\begin{linenomath*}
 In the line list, we observe unusual spikes in reporting in 2020 in comparison
 to majority of 2021. When stratified by report date, a few states contribute
 unusually large case counts on isolated dates very late in the reporting process
@@ -134,11 +136,14 @@ $
 z_{\ell bj} = \sum_{d = 50j}^{50(j+1)}\sum_t x_{\ell
 t}(d).$ Then, locate the collection of
 potentially problematic combinations 
+\end{linenomath*}
+\begin{linenomath*}
 $$
 \cH = \{(\ell, b, j) : \log(z_{\ell bj}) >
 \textrm{median}_{\ell}(\log(z_{\ell bj})) + 1.5
 \times\textrm{IQR}_\ell(\log(z_{\ell bj}))\}.
 $$
+\end{linenomath*}
 Remove any case reports from the line list in $\cH$ where the total number of
 cases with the same report date exceeds 2000 if $j=1$ or 500 otherwise.
 
@@ -191,9 +196,11 @@ We let $V_{j\ell,t}$ to be the probability of a new cases at time $t$ in locatio
 $\ell$ corresponding to variant $j$. Let $v_{j\ell,t}$ be the analogous observed
 proportion. Then nonparametric multinomial logistic regression models the log odds
 as the system
+\begin{linenomath*}
 \begin{equation}
 \log\left(\frac{V_{j\ell,t}}{1-V_{j\ell,t}}\right) = \beta_{j\ell,0} + \beta_{j\ell,1} t + \beta_{j\ell,2}t^2 + \beta_{j\ell,3}t^3,\;\; j=1,\ldots J.
 \end{equation}
+\end{linenomath*}
 This is estimated along with a constraint to ensure that the estimated proportions will sum to 1 across all
 $J$ variants. The specification of the log odds as a third-order polynomial in
 time produces smoothness of the estimated proportions.
@@ -382,7 +389,8 @@ measurements in a week from a seroprevalence source, then the average is used.
 
 \subsection{State space representation of the antibody prevalence
 model}\label{supp:ssapm} 
-
+\begin{linenomath*}
+\postdisplaypenalty=0
 The antibody prevalence model described in \Cref{sec:report-ratio} can be expressed
 as a linear Gaussian state space model \citep{durbin2012time}.
 For $m = 1, \dots, M$, let $\alpha_m$ be a vector of
@@ -392,6 +400,7 @@ observations at time $m$. The form of the (general) linear Gaussian state space 
 y_m &= Z\alpha_m + \sigma^2_r\epsilon_m, \qquad \epsilon_m \sim N(0, H_m) \label{eq:ss1}\\
 \alpha_{m+1} &= T_m\alpha_m + R\eta_m, \quad \eta_m \sim N(0, Q) \label{eq:ss2}
 \end{align}
+\end{linenomath*}
 where $\alpha_1 \sim N(a_1, P_1)$ and 
 $\epsilon_m$ and $\eta_m$ are mutually and serially independent.
 
@@ -421,7 +430,7 @@ To express the antibody prevalence model in state space form, we relate the
 model in \Crefrange{eq:sero-measurements}{eq:report-ratio} to the components in
 \Cref{eq:ss1,eq:ss2} as follows (omitting the location subscript for
 simplicity):
-
+\begin{linenomath*}
 \begin{align*}
     Z &= \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \end{bmatrix} &
     H_m &= \begin{bmatrix}w^1_{m} & 0 \\ 0 & w^2_{m} \end{bmatrix} \\
@@ -435,6 +444,7 @@ simplicity):
     0 & \sigma^2_{\tilde{a}_1} & 0 & 0\\ 0 & 0 & \sigma^2_{\tilde{a}_1} & 0 \\ 
     0 & 0 & 0 & \sigma^2_{\tilde{a}_1} \end{bmatrix} 
 \end{align*}
+\end{linenomath*}
 where $\sigma^2_r$ is the variance of observations, $\sigma^2_\epsilon$ is the
 variance of the seroprevalence estimates, $\sigma^2_\eta$ is the trend variance,
 and $\widehat{u}^\Sigma_{m}$ denotes the new deconvolved cases between $m$ and
@@ -455,14 +465,12 @@ parameters easier.
 The prior distribution for $\alpha_1$ is estimated using both data-driven
 constraints and externally sourced information. The initial value of the
 seroprevalence component, $\tilde{s}_{1}$ is the average of the initial
-seroprevalence measurements from each source rounded down to two decimal places,
+seroprevalence measurements from each source rounded down to two decimal places.
 The corresponding initial variance estimate, $\sigma^2_{\tilde{s}_{1}}$, is
 taken to be the mean of the standard errors of the two seroprevalence estimates.
-For the initial values of the trend components, we use the inverse of the
-ascertainment ratio estimate for each as of June 1, 2020 from Table 1 in
-\citep{unwin2020state}: the mean for $\tilde{a}_1$ and half the width of the
-confidence interval converted to the inverse for
-$\sigma^2_{\tilde{a}_1}$.
+For the initial value of the trend component, we use the inverse of the
+ascertainment ratio estimate for each state as of June 1, 2020 from Table 1 in  
+\citep{unwin2020state}.
 
 The initial $\sigma^2_r$ is taken to be the average of the estimated variances
 from the observed seroprevalence measurements regressed linearly on time.
@@ -520,46 +528,45 @@ populations as of July 1 of 2020 are taken from the Dec.\
 
 
 
-% \subsection{Ablation analysis of infection-hospitalization correlations}
+\subsection{Ablation analysis of infection-hospitalization correlations}
+\label{supp:ablation}
+In this ablation study, the lagged correlation is re-computed by
+using the following infection estimates: 1. those from
+the deconvolution procedure under the assumption that the infection onset is the
+same as the positive specimen date (i.e., excluding the positive specimen to
+infection onset data and deconvolution); 2. those from the deconvolution
+procedure under the assumption that the infection onset is the same as the
+symptom onset date (excluding the incubation period data); 3. those from the
+deconvolution procedure when utilizing all incubation period and delay data (the
+deconvolved case estimates); 4. those from applying the antibody prevalence
+model to produce estimates for both the reported and the unreported cases (the
+infection estimates).
 
-% To better understand the contribution of the intermediate steps to the lagged
-% correlation analysis, we carry out a brief ablation study in which we calculate
-% the lagged correlation using the following infection estimates: 1. those from
-% the deconvolution procedure under the assumption that the infection onset is the
-% same as the positive specimen date (i.e., excluding the positive specimen to
-% infection onset data and deconvolution); 2. those from the deconvolution
-% procedure under the assumption that the infection onset is the same as the
-% symptom onset date (excluding the incubation period data); 3. those from the
-% deconvolution procedure when utilizing all incubation period and delay data (the
-% deconvolved case estimates); 4. those from applying the antibody prevalence
-% model to produce estimates for both the reported and the unreported cases (the
-% infection estimates).
+The results of this study are shown in \Cref{fig:abl-lag-cor}. From
+this, we can see that the deconvolved case and infection estimates from the
+intermediate steps are all leading indicators of hospitalizations. However, the
+degree that each such set of estimates lead hospitalizations depend on its
+location in the sequence of deconvolution steps and how close the estimates are to infection
+onset. For example, the deconvolved cases by positive specimen date tend to
+precede hospitalizations by about $11$ days, while those for the subsequent step
+indicate that the deconvolved cases by symptom onset tend to precede
+hospitalizations by a longer time of $13$ days. Finally, after adding the
+variant-specific incubation period data into the deconvolution and obtaining the
+deconvolved case estimates, we can observe that the reported infections precede
+hospitalizations by about $19$ days. 
 
-% The results of this study are shown in \Cref{fig:abl-lag-cor}. From
-% this, we can see that the deconvolved case and infection estimates from the
-% intermediate steps are all leading indicators of hospitalizations. However, the
-% degree that each such set of estimates lead hospitalizations depend on its
-% location in the sequence of deconvolution steps and how close the estimates are to infection
-% onset. For example, the deconvolved cases by positive specimen date tend to
-% precede hospitalizations by about $11$ days, while those for the subsequent step
-% indicate that the deconvolved cases by symptom onset tend to precede
-% hospitalizations by a longer time of $13$ days. Finally, after adding the
-% variant-specific incubation period data into the deconvolution and obtaining the
-% deconvolved case estimates, we can observe that the reported infections precede
-% hospitalizations by about $19$ days. 
-
-% \begin{figure}[H]
-% \centering
-%     \includegraphics[width=.78\textwidth]{adj_unadj_pi_no_inc_hosp_lag_corr_F24.pdf} 
-%     \caption{Lagged Spearman's correlation between the infection and
-%     hospitalization rates per 100,000 averaged for each lag across \US states
-%     and days over June 1, 2020 to November 29, 2021, and taken over a rolling
-%     window of 61 days. The infection rates are based on the counts for the
-%     deconvolved case and infection estimates as well as the reported infections
-%     by symptom onset and when the report is symptom onset. Note that each such
-%     set of infection counts is subject to a center-aligned 7-day averaging to
-%     remove spurious day of the week effects. The dashed lines indicate the lags
-%     for which the highest average correlation is attained.}
-%     \label{fig:abl-lag-cor}
-% \end{figure}
+\begin{figure}[H]
+\centering
+     \includegraphics[width=.78\textwidth]{adj_unadj_pi_no_inc_hosp_lag_corr_F24.pdf} 
+     \caption{Lagged Spearman's correlation between the infection and
+     hospitalization rates per 100,000 averaged for each lag across \US states
+     and days over June 1, 2020 to November 29, 2021, and taken over a rolling
+     window of 61 days. The infection rates are based on the counts for the
+     deconvolved case and infection estimates as well as the reported infections
+     by symptom onset and when the report is symptom onset. Note that each such
+     set of infection counts is subject to a center-aligned 7-day averaging to
+     remove spurious day of the week effects. The dashed lines indicate the lags
+     for which the highest average correlation is attained.}
+     \label{fig:abl-lag-cor}
+ \end{figure}
  

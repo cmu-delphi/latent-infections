@@ -64,7 +64,7 @@ knitr::include_graphics("convolution_diagram.pdf")
 
 ## Additional details on the date fields in the CDC line list
 
-Because the CDC line list is updated monthly and cases may undergo revision, we
+Because the restricted CDC line list is updated monthly and cases may undergo revision, we
 use a single version of it that was released on June 6, 2022. We consider this
 version to be finalized in that it is well-beyond our study end date such that
 the dataset is unlikely to be subject to further significant revisions.
@@ -107,8 +107,8 @@ IO $\rightarrow$ PS $\rightarrow$ RE $\rightarrow$ SO & \begin{tabular}[c]{@{}l@
 \end{table}
 ```
 
-The CDC restricted line list contains 74,849,225 cases (rows) in total compared
-to 84,714,805 cases reported by the JHU CSSE; that is, line list is missing
+The restricted CDC line list contains 74,849,225 cases (rows) in total compared
+to 84,714,805 cases reported by the JHU CSSE; that is, the line list is missing
 about 10 million cases. The extent that this issue impacts each state is shown
 in Figure \@ref(fig:prop), from which it is clear the fraction of missing cases is
 substantial for many states, often surpassing 50\% @jahja2022real. In
@@ -416,6 +416,37 @@ corresponding deconvolved case estimates before converting to per-capita values.
 Annual estimates of the state
 populations as of July 1 of 2020 are taken from the Dec.
 2022 press release from the US Census Bureau @uscensus2022annual.
+
+## Ablation analysis of infection-hospitalization correlations
+
+In this ablation study, the lagged correlation is re-computed by using the 
+following infection estimates: 1. Those from the deconvolution procedure 
+under the assumption that the infection onset is the same as the positive 
+specimen date (i.e., excluding the positive specimen to infection onset data 
+and deconvolution); 2. Those from the deconvolution procedure under the 
+assumption that the infection onset is the same as the symptom onset date 
+(excluding the incubation period data); 3. Those from the deconvolution 
+procedure when utilizing all incubation period and delay data 
+(the deconvolved case estimates); 4. Those from applying the antibody prevalence
+model to produce estimates for both the reported and the 
+unreported cases (the infection estimates).
+
+The results of this study are shown in Figure \@ref(fig:abl-lag-cor). 
+From this, we can see that the deconvolved case and infection estimates 
+from the intermediate steps are all leading indicators of hospitalizations. 
+However, the degree that each set of estimates leads hospitalizations depends
+on its location in the sequence of deconvolution steps and how close the
+estimates are to infection onset. For example, the deconvolved cases by
+positive specimen date tend to precede hospitalizations by about 11 days,
+while those for the subsequent step indicate that the deconvolved cases by
+symptom onset tend to precede hospitalizations by a longer time of 13 days.
+Finally, after adding the variant-specific incubation period data into the
+deconvolution and obtaining the deconvolved case estimates, 
+we can observe that the reported infections precede hospitalizations by about 19 days.
+
+```{r abl-lag-cor, echo=FALSE, out.width = '78%', fig.cap="Lagged Spearman's correlation between the infection and hospitalization rates per 100,000 averaged for each lag across US states and days over June 1, 2020 to November 29, 2021, and taken over a rolling window of 61 days. The infection rates are based on the counts for the deconvolved case and infection estimates as well as the reported infections by symptom onset and when the report is symptom onset. Note that each such set of infection counts is subject to a center-aligned 7-day averaging to remove spurious day of the week effects. The dashed lines indicate the lags for which the highest average correlation is attained."}
+knitr::include_graphics("adj_unadj_pi_no_inc_hosp_lag_corr_F24.pdf")
+```
 
 \newpage
 # Supplementary References {-}

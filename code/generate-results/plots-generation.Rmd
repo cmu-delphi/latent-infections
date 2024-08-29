@@ -270,7 +270,7 @@ ggplot(corrs_df, aes(lag, cor, color = type, group = type)) +
     values = c("Infections" = "midnightblue", 
                "Reported cases" = "darkorange2"
     )) +
-  labs(x = "Days before from hospitalization", y = "Average correlation") +
+  labs(x = "Days before hospitalization", y = "Average correlation") +
   theme_bw(16) +
   theme(legend.position = "inside",
         legend.position.inside = c(.85, .90),

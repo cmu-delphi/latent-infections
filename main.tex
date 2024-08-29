@@ -16,7 +16,8 @@
 } 
 \font\supptitlefont=cmr12 at 16pt 
 \newcommand{\attn }[1]{\textcolor{red}{ATTN: #1}}
-     
+\renewcommand{\bibfont}{\doublespacing}
+
 \begin{document}
 \title{Retrospective estimation of latent COVID-19 infections before Omicron in the \US}
 \author[a,1]{Rachel Lobay}
@@ -30,73 +31,87 @@
 \affil[b]{Department of Computer and Electrical Engineering, University of Southern California}
 \affil[c]{Department of Statistics, The University of California, Berkeley}
 
-\footnotetext[1]{To whom correspondence should be
-  addressed. E-mail: \email{rachel.lobay@stat.ubc.ca}} 
+%\footnotetext[1]{To whom correspondence should be
+%  addressed. E-mail: \email{rachel.lobay@stat.ubc.ca}} 
 
 
 
 \date{Version: \today}
 \maketitle
 
+%\linenumbers
+%\begin{abstract}
+%The true timing and magnitude of COVID-19 infections are of interest to both the
+%public and to public health, but these are challenging to pin down for a variety
+%of reasons such as the underdetection of asymptomatic cases and delays in
+%reporting. Accurate estimates of latent COVID-19 infections can improve our
+%understanding of the size and scope of the pandemic and provide more meaningful
+%and timely quantification of disease patterns and burden. In this work, we
+%describe methodology to estimate daily incident \emph{infections} for each \US
+%state. To this end, we first deconvolve reported COVID-19 cases to their date of
+%infection onset using delay distributions estimated from the CDC line list. We
+%then use a serology-driven model to scale these deconvolved cases to account for
+%the unreported infections. The resulting daily infection estimates
+%incorporate variant-specific incubation periods, reinfections,
+%and waning antigenic immunity. This analysis also produces estimates for other
+%important quantities such as the number of deconvolved cases specific to each
+%variant and the infection-case-report ratio (also referred to as the case
+%ascertainment ratio). Finally, we discuss some implications of our results: a
+%disease burden that appears earlier and more extensively than previously
+%quantified and differential infection-hospitalization ratio estimates. Our
+%findings help to better understand the progression of the pandemic in the \US
+%prior to the onset of Omicron and its descendants. 
+%\end{abstract}
+
+\newpage 
 \begin{abstract}
-The true timing and magnitude of COVID-19 infections are of interest to both the
-public and to public health, but these are challenging to pin down for a variety
-of reasons such as the underdetection of asymptomatic cases and delays in
-reporting. Accurate estimates of latent COVID-19 infections can improve our
-understanding of the size and scope of the pandemic and provide more meaningful
-and timely quantification of disease patterns and burden. In this work, we
-describe methodology to estimate daily incident \emph{infections} for each \US
-state. To this end, we first deconvolve reported COVID-19 cases to their date of
-infection onset using delay distributions estimated from the CDC line list. We
-then use a serology-driven model to scale these deconvolved cases to account for
-the unreported infections. The resulting daily infection estimates
-incorporate variant-specific incubation periods, reinfections,
-and waning antigenic immunity. This analysis also produces estimates for other
-important quantities such as the number of deconvolved cases specific to each
-variant and the infection-case-report ratio (also referred to as the case
-ascertainment rate). Finally, we discuss some implications of our results: a
-disease burden that appears earlier and more extensively than previously
-quantified and differential infection-hospitalization ratio estimates. Our
-findings help to better understand the progression of the pandemic in the \US
-prior to the onset of Omicron and its descendants. 
+
+\noindent \textbf{Background:} The true timing and magnitude of COVID-19 infections are of interest to both the public and public health, but these are challenging to pin down due to the underdetection of asymptomatic cases and delays in reporting. Retrospective estimation of COVID-19 infections can improve our understanding of the size and scope of the pandemic and provide more meaningful quantification of disease patterns and burden. \newline
+\textbf{Methodology:} We retrospectively estimate daily incident infections for each \US state prior to Omicron. First, the reported COVID-19 cases are deconvolved to their date of infection onset using delay distributions estimated from the CDC line list. Then, a novel serology-driven model is used to scale the deconvolved cases to account for the unreported infections. The resulting daily infection estimates incorporate variant-specific incubation periods, time-varying reinfection estimates, and waning antigenic immunity. \newline
+\textbf{Results:} The disease burden from infections emerges earlier and more extensively than is reflected by cases. Notably, infections were severely underreported during the Delta wave, with an estimated reporting rate as low as 6.3\% in New Jersey, 7.3\% in Maryland, and 8.4\% in Nevada. Moreover, in 44 states, fewer than 30\% of infections were eventually reported as cases during this period. \newline
+\textbf{Conclusions:} While reported cases offer a convenient proxy of disease burden, they fail to capture the full extent of infections. Our estimates of infections enhance the understanding of the progression of the pandemic in the \US prior to the onset of Omicron and its descendants. \newline
+
+\noindent\textbf{Keywords:} Infections; Case ascertainment ratio; COVID-19; SARS-CoV-2; Deconvolution; Time series; Seroprevalence; Antibody
 
 \end{abstract}
 
+
+
 \input{doc/intro.tex}
+
+\input{doc/methods.tex}
 
 \input{doc/results.tex}
 
 \input{doc/discussion.tex}
 
-\input{doc/methods.tex}
 
+%\section*{Data availability}
 
-\section*{Data availability}
-
-The Nationwide Commercial Laboratory Seroprevalence Survey 
-and 2020-2021 Nationwide Blood Donor Seroprevalence Survey 
-data are both freely available at
-\href{https://data.cdc.gov/Laboratory-Surveillance/Nationwide-Commercial-Laboratory-Seroprevalence-Su/d2tw-32xv}{https://data.cdc.gov/Laboratory-Surveillance/Nationwide-Commercial-Laboratory-Seroprevalence-Su/d2tw-32xv} 
-and 
-\href{https://data.cdc.gov/Laboratory-Surveillance/2020-2021-Nationwide-Blood-Donor-Seroprevalence-Su/mtc3-kq6r}{https://data.cdc.gov/Laboratory-Surveillance/2020-2021-Nationwide-Blood-Donor-Seroprevalence-Su/mtc3-kq6r}. 
-The COVID-19 Case Surveillance Restricted Access Detailed Data 
-requires a Restriction Information and Data Use Restrictions 
-Agreement. More information on the dataset and the agreement 
-can be found \href{https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Restricted-Access-Detai/mbd7-r32t/about\_data}{https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Restricted-Access-Detai/mbd7-r32t/about\_data}. 
-The JHU reported case and hospital admission data are 
-publicly accessible through the COVIDcast API, 
-\href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html}{https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html}. 
-The data used to construct the incubation periods was obtained from \newline
-\href{https://elifesciences.org/articles/57149}{https://elifesciences.org/articles/57149}, 
-\href{https://pubmed.ncbi.nlm.nih.gov/35627870/}{https://pubmed.ncbi.nlm.nih.gov/35627870/}, \newline
-\href{https://pubmed.ncbi.nlm.nih.gov/34849500/}{https://pubmed.ncbi.nlm.nih.gov/34849500/}, 
-and \href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8834809/}{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8834809/}. 
-The data used to estimate the variant proportions in circulation is freely 
-available at \newline \href{https://github.com/hodcroftlab/covariants}{https://github.com/hodcroftlab/covariants}. 
-The prior inverse ascertainment ratio estimates were extracted from Table 1 in
- \href{https://www.nature.com/articles/s41467-020-19652-6}{https://www.nature.com/articles/s41467-020-19652-6}. 
- The fraction of new infections are based on estimates from \href{https://wwwnc.cdc.gov/eid/article/28/10/22-1045\_article}{https://wwwnc.cdc.gov/eid/article/28/10/22-1045\_article}. 
-Finally, the state population estimates are from a U.S. Census Bureau press release at \href{https://www.census.gov/data/tables/time-series/demo/popest/2020s-state-total.html}{https://www.census.gov/data/tables/time-series/demo/popest/2020s-state-total.html}.
+%The Nationwide Commercial Laboratory Seroprevalence Survey 
+%and 2020-2021 Nationwide Blood Donor Seroprevalence Survey 
+%data are both freely available at
+%\href{https://data.cdc.gov/Laboratory-Surveillance/Nationwide-Commercial-Laboratory-Seroprevalence-Su/d2tw-32xv}{https://data.cdc.gov/Laboratory-Surveillance/Nationwide-Commercial-Laboratory-Seroprevalence-Su/d2tw-32xv} 
+%and 
+%\href{https://data.cdc.gov/Laboratory-Surveillance/2020-2021-Nationwide-Blood-Donor-Seroprevalence-Su/mtc3-kq6r}{https://data.cdc.gov/Laboratory-Surveillance/2020-2021-Nationwide-Blood-Donor-%Seroprevalence-Su/mtc3-kq6r}. 
+%The COVID-19 Case Surveillance Restricted Access Detailed Data 
+%requires a Restriction Information and Data Use Restrictions 
+%Agreement. More information on the dataset and the agreement 
+%can be found \href{https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Restricted-Access-Detai/mbd7-r32t/about\_data}{https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Restricted-Access-Detai/mbd7-r32t/about\_data}. 
+%The JHU reported case and hospital admission data are 
+%publicly accessible through the COVIDcast API, 
+%\href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html}{https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html}. 
+%The data used to construct the incubation periods was obtained from \newline
+%\href{https://elifesciences.org/articles/57149}{https://elifesciences.org/articles/57149}, 
+%\href{https://pubmed.ncbi.nlm.nih.gov/35627870/}{https://pubmed.ncbi.nlm.nih.gov/35627870/}, \newline
+%\href{https://pubmed.ncbi.nlm.nih.gov/34849500/}{https://pubmed.ncbi.nlm.nih.gov/34849500/}, 
+%and \href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8834809/}{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8834809/}. 
+%The data used to estimate the variant proportions in circulation is freely 
+%available at \newline \href{https://github.com/hodcroftlab/covariants}{https://github.com/hodcroftlab/covariants}. 
+%The prior inverse ascertainment ratio estimates were extracted from Table 1 in
+% \href{https://www.nature.com/articles/s41467-020-19652-6}{https://www.nature.com/articles/s41467-020-19652-6}. 
+% The fraction of new infections are based on estimates from \href{https://wwwnc.cdc.gov/eid/article/28/10/22-1045\_article}{https://wwwnc.cdc.gov/eid/article/28/10/22-1045\_article}. 
+%Finally, the state population estimates are from a U.S. Census Bureau press release at \href{https://www.census.gov/data/tables/time-series/demo/popest/2020s-state-total.html}{https://www.census.gov/data/tables/time-series/demo/popest/2020s-state-total.html}.
 
 
 
