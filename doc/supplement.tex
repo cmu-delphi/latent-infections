@@ -1,10 +1,8 @@
-\section{Supplementary Methods}
-
-This section contains additional information about the data used as well as
+This Supplement contains additional information about the data used as well as
 details about statistical methodology.
 
-\subsection{A general description and depiction of convolution}
-\label{supp:convol}
+\section{A general description and depiction of convolution}
+\label{sec:convol}
 
 In general, the goal of convolution is to propagate the input signal forward in
 time using a probability distribution. In the 1D and discrete context, it is
@@ -37,8 +35,8 @@ convolution.
     \label{fig:convol}
 \end{figure}
 
-\subsection{Additional details on the date fields in the CDC line list}
-\label{supp:linelist-details}
+\section{Additional details on the date fields in the CDC line list}
+\label{sec:linelist-details}
 
 Because the restricted CDC line list is updated monthly and cases may undergo revision, we
 use a single version of it that was released on June 6, 2022. We consider this
@@ -111,11 +109,11 @@ of alternative line list sources.
 
 
 
-%\subsection{Table on the percent pairwise occurrence of events in the CDC line list}
+%\section{Table on the percent pairwise occurrence of events in the CDC line list}
 
 
-\subsection{Additional details on delay distribution calculations}
-\label{supp:delay-justifications}
+\section{Additional details on delay distribution calculations}
+\label{sec:delay-justifications}
 \begin{linenomath*}
 In the line list, we observe unusual spikes in reporting in 2020 in comparison
 to majority of 2021. When stratified by report date, a few states contribute
@@ -177,7 +175,7 @@ $\alpha_{\textrm{NH},t}=1$ resulting $\widehat\pi_{\textrm{NH},t}(k)$ also being
 point mass at $k=0$. In this specific case, we force $\alpha_{\textrm{NH},t} =
 \min_{\ell\neq\textrm{NH}} \alpha_{\ell,t}$.
 
-\subsection{Variant circulation proportions}
+\section{Variant circulation proportions}
 \label{sec:variant-proportions}
 
 
@@ -220,8 +218,8 @@ time produces smoothness of the estimated proportions.
     
 
 
-\subsection{Constructing the delay from infection to test}
-\label{supp:delay-sops}
+\section{Constructing the delay from infection to test}
+\label{sec:delay-sops}
 
 The result of Step 1 (\Cref{sec:step1}) is $\widehat{x}_{\ell,t}$, case
 estimates by positive specimen date for each state. To continue, pushing this
@@ -232,7 +230,7 @@ positive specimen collection. The first requires different methods and is
 specific to the variant causing the infection, while the second is estimable from the CDC line
 list.
 
-\subsubsection{Estimating the incubation period distributions} 
+\section{Estimating the incubation period distributions} 
 \label{sec:incubation}
 
 To account for the incubation period, the time between infection and symptom
@@ -284,8 +282,8 @@ the middle of 2021.
 
 
 
-\subsubsection{Estimating the delay distributions for symptom onset to positive specimen}
-\label{supp:delay-sops}
+\section{Estimating the delay distributions for symptom onset to positive specimen}
+\label{sec:delay-sops}
 
 
 Estimating the delay from symptom onset to positive specimen date follows a
@@ -313,13 +311,13 @@ construction, or the film industry could also produce negative delays.
     \label{fig:delay-plots-samp}
 \end{figure}
 
-\subsubsection{Details on constructing the infection-to-test distributions}
-\label{supp:details-conv}
+\section{Details on constructing the infection-to-test distributions}
+\label{sec:details-conv}
 
 Finally, to produce the delay from infection to positive specimen collection we
 convolve the variant-specific incubation periods from \Cref{sec:incubation},
 denoted by $\{i_{j}(k) : 0 < k \leq 21\}$ with the location-time-specific
-symptom-to-positive-test distributions from \Cref{supp:delay-sops}, denoted by
+symptom-to-positive-test distributions from \Cref{sec:delay-sops}, denoted by
 $\{q_{\ell,t}(k) : -3\leq k \leq 21\}$. The convolution of these yields a
 distribution $\{\tau_{j\ell,t}(k): -3 \leq k
 \leq 42\}$. \Cref{fig:delay-plots-samp} shows the delays used for a sample of 6
@@ -332,8 +330,8 @@ incubation periods shown in \Cref{fig:inc_gammas}.
 
 
 
-\subsection{Details about seroprevalence data}
-\label{supp:sero-details}
+\section{Details about seroprevalence data}
+\label{sec:sero-details}
 
 We use two major contemporaneous surveys to estimate the proportion of the
 population with evidence of previous infection in each state over time: the
@@ -387,8 +385,8 @@ dates is taken to be the date for the weighted average. If there are multiple
 measurements in a week from a seroprevalence source, then the average is used.
 
 
-\subsection{State space representation of the antibody prevalence
-model}\label{supp:ssapm} 
+\section{State space representation of the antibody prevalence
+model}\label{sec:ssapm} 
 \begin{linenomath*}
 \postdisplaypenalty=0
 The antibody prevalence model described in \Cref{sec:report-ratio} can be expressed
@@ -431,7 +429,7 @@ model in \Crefrange{eq:sero-measurements}{eq:report-ratio} to the components in
 \Cref{eq:ss1,eq:ss2} as follows (omitting the location subscript for
 simplicity):
 \begin{linenomath*}
-\begin{align*}
+\begin{align}
     Z &= \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \end{bmatrix} &
     H_m &= \begin{bmatrix}w^1_{m} & 0 \\ 0 & w^2_{m} \end{bmatrix} \\
     \alpha_m &= \begin{bmatrix}s_{m} \\ a_m \\ a_{m-1}\\ a_{m-2} \end{bmatrix} & 
@@ -443,7 +441,7 @@ simplicity):
     P_{1} &= \begin{bmatrix} \sigma^2_{\tilde{s}_{1}} & 0 & 0 & 0 \\ 
     0 & \sigma^2_{\tilde{a}_1} & 0 & 0\\ 0 & 0 & \sigma^2_{\tilde{a}_1} & 0 \\ 
     0 & 0 & 0 & \sigma^2_{\tilde{a}_1} \end{bmatrix} 
-\end{align*}
+\end{align}
 \end{linenomath*}
 where $\sigma^2_r$ is the variance of observations, $\sigma^2_\epsilon$ is the
 variance of the seroprevalence estimates, $\sigma^2_\eta$ is the trend variance,
@@ -491,7 +489,7 @@ populations as of July 1 of 2020 are taken from the Dec.\
 
 
 % The $50$, $80$, and $95\%$ confidence intervals are constructed by taking a
-% Bayesian view of the antibody prevalence model (refer to \ref{supp:bayeswaning} 
+% Bayesian view of the antibody prevalence model (refer to \ref{sec:bayeswaning} 
 % for the Bayesian specification of the model). 
 % That is, for each time, $t$, we obtain an estimate of the
 % posterior variance of $a_t$, apply the deconvolved case estimate as a constant
@@ -500,8 +498,8 @@ populations as of July 1 of 2020 are taken from the Dec.\
 % bound must be at least the deconvolved case estimate for the time under consideration.
 
 
-% \subsection{Bayesian specification of the antibody prevalence
-% model}\label{supp:bayeswaning} 
+% \section{Bayesian specification of the antibody prevalence
+% model}\label{sec:bayeswaning} 
 % In brief, the antibody prevalence model where we let
 % $\beta = \left \{  \gamma, a_1,\dots, a_t \right \}$ and $X$ be the design
 % matrix, corresponds to a Bayesian model with prior 
@@ -524,12 +522,12 @@ populations as of July 1 of 2020 are taken from the Dec.\
 % \end{align*}
 
 
-% \subsection{Scaling by population}
+% \section{Scaling by population}
 
 
 
-\subsection{Ablation analysis of infection-hospitalization correlations}
-\label{supp:ablation}
+\section{Ablation analysis of infection-hospitalization correlations}
+\label{sec:ablation}
 In this ablation study, the lagged correlation is re-computed by
 using the following infection estimates: 1. those from
 the deconvolution procedure under the assumption that the infection onset is the

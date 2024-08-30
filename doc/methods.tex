@@ -2,17 +2,18 @@
 \label{sec:methods}
 
 
-In what follows, we describe how we estimate the daily incident
-infections for each \US state from June 1, 2020 to November 29, 2021.
-\autoref{fig:cases_to_infect_flowchart} provides a visual summary of the major
-analysis tasks, which can be summarized as follows: First, we estimate the
-time-varying delays from positive specimen to report date 
-and use them to deconvolve reported cases to their collection date.
-Next, we estimate the delay from symptoms to positive specimen,
-combine this with variant specific infection-to-symptoms delays, and
-push back to the date of infection. These reported infection
-estimates are aggregated across the variant categories and adjusted
-for the unreported infections by using seroprevalence survey data.
+In what follows, we describe how we estimate the daily incident infections for
+each \US state from June 1, 2020 to November 29, 2021.
+\Cref{fig:cases_to_infect_flowchart} provides a visual summary of the major
+analysis tasks. First, we estimate spatiotemporal-specific delays from positive
+specimen to report date and use them to deconvolve reported cases to their
+sample collection date. Next, we estimate the delay from symptom onset to
+positive specimen, combine this with variant specific infection-to-symptom
+delays, and push back reported cases to the corresponding date of infection.
+These reported infection estimates are aggregated across the variant categories
+and adjusted by the case ascertainment ratio, estimated with seroprevalence
+survey data and a model for antigenic immunity. Additional methodological
+details are provided in the Supplement.
 
 \subsection{From reported cases to positive specimen collection}
 \label{sec:step1}
@@ -20,30 +21,31 @@ for the unreported infections by using seroprevalence survey data.
 Deconvolution ``pushes back'' reported cases to the likely date of positive
 specimen collection. An important aspect of our methods is that deconvolution is
 not the same as a simple shift, rather it involves the distribution of delays
-(specific to each state and date)%, as estimated from de-identified patient-level
+(specific to each state and date).
+%, as estimated from de-identified patient-level
 %line list data on COVID-19 cases from the CDC \citep{cdc2020caserestr}. 
 Simply shifting cases back in time would fail to reflect the fact that some cases take
 much longer to be reported than others 
-(see Supplementary Methods \Cref{supp:convol} for further details).
+(\Cref{sec:convol}).
 
 \begin{linenomath*} 
 We will start by describing how the model for deconvolution infers the likely
 dates of positive specimen collection from reported cases before describing how
 the CDC line list \citep{cdc2020caserestr} 
-was used to estimate the necessary delay distribution. Together,
+was used to estimate the necessary delay distributions. Together,
 these are the ingredients for Step 1 in \Cref{fig:cases_to_infect_flowchart}.
 Define $y_{\ell,t}$ to be the number of new cases reported in location $\ell$ at
-time $t$, as disseminated by the John Hopkins Center for Systems Science and
+time $t$, as reported by the John Hopkins Center for Systems Science and
 Engineering (JHU CSSE)\citealp{dong2020interactive} and retrieved with the
 COVIDcast API \citep{reinhart2021open}. Let $\pi_{\ell,t}(k)$ be the probability
-that cases with positive specimen collection on time $t-k$ are reported at $t$. 
+that cases with positive specimen collection at time $t-k$ are reported at $t$. 
 \end{linenomath*} 
 \begin{linenomath*} 
 Then, we
-model $y_{\ell,t}$ as Gaussian with mean 
+model $y_{\ell,t}$ as a Gaussian with mean 
 \begin{align}
-  \label{eq:cases-model}
   \mathbb{E}[y_{\ell,t} \mid x_{\ell,s}, s \leq t ] =\sum_{k} \pi_{\ell,t-k}(k)x_{\ell,t-k},
+  \label{eq:cases-model}
 \end{align}
 which is a probability weighted sum of the number of positive specimens
 collected $k$ days earlier, $x_{\ell,t-k}$.
@@ -51,13 +53,12 @@ We estimate $\mathbf{x}_\ell = \{x_{\ell,1},\ldots,x_{\ell,T}\}$ by minimizing
 the negative log-likelihood with a penalty that encourages smoothness in time.
 Thus, our estimator is given by
 \begin{align}
-  \label{eq:cases-deconvolved}
   \widehat{\mathbf{x}}_\ell = \argmin_{\mathbf{x}}\ \sum_{t}
   \bigg( y_{\ell,t} -  \sum_k \pi_{\ell,t-k}(k) x_{t-k} \bigg)^2 
   + \lambda\ \sum_t \big|x_t - 4x_{t-1} + 6x_{t-2} -4x_{t-3}+ x_{t-4}\big|.
+  \label{eq:cases-deconvolved}
 \end{align}
 \end{linenomath*} 
-
 %The two parts of this optimization problem trade data fidelity (the sum of
 %squared errors) with smoothness in the resulting estimates (the fourth order
 %differences of $\mathbf{x}$). The tuning parameter $\lambda$ determines the
@@ -68,7 +69,7 @@ tibshirani2022divided} and can be accurately computed with ease
 \citep{ramdas2016fast,jahja2022real}. We select the tuning parameter
 $\lambda$ with cross-validation
 to minimize the out-of-sample reconvolution error. 
-%Additional details about convolution are given in the Supplement, \Cref{supp:convol}.
+%Additional details about convolution are given in the Supplement, \Cref{sec:convol}.
 % with $3$-fold cross validation
 % \citep{jahja2022real} in which every third day is reserved for testing, and the
 % value that results in the smallest out-of-sample mean squared error is chosen.
@@ -78,26 +79,22 @@ to minimize the out-of-sample reconvolution error.
 
 \begin{linenomath*} 
 To estimate the $\pi_{\ell,t}(k)$ for all states $\ell$, times $t$, and delays
-$k$, we use the CDC line list \citep{cdc2020caserestr}. 
-The line list contains three key dates of interest for many
-cases that eventually appear in case reports: symptom onset,
-positive specimen collection, and report to the CDC. Handling missingness
-in these dates requires careful attention, and so such details are presented in
- Supplementary Methods \Cref{supp:linelist-details}.
-Define $z_{\ell,t}$ to be a case report occurring at time $t$ in
-location $\ell$, and let $\pi_{\ell,t}(k)$ be the probability that
-$z_{\ell,t}$ has a positive specimen collected $k$ days earlier. We assume that
-all positive specimen results will be reported within 60 days and that no test will be
-reported on the same date as it was collected.
-Under these assumptions, let $N_{\ell,t}$ be the total number of
-$z_{\ell,r}$ with positive specimen collection date $r$ in a window $r \in
-[t-75+1, t+60]$ around the time of interest $t$. 
+$k$, we use the CDC line list \citep{cdc2020caserestr}. The line list contains
+three key dates of interest for many cases that eventually appear in case
+reports: symptom onset, positive specimen collection, and report to the CDC.
+Handling missingness in these dates requires careful attention
+(\Cref{sec:linelist-details}). Define $z_{\ell,t}$ to be a case report occurring
+at time $t$ in location $\ell$. We assume that positive specimens
+will be reported within 60 days and that no test will be reported on the same
+date as it was collected. Under these assumptions, let $N_{\ell,t}$ be the total
+number of $z_{\ell,r}$ with positive specimen collection date $r$ in a window $r
+\in [t-75+1, t+60]$ around $t$. 
 \end{linenomath*} 
 \begin{linenomath*} 
 Then, we compute the observed probability mass function (pmf)
 \begin{align}
+  \tilde{p}_{\ell,t}(k) = \frac{1}{N_{\ell,t}} \big(\textrm{\# $z_{\ell,r}$ with positive specimen at $r-k$}\big)\indicator(0<k\leq 60),
   \label{eq:line-list-delay}
-    \tilde{p}_{\ell,t}(k) = \frac{1}{N_{\ell,t}} \big(\textrm{\# $z_{\ell,r}$ with positive specimen at $r-k$}\big)\indicator(0<k\leq 60),
 \end{align}
 \end{linenomath*} 
 where $\indicator(Z) = 1$ if $Z$ is true and 0 otherwise. We also compute a
@@ -108,44 +105,43 @@ CSSE\cite{dong2020interactive} in the window $[t-60+2, t+75]$. Then, compute
 $p_{\ell,t} = \alpha_{\ell,t}\tilde{p}_{\ell,t} +
 (1-\alpha_{\ell,t})\tilde{p}_t$. This construction was adopted to allow for more
 reliance on the state estimate when a larger fraction the JHU cases reports
-appear in the CDC line list (and vice versa). We calculate the mean $m_{\ell,t}$
+appear in the CDC line list. We calculate the mean $m_{\ell,t}$
 and variance $v_{\ell,t}$ of the pmf $\{p_{\ell,t}(k)\}$ and estimate the
 best-fitting gamma distribution by solving the moment equations $m_{\ell,t} =
 \alpha_{\ell,t}\theta_{\ell,t}$ and $v_{\ell,t}=
 \alpha_{\ell,t}\theta_{\ell,t}^2$ for the shape $\alpha_{\ell,t}$ and scale
 $\theta_{\ell,t}$. Finally, we discretize the resulting gamma density to the
 original support to produce an estimate $\widehat{\pi}_{\ell,t}(k)$ of the delay
-distribution $\pi_{\ell,t}(k)$. Additional minor details are deferred to Supplementary Methods
-\Cref{supp:delay-justifications}.
+distribution $\pi_{\ell,t}(k)$. Additional details are deferred to 
+\Cref{sec:delay-justifications}.
  
 \subsection{From positive specimen collection to infection onset}
 \label{sec:step2-and-3}
+
 
 To continue, pushing positive specimen collection time back to infection onset
 (Step 2 in \Cref{fig:cases_to_infect_flowchart}), we use a procedure very
 similar to that described above and specified in
 \Cref{eq:cases-model,eq:cases-deconvolved}. However, because
 the delays involve the time from infection to symptom onset, these must be
-variant-specific. This means that both the probabilities and the observations
-must be replaced with variant-specific quantities. 
-
-For the observations, we use our estimates from \Cref{sec:step1},
+variant-specific.
+We use our estimates from \Cref{sec:step1},
 $\widehat{\mathbf{x}}_\ell$, but we weight them corresponding to the mix of
 variants in circulation. To estimate the daily proportions of the variants
 circulating in each state, we use GISAID genomic sequencing data from
 CoVariants.org \citep{hodcroft2021covariants, elbe2017data}, and estimate a
 multinomial logistic regression model. This procedure is now standard
-\citep{obermeyer2022analysis, annavajhala2021emergence, figgins2021sars}, so we
-defer details to Supplementary Methods \Cref{sec:variant-proportions}. The resulting
+\citep{obermeyer2022analysis, annavajhala2021emergence, figgins2021sars} (see
+also \Cref{sec:variant-proportions}). The resulting
 estimated probability of variant $j$ is given by $\hat{v}_{j\ell,t}$.
 
 To estimate variant-specific delays from infection to positive specimen
 collection, we convolve the location-time-specific symptom-to-test distributions
-(that are estimated from the CDC line list in the same way as in \Cref{sec:step1}), 
-with variant-specific incubation periods.
-The convolution of these yields a distribution $\tau_{j\ell,t}(k)$. 
-Details on the convolution and its inputs are deferred to Supplementary Methods
-\Cref{supp:delay-sops,sec:incubation,supp:details-conv}. 
+(that are estimated from the CDC line list in the same way as in
+\Cref{sec:step1}), with variant-specific incubation periods. The convolution of
+these yields a distribution $\widehat{\tau}_{j\ell,t}(k)$. Details on the
+convolution and its inputs are in
+\Cref{sec:delay-sops,sec:incubation,sec:details-conv}. 
 
 \begin{linenomath*} 
 Analogous to \Cref{eq:cases-model,eq:cases-deconvolved}, for each variant $j$,
@@ -153,7 +149,7 @@ we model the variant-specific, deconvolved cases as Gaussian with mean
 \end{linenomath*} 
 \begin{linenomath*} 
 \begin{align}
-  \mathbb{E}\left[\widehat{v}_{j\ell,t}\widehat{x}_{\ell,t} \mid u_{j\ell,s}, s \leq t  \right] = \sum_k \tau_{j\ell,t-k}(k) u_{j\ell,t-k} 
+  \mathbb{E}\left[\widehat{v}_{j\ell,t}\widehat{x}_{\ell,t} \mid u_{j\ell,s}, s \leq t  \right] = \sum_k \widehat\tau_{j\ell,t-k}(k) u_{j\ell,t-k} 
 \end{align}
 and estimate $\mathbf{u}_{j\ell}$ by minimizing the negative loglikelihood with
 a penalty to encourage smoothness:
@@ -161,17 +157,17 @@ a penalty to encourage smoothness:
 \widetilde{\mathbf{u}}_{j\ell} = \argmin_{\mathbf{u}}\ \sum_{t} 
 \left( 
     \widehat{v}_{j\ell,t} \widehat{x}_{\ell,t} -  
-    \sum_k \tau_{j\ell,t-k}(k) u_{t-k} 
+    \sum_k \widehat{tau}_{j\ell,t-k}(k) u_{t-k} 
 \right)^2 
 + \lambda\ \sum_{t} \big|u_{t} - 4u_{t-1} + 6u_{t-2} -4u_{t-3}+ u_{t-4}\big|.
 \end{align} 
 \end{linenomath*} 
 
 We call the solution $\widetilde{\mathbf{u}}_{j\ell}$ the \emph{variant-specific
-deconvolved cases} and emphasize that these are cases that will eventually
-be reported to public health. Because this deconvolution is performed separately for
-each location and variant, we add them together at each time $t$, and
-we denote the total deconvolved cases at location $\ell$ as
+deconvolved cases} and emphasize that these are cases that will eventually be
+reported to public health. Because this deconvolution is performed separately
+for each location and variant, we sum over the variants at each time $t$, and
+denote the total deconvolved cases at location $\ell$ as
 $\widehat{\mathbf{u}}_\ell = \sum_j \widetilde{\mathbf{u}}_{j\ell}$ (Step 3 in
 \Cref{fig:cases_to_infect_flowchart}). Note that these deconvolved cases are now
 indexed by the time of infection onset rather than case report.
@@ -183,19 +179,15 @@ indexed by the time of infection onset rather than case report.
 \label{sec:report-ratio}
 
 To capture the unreported infections, it is necessary to adjust these
-deconvolved case estimates by the inverse reporting ratio, which is
-the ratio of the true number of new infections to
-the new reported infections (Step 4 in \Cref{fig:cases_to_infect_flowchart}).
-Seroprevalence of anti-nucleocapsid antibodies represents the percentage
-of people who have at least one resolving or past infection \citep{cdc2020data},
-so we use the change in subsequent seroprevalence measurements to estimate
-all new infections. 
-
-\begin{linenomath*}
-We use two major seroprevalence surveys to estimate the proportion of the
+deconvolved case estimates by the inverse reporting ratio, the ratio of the
+number of incident infections to incident reported infections (Step 4 in
+\Cref{fig:cases_to_infect_flowchart}). Seroprevalence of anti-nucleocapsid
+antibodies represents the percentage of people who have at least one resolving
+or past infection \citep{cdc2020data}, so we develop a model that uses the
+change in subsequent seroprevalence measurements to estimate all new infections. 
+We use two seroprevalence surveys to estimate the proportion of the
 population with evidence of previous infection in each state over time  % the 2020--2021 Blood Donor Seroprevalence Survey and the Nationwide Commercial Lab Seroprevalence Survey 
-\citep{cdc2021blood, cdc2021comm}. Details on these surveys are presented in Supplementary
-Methods \Cref{supp:sero-details}. 
+\citep{cdc2021blood, cdc2021comm} (\Cref{sec:sero-details}). 
 
 To account
 for different surveys occurring on different dates with roughly weekly
@@ -203,7 +195,6 @@ availability and measurement error, we treat actual seroprevalence $s_{\ell,m}$
 as a latent variable available on Monday (using $m$ rather than $t$ to denote
 Mondays). Therefore, the observed seroprevalence survey measurements $r^1_m$ and
 $r^2_m$ are modelled as Gaussian,
-\end{linenomath*}
 \begin{linenomath*}
 \postdisplaypenalty=0
 \begin{align}
@@ -213,12 +204,12 @@ r^2_{\ell,m} \mid s_{\ell,m},\  w^2_{\ell,m}
   &\sim \textrm{N}(s_{\ell,m},\ w^2_{\ell,m}\sigma^2_{\ell,r}),
 \end{align}
 \end{linenomath*}
-with source-specific measurement errors that scale proportional to the reported
-confidence intervals, respectively $w^1_{\ell,m}$ and $w^2_{\ell,m}$.  
+with source-specific measurement errors, $w^1_{\ell,m}$ and $w^2_{\ell,m}$, that
+scale proportional to reported uncertainty.
 
 \begin{linenomath*}
 To complete the model, we suppose that latent seroprevalence is modeled as a
-Guassian with mean given by a fraction of the previous seroprevalence
+Gaussian with mean given by a fraction of the previous seroprevalence
 measurement at $m$ plus the reinfection-adjusted deconvolved cases multiplied by
 the inverse reporting ratio at time $m$:
 \end{linenomath*}
@@ -250,13 +241,13 @@ smoothly in time.
     
 The antibody prevalence model specified by
 \Crefrange{eq:sero-measurements}{eq:report-ratio} is a state space model with
-latent variables $\mathbf{s}_{\ell}$ and $\mathbf{a}_{\ell}$. Writing it in this
-way allows for convenient handling of missing or irregularly-spaced survey
-data, extrapolation of the latent quantities beyond the
-observed seroprevalence period, and maximum likelihood
-estimates of the latent variables and all unknown parameters. Details of
+latent variables $\mathbf{s}_{\ell}$ and $\mathbf{a}_{\ell}$. In this way, 
+the latent variables and all unknown parameters can be estimated using maximum likelihood, despite
+missing or irregularly-spaced survey
+measurements. Additionally, latent quantities can be extrapolated beyond the
+times of measured seroprevalence. Additional details of
 this methodology and the computation of the associated uncertainty measurements
-are deferred to Supplementary Methods \Cref{supp:ssapm}.
+are in \Cref{sec:ssapm}.
 
 
 
@@ -274,7 +265,7 @@ lag values ranging from 1 to 25 days.
 Then, to assess the impact of our modelling choices,
 particularly the contribution of the main steps to the lagged
 correlation analysis, we conduct an ablation study that is detailed
-in Supplementary Methods \Cref{supp:ablation}.
+in Supplementary Methods \Cref{sec:ablation}.
 
 %To remove day of the week effects, both the infection and hospitalization
 %signals are averaged over a 7-day, center-aligned, moving window before their
