@@ -51,6 +51,14 @@ adj_df %>%
   filter(adj_inf_rate %in% max_adj_inf_rate[1:5]) %>% # Top 5
   arrange(desc(adj_inf_rate)) %>% 
   select(geo_value, date, adj_inf_rate)
+
+# Case rates max around the time of the peak for the top two
+adj_df %>% 
+  filter((geo_value == "LA" & date >= "2021-06-01") | (geo_value == "ID" & date >= "2021-08-01")) %>% 
+  arrange(desc(cases_rate_7d_av)) %>%
+  group_by(geo_value) %>% 
+  slice(1) %>% 
+  select(date, geo_value, cases_rate_7d_av)
 ```
 
 

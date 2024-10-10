@@ -2,8 +2,8 @@
 \label{sec:intro}
 
 Reported COVID-19 cases are a staple in tracking the pandemic at varying
-geographic resolutions \citep{dong2020interactive, nyt2020corona,
-wp2020tracking}. Yet, for every case that is eventually reported to public
+geographic resolutions. \citep{dong2020interactive, nyt2020corona,
+wp2020tracking} Yet, for every case that is eventually reported to public
 health, several infections are likely to have occurred, and likely much earlier.
 To see why, it is important to understand \emph{whose} cases are being reported
 and what differentiates them from unreported cases as well as \emph{when} these
@@ -12,13 +12,13 @@ path of a symptomatic infection that is eventually reported to public
 health. This figure illustrates a number of sources of bias in the
 reporting pipeline. For instance, diagnostic testing mainly targets symptomatic
 individuals; thus, infected individuals exhibiting little to no symptoms are
-omitted \citep{cdc2022estimated}. In addition, testing practices, availability,
-and uptake vary temporally and spatially \citep{pitzer2021impact,
-ecdc2020strategies, hitchings2021usefulness}. Finally, cases provide a belated
+omitted. \citep{cdc2022estimated} In addition, testing practices, availability,
+and uptake vary temporally and spatially. \citep{pitzer2021impact,
+ecdc2020strategies, hitchings2021usefulness} Finally, cases provide a belated
 view of the pandemic's progression, because they are subject to delays due to
 the viral incubation period, the speed and severity of symptom onset, laboratory
-confirmation, test turnaround times, and eventual submission to public health
-\citep{pellis2021challenges, wash2020dash}. For these reasons, reported cases
+confirmation, test turnaround times, and eventual submission to public health.
+\citep{pellis2021challenges, wash2020dash} For these reasons, reported cases
 are lagging indicators of the course of the pandemic. Furthermore, they do not
 represent the actual number of new infections that occur on any given day based on
 exposure to the pathogen. Since there was no large-scale surveillance effort in
@@ -53,7 +53,7 @@ health to perform a pandemic post-mortem. Estimates of daily incident infections
 are one such way to measure this and can guide understanding of the pandemic
 burden over space and time. 
 
-\begin{figure}[!tb]
+\begin{figure}[H]
 \centering
     \includegraphics[width=.9\textwidth]{li-flowchart.pdf} 
     \caption{Flowchart of the data and major analysis steps required to get from
@@ -70,7 +70,7 @@ burden over space and time.
     
 
 In this work, we provide a data-driven reconstruction of daily incident
-infections for each \US state from June 1, 2020 to November 29, 2021. Using
+infections for each \US state before the onset of Omicron. Using
 state-level line list data, we estimate state-date specific distributions for
 the delay from symptom onset to positive specimen date and positive specimen to
 case report date. We combine these with variant-specific incubation period
@@ -84,8 +84,6 @@ than reported cases, to assess the impact of the pandemic. We also produce
 simple time-varying infection-hospitalization ratios (IHRs) for each state and
 compare these with case-hospitalization ratios (CHRs). While these analyses
 provide a glimpse into the utility of our infection estimates, we believe that
-there is much more to be explored, and we hope that our work and will prove an
-important benchmark for others to undertake retrospective analyses. Our
-estimates, as well as the R and Python code used to produce them, are available
-on \href{https://github.com/cmu-delphi/latent-infections/}{GitHub}.
+there is much more to be explored, and we hope that our work serves as a
+benchmark for future retrospective analyses. 
 

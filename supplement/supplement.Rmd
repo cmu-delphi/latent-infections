@@ -1,7 +1,6 @@
 ---
-title: "Supplementary Information: Retrospective estimation of latent COVID-19 infections before Omicron in the US"
-author: "Rachel Lobay"
-date: "2024-06-01"
+title: "Supplement for: \n Retrospective estimation of latent COVID-19 infections before Omicron in the US"
+author: "Rachel Lobay, Ajitesh Srivastava, Ryan J. Tibshirani, and Daniel J. McDonald"
 output: 
   bookdown::pdf_document2:
     fig_caption: yes
@@ -15,11 +14,11 @@ header-includes:
   \def\given{\mid}
   \def\indicator{\mathbf{1}}
   \def\th{^{\textnormal{th}}}
-  \renewcommand{\thesection}{S\arabic{section}}
   \usepackage{float} \floatplacement{figure}{H} 
+  \renewcommand{\thesubsection}{\Alph{subsection}} % Subsections are A, B, C, etc.
   \newcommand{\beginsupplement}{\setcounter{table}{0}  
-  \renewcommand{\thetable}{S\arabic{table}} \setcounter{figure}{0}
-  \renewcommand{\thefigure}{S\arabic{figure}}}
+  \renewcommand{\thetable}{\arabic{table}} \setcounter{figure}{0}
+  \renewcommand{\thefigure}{\arabic{figure}}}
 lot: yes
 lof: yes
 bibliography: bibliography.bib
@@ -76,8 +75,8 @@ much as possible. Unfortunately, the line list has significant missing data,
 notably with respect to our variables of interest. Approximately 62.3\% of cases
 are missing the symptom onset date, 55.4\% are missing positive specimen date,
 and 8.96\% of cases are missing the report date. Furthermore, cases with missing
-report or positive specimen dates may be filled with their symptom onset date
-@jahja2022real. So it is possible that all three variables may have the
+report or positive specimen dates may be filled with their symptom onset date.
+@jahja2022real So it is possible that all three variables may have the
 same date for a case. However, we only actually deal with pairs of these events;
 we do not use all three at once in our construction of the delay distributions.
 Therefore, we restrict our investigation of coincident missingness to the possible pairs.
@@ -111,7 +110,7 @@ The restricted CDC line list contains 74,849,225 cases (rows) in total compared
 to 84,714,805 cases reported by the JHU CSSE; that is, the line list is missing
 about 10 million cases. The extent that this issue impacts each state is shown
 in Figure \@ref(fig:prop), from which it is clear the fraction of missing cases is
-substantial for many states, often surpassing 50\% @jahja2022real. In
+substantial for many states, often surpassing 50\%. @jahja2022real In
 addition, the probability of being missing does not appear to be the same for
 states, so there is likely bias introduced from using the complete case line
 list data. We consider such bias to be unavoidable in our analysis due to a lack
@@ -169,15 +168,15 @@ point mass at $k=0$. In this specific case, we force $\alpha_{\textrm{NH},t} =
 ## Variant circulation proportions
 
 To estimate the daily proportions of the variants circulating in each state, we
-obtain the GISAID genomic sequencing data from CoVariants.org
-[@hodcroft2021covariants; @elbe2017data]. These counts represent the total
+obtain the GISAID genomic sequencing data from CoVariants.org.
+[@hodcroft2021covariants; @elbe2017data] These counts represent the total
 number of cases belonging to a particular variant using
 a sample of positive tests over a biweekly period. To estimate the population
 proportion of each variant, we apply multinomial logistic regression 
 for the eight variant categories separately for each state. 
 Multinomial logistic regression is a standard technique to model the
-frequency of SARS-CoV-2 variants 
-[@obermeyer2022analysis; @annavajhala2021emergence; @figgins2021sars].
+frequency of SARS-CoV-2 variants.
+[@obermeyer2022analysis; @annavajhala2021emergence; @figgins2021sars]
 
 We let $V_{j\ell,t}$ to be the probability of a new cases at time $t$ in location
 $\ell$ corresponding to variant $j$. Let $v_{j\ell,t}$ be the analogous observed
@@ -202,7 +201,7 @@ knitr::include_graphics("var-props-1.pdf")
 The result of Step 1 (Section 4.1) is $\widehat{x}_{\ell,t}$, case
 estimates by positive specimen date for each state. To continue, pushing this
 back to infection estimates, we need the variant-specific delays from infection
-to positive specimen collection. As shown in Figure 1}, this delay can be broken into two separate pieces: (1) the
+to positive specimen collection. As shown in Figure 1, this delay can be broken into two separate pieces: (1) the
 delay from infection to symptom onset, and (2) the delay from symptom onset to
 positive specimen collection. The first requires different methods and is
 specific to the variant causing the infection, while the second is estimable from the CDC line
@@ -218,32 +217,32 @@ different parameters. We focus on the following eight variants (shown in
 Figure \@ref(fig:var-props-1), which saw significant circulation in one of the US states
 during our study period: Ancestral/Other, Alpha, Beta, Epsilon,
 Iota, Gamma, Delta, and Omicron. Alpha, Beta, Delta, Gamma, and Omicron are all
-variants of concern @who2021tracking, while we include the Epsilon
+variants of concern. @who2021tracking while we include the Epsilon
 (California) and Iota (New York) variants because of large impact on those and
-neighbouring states [@yang2022investigation; @duerr2021dominance].
+neighbouring states. [@yang2022investigation; @duerr2021dominance]
 
 The incubation period of the Ancestral variant has been modelled as a gamma
-distribution @tindale2020evidence, so we simply use the reported shape
+distribution, @tindale2020evidence so we simply use the reported shape
 and scale parameters. For the Alpha, Beta, Gamma, Delta and Omicron variants,
-the mean and standard deviation are reported [@tanaka2022shorter; @grant2022impact; @ogata2022shorter]. 
+the mean and standard deviation are reported. [@tanaka2022shorter; @grant2022impact; @ogata2022shorter]
 Therefore, we use method of moments to match
 the mean and variance to estimate the gamma parameters, using the moment
 equations given in Section 4.1. Then, we discretize each resulting density
 shown in Figure \@ref(fig:inc-gammas) to the support set, which is taken to be from 1
 and 21 days. This range assumes that symptoms require at least 1 day to develop @phcan2021covid 
-and that an asymptomatic infection will resolve within 21 days [@zaki2021estimations; @cortes2022sars]. 
+and that an asymptomatic infection will resolve within 21 days. [@zaki2021estimations; @cortes2022sars]
 
 We were unable to locate incubation period estimates for the geo-specific
 Epsilon and Iota variants, so we use the incubation period for Beta because
 Epsilon, Iota, and Beta are all children from the same parent in the
-phylogenetic tree of the Nextstrain Clades @hodcroft2021covariants. All
+phylogenetic tree of the Nextstrain Clades. @hodcroft2021covariants All
 other circulating variants are grouped together with the Ancestral variant.
 There was little available sequencing data prior to Alpha-emergence, but
 unfortunately, later in the pandemic, it is impossible to separate Ancestral
 from other rare variants, though these also saw minimal circulation after
 the middle of 2021.
 
-(ref:caption-inc-gammas) Gamma density for the incubation period of each of the eight variant categories. Note that the Ancestral variant uses reported shape and scale parameters @tindale2020evidence, while the remaining variants convert reported estimates for the mean and variance using the method of moments to produce the gamma parameters [@tanaka2022shorter; @grant2022impact; @ogata2022shorter].
+(ref:caption-inc-gammas) Gamma density for the incubation period of each of the eight variant categories. Note that the Ancestral variant uses reported shape and scale parameters. @tindale2020evidence while the remaining variants convert reported estimates for the mean and variance using the method of moments to produce the gamma parameters. [@tanaka2022shorter; @grant2022impact; @ogata2022shorter]
 
 ```{r inc-gammas, echo=FALSE, out.width = '60%', fig.cap="(ref:caption-inc-gammas)"}
 knitr::include_graphics("inc-gammas-1.pdf")
@@ -291,11 +290,11 @@ incubation periods shown in Figure \@ref(fig:inc-gammas).
 We use two major contemporaneous surveys to estimate the proportion of the
 population with evidence of previous infection in each state over time: the
 2020--2021 Blood Donor Seroprevalence Survey and the Nationwide Commercial Lab
-Seroprevalence Survey [@cdc2021blood; @cdc2021comm]. In the former, the CDC
+Seroprevalence Survey. [@cdc2021blood; @cdc2021comm] In the former, the CDC
 collaborated with 17 blood collection organizations in the largest nationwide
-COVID-19 seroprevalence survey to date @cdc2021blood. The blood donation
+COVID-19 seroprevalence survey to date. @cdc2021blood The blood donation
 samples were used to construct monthly seroprevalence estimates for nearly all
-states from July 2020 to December 2021 @jones2021estimated. In the latter
+states from July 2020 to December 2021. @jones2021estimated In the latter
 survey, the CDC collaborated with two private commercial laboratories to test
 blood samples from people that were in for routine or clinical management
 (presumably unrelated to COVID-19 @bajema2021estimated) for the
@@ -306,7 +305,7 @@ for a number of multi-week collection periods starting in July 2020 to February
 Both datasets are based on repeated, cross-sectional studies that estimate the
 percentage of people who were previously infected with COVID-19 using the
 percentage of people from a convenience sample who had antibodies against the
-virus [@bajema2021estimated; @cdc2020data; @jones2021estimated]. Adjustments
+virus. [@bajema2021estimated; @cdc2020data; @jones2021estimated] Adjustments
 were made in both for age and sex to account for the demographic differences
 between the sampled and the target populations. However, both datasets are
 incomplete and they differ in the number and the timing of the data points for
@@ -335,7 +334,7 @@ knitr::include_graphics("sero_blood_comm_compar.pdf")
 ## State space representation of the antibody prevalence model
 
 The antibody prevalence model can be expressed
-as a linear Gaussian state space model [@durbin2012time; @helske2017kfas].
+as a linear Gaussian state space model. [@durbin2012time; @helske2017kfas]
 For $m = 1, \dots, M$, let $\alpha_m$ be a vector of
 latent state processes at time $m$ and $y_m$ be a vector of
 observations at time $m$. The form of the (general) linear Gaussian state space model is 
@@ -356,7 +355,7 @@ R &= \begin{bmatrix}1 & 0  \\ 0 & 1 \\ 0 & 0 \\ 0 & 0
 \end{bmatrix} &\qquad 
  Z &= \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0
 \end{bmatrix} &\qquad 
-H_m &= \begin{bmatrix}w^1_{m} & 0 \\ 0 & w^2_{m}
+H_m &= \begin{bmatrix}w^1_{m}\sigma^2_r & 0 \\ 0 & w^2_{m}\sigma^2_r
 \end{bmatrix} \\
 \alpha_m &= \begin{bmatrix}s_{m} \\ a_m \\ a_{m-1}\\ a_{m-2}
 \end{bmatrix} & 
@@ -410,12 +409,12 @@ Following maximum likelihood estimation of remaining parameters we use the
 Kalman filter to obtain the smoothed point estimates and variances of the weekly
 inverse reporting ratios. We use forward and backward extrapolation to extend
 these estimates outside of the observed seroprevalence range
-@durbin2012time, followed by linear interpolation to produce daily
+@durbin2012time followed by linear interpolation to produce daily
 values. We then multiply these by the
 corresponding deconvolved case estimates before converting to per-capita values.
 Annual estimates of the state
 populations as of July 1 of 2020 are taken from the Dec.
-2022 press release from the US Census Bureau @uscensus2022annual.
+2022 press release from the US Census Bureau. @uscensus2022annual
 
 ## Ablation analysis of infection-hospitalization correlations
 

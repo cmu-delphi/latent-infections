@@ -4,39 +4,30 @@
 \def\TimesFont{} 
 \graphicspath{{gfx/}}
 
-% \newcommand{\beginsupplement}{
-%   \setcounter{table}{0}  
-%   \renewcommand{\thetable}{S\arabic{table}} 
-%   \renewcommand{\theHtable}{S\arabic{table}} 
-%   \setcounter{figure}{0} 
-%   \renewcommand{\thefigure}{S\arabic{figure}}
-%     \renewcommand{\theHfigure}{S\arabic{figure}} 
-%   \setcounter{section}{0} 
-%   \renewcommand{\thesection}{S\arabic{section}}
-% } 
-% \font\supptitlefont=cmr12 at 16pt 
+\newcommand{\beginsupplement}{
+  \setcounter{table}{0}  
+  \renewcommand{\thetable}{S\arabic{table}} 
+  \renewcommand{\theHtable}{S\arabic{table}} 
+  \setcounter{figure}{0} 
+  \renewcommand{\thefigure}{S\arabic{figure}}
+    \renewcommand{\theHfigure}{S\arabic{figure}} 
+  \setcounter{section}{0} 
+  \renewcommand{\thesection}{S\arabic{section}}
+} 
+\font\supptitlefont=cmr12 at 16pt 
 \newcommand{\attn }[1]{\textcolor{red}{ATTN: #1}}
-\renewcommand{\bibfont}{\doublespacing}
-
-\crefname{appendix}{supplement}{supplements}
-\Crefname{appendix}{Supplement}{Supplements}
-% \usepackage{autonum}
+%\renewcommand{\bibfont}{\doublespacing}
 
 \begin{document}
 \title{Retrospective estimation of latent COVID-19 infections before Omicron in the \US}
 \author[a,1]{Rachel Lobay}
-%\author[b]{Maria Jahja}
 \author[b]{Ajitesh Srivastava}
 \author[c]{Ryan J.\ Tibshirani}
 \author[a]{Daniel J.\ McDonald}
 
 \affil[a]{Department of Statistics, The University of British Columbia}
-%\affil[b]{Department of Statistics \& Data Science, Carnegie Mellon University}
 \affil[b]{Department of Computer and Electrical Engineering, University of Southern California}
 \affil[c]{Department of Statistics, The University of California, Berkeley}
-
-%\footnotetext[1]{To whom correspondence should be
-%  addressed. E-mail: \email{rachel.lobay@stat.ubc.ca}} 
 
 
 
@@ -67,26 +58,27 @@
 %prior to the onset of Omicron and its descendants. 
 %\end{abstract}
 
-\newpage 
 \begin{abstract}
 
-\noindent \textbf{Background:} The timing and magnitude of COVID-19
+The timing and magnitude of COVID-19
 infections are of interest to the public and to public health, but these are
 challenging to discern due to the volume of undetected asymptomatic cases and
-reporting delays. Retrospective estimation of COVID-19 infections improves
-our understanding of the size and scope of the pandemic and provides more
-meaningful quantification of disease patterns and burden. \newline
-\textbf{Methodology:} We retrospectively estimate daily incident infections for
-each \US state prior to Omicron. Reported COVID-19 cases are
+reporting delays. Accurate estimates of COVID-19 infections based on finalized data
+can improve our understanding of the true size of the pandemic and provide more meaningful
+and timely quantification of disease patterns and burden. 
+In this work, we retrospectively estimate daily incident infections for
+each \US state prior to Omicron. To this end, reported COVID-19 cases are
 deconvolved to their date of infection onset using delay distributions estimated
-from the CDC line list. Then, we develop a serology-driven model to scale the
-deconvolved cases and account for unreported infections. The resulting daily
-infection estimates incorporate variant-specific incubation periods,
-time-varying reinfection estimates, and waning antigenic immunity. \newline
-\textbf{Results:} The disease burden from infections emerges earlier and more extensively than is reflected by cases. Notably, infections were severely underreported during the Delta wave, with an estimated reporting rate as low as 6.3\% in New Jersey, 7.3\% in Maryland, and 8.4\% in Nevada. Moreover, in 44 states, fewer than 30\% of infections were eventually reported as cases during this period. \newline
-\textbf{Conclusions:} While reported cases offer a convenient proxy of disease burden, they fail to capture the full extent of infections. Our estimates of infections enhance the understanding of the progression of the pandemic in the \US prior to the onset of Omicron and its descendants. \newline
+from the CDC line list. Then, a novel serology-driven model is used to scale these 
+deconvolved cases to account for
+the unreported infections. The resulting
+infections incorporate variant-specific incubation periods,
+reinfections, and waning antigenic immunity. 
+They clearly demonstrate that the disease burden from infections emerges earlier and more extensively than is reflected by cases. Most notably, infections were severely underreported during the Delta wave, with an estimated reporting rate as low as 6.3\% in New Jersey, 7.3\% in Maryland, and 8.4\% in Nevada. 
+Moreover, in 44 states, fewer than 30\% of infections were eventually reported as cases during this period.
+Therefore, while reported cases offer a convenient proxy of disease burden, they fail to capture the full extent of infections, and often severely underestimate the true disease burden. Finalized infection estimates provide a more realistic picture of the pandemic's progression in the \US prior to the onset of Omicron and its descendants. Furthermore, this retrospective analysis produces estimates for other important quantities for every state such as the number of deconvolved cases specific to each variant, time-varying case ascertainment ratios, and infection-hospitalization ratios.
 
-\noindent\textbf{Keywords:} Infections; Case ascertainment ratio; COVID-19; SARS-CoV-2; Deconvolution; Time series; Seroprevalence; Antibody
+\noindent\textbf{Keywords:} COVID-19; SARS-CoV-2; Infections; Deconvolution; Time series; Seroprevalence; Antibody
 
 \end{abstract}
 
@@ -101,87 +93,11 @@ time-varying reinfection estimates, and waning antigenic immunity. \newline
 \input{doc/discussion.tex}
 
 
-%\section*{Data availability}
-
-%The Nationwide Commercial Laboratory Seroprevalence Survey 
-%and 2020-2021 Nationwide Blood Donor Seroprevalence Survey 
-%data are both freely available at
-%\href{https://data.cdc.gov/Laboratory-Surveillance/Nationwide-Commercial-Laboratory-Seroprevalence-Su/d2tw-32xv}{https://data.cdc.gov/Laboratory-Surveillance/Nationwide-Commercial-Laboratory-Seroprevalence-Su/d2tw-32xv} 
-%and 
-%\href{https://data.cdc.gov/Laboratory-Surveillance/2020-2021-Nationwide-Blood-Donor-Seroprevalence-Su/mtc3-kq6r}{https://data.cdc.gov/Laboratory-Surveillance/2020-2021-Nationwide-Blood-Donor-%Seroprevalence-Su/mtc3-kq6r}. 
-%The COVID-19 Case Surveillance Restricted Access Detailed Data 
-%requires a Restriction Information and Data Use Restrictions 
-%Agreement. More information on the dataset and the agreement 
-%can be found \href{https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Restricted-Access-Detai/mbd7-r32t/about\_data}{https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Restricted-Access-Detai/mbd7-r32t/about\_data}. 
-%The JHU reported case and hospital admission data are 
-%publicly accessible through the COVIDcast API, 
-%\href{https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html}{https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html}. 
-%The data used to construct the incubation periods was obtained from \newline
-%\href{https://elifesciences.org/articles/57149}{https://elifesciences.org/articles/57149}, 
-%\href{https://pubmed.ncbi.nlm.nih.gov/35627870/}{https://pubmed.ncbi.nlm.nih.gov/35627870/}, \newline
-%\href{https://pubmed.ncbi.nlm.nih.gov/34849500/}{https://pubmed.ncbi.nlm.nih.gov/34849500/}, 
-%and \href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8834809/}{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8834809/}. 
-%The data used to estimate the variant proportions in circulation is freely 
-%available at \newline \href{https://github.com/hodcroftlab/covariants}{https://github.com/hodcroftlab/covariants}. 
-%The prior inverse ascertainment ratio estimates were extracted from Table 1 in
-% \href{https://www.nature.com/articles/s41467-020-19652-6}{https://www.nature.com/articles/s41467-020-19652-6}. 
-% The fraction of new infections are based on estimates from \href{https://wwwnc.cdc.gov/eid/article/28/10/22-1045\_article}{https://wwwnc.cdc.gov/eid/article/28/10/22-1045\_article}. 
-%Finally, the state population estimates are from a U.S. Census Bureau press release at \href{https://www.census.gov/data/tables/time-series/demo/popest/2020s-state-total.html}{https://www.census.gov/data/tables/time-series/demo/popest/2020s-state-total.html}.
-
-
-
-
-\section*{Code availability}
-Code for reproducing all figures and the numerical results is 
-available at 
-\href{https://github.com/cmu-delphi/latent-infections/}{https://github.com/cmu-delphi/latent-infections/}.
-
 \clearpage
 %\bibliographystyle{apalike}
 \bibliography{bibliography.bib}
-\bibliographystyle{naturemag} %% Change back to numeric references in line with
-%requirements for Nature Communications articles (see pg 3 fro here:
-%https://www.nature.com/documents/ncomms-formatting-instructions.pdf)
+\bibliographystyle{naturemag} 
 
-
-
-\section*{Acknowledgements}
-
-We would like to thank members of the Delphi research group for valuable
-feedback, and Change Healthcare and Optum/United Health Group for their
-invaluable data partnership and collaboration. 
-
-We gratefully acknowledge all
-data contributors, i.e., the Authors and their Originating laboratories
-responsible for obtaining the specimens, and their Submitting laboratories for
-generating the genetic sequence and metadata and sharing via the GISAID
-Initiative \citep{elbe2017data}, on which this research is based.
-% Required Gisaid acknowledgement
-
-Any opinions, findings, and
-conclusions or recommendations expressed in this material are
-those of the authors and do not necessarily reflect the views of
-the National Science Foundation and the Centers for Disease
-Control and Prevention.
-% NSF and CDC acknowledgement 
-
-DJM and RJT were supported by Centers for Disease Control and Prevention (CDC)
-Grant No.\ 75D30123C15907. DJM and RL received support from the National
-Sciences and Engineering Research Council of Canada and the University of
-British Columbia. AS was supported by the Centers for Disease Control
-and Prevention and the National Science Foundation under
-Award No.\ 2223933 and 2333494. 
-
-
-\section*{Author contributions}
-RT and DJM conceptualized the project. RL acquired the data, performed the
-statistical analysis, and wrote the initial draft of the paper. DJM, RT, and AS,
-reviewed and revised the paper. All authors were involved in significant
-discussion and development of the methodology.
-
-\section*{Competing interests}
-
-The authors declare no competing interests.
 
 \clearpage
 % Eventually make the supplement a separate document with its own title page 
@@ -195,7 +111,9 @@ The authors declare no competing interests.
 \end{center}
 
 \vspace{11pt}
-
+% Reset equation and figure counters
+\setcounter{equation}{0}
+\setcounter{figure}{0}
 \input{doc/supplement.tex}
 
 \end{document}

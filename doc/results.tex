@@ -4,16 +4,18 @@
 \subsection{Infection estimates and cases-to-infections ratios across the \US states}
 \label{sec:omitted-waves}
 
-Prior to Omicron, the largest infection (as opposed to case) outbreaks were
+Prior to Omicron, the largest infection outbreaks were
 observed in the late summer and early fall of 2021 in Louisiana, Georgia, Idaho,
-and Montana (\Crefrange{fig:state_infect_est}{fig:six-states}). During this
-time, the states that have the highest rate of infections on single day are
-Louisiana (476 infections per 100K, on July 20, 2021) and Idaho (also 457
-infections per 100K, on September 7, 2021). The period of lowest viral
-transmission was in the summer of 2020, where Vermont had fewer than 10
-infections per 100K per week from June to August, the longest such lull observed
-for any state. \attn{Can you put one sentence that compares these to the case
-peaks around the same time, just for context?}
+and Montana (\Crefrange{fig:state_infect_est}{fig:six-states}). During this time, 
+the state with the highest rate of infections on a single day is Louisiana, 
+with 476 infections per 100K on July 20, 2021. For comparison, 
+the state's 7-day average case rate peaks at 126 cases per 100K on August 13, 2021. 
+Idaho follows with an infections peak of 457 per 100K on September 7, 2021, 
+and a case peak of 76 per 100K occurring shortly thereafter on September 13, 2021. 
+The period of lowest viral transmission is observed in the summer of 2020, when 
+Vermont has fewer than 10 infections per 100K per week from June to August, the
+ longest such lull observed for any state. %\attn{Can you put one sentence that compares these to the case
+%peaks around the same time, just for context?}
 
 \begin{figure}[!tb]
 \centering
@@ -79,13 +81,17 @@ overlooked. For instance, on August 27, 2021, Montana and Idaho have some of the
 highest infection rates (\Cref{fig:choro_inf_case_rates}). In contrast, their
 case rates are unremarkable (the highest case rates tend to be in the
 Southeast). Infection outbreaks tend to precede case outbreaks, though the lead
-time can vary widely. During the Delta wave, infections in Montana and Idaho lead
-cases by about 41 and 6 days at the peaks (\Cref{fig:state_infect_est}). Such
-trends are also observed during the Ancestral wave, where infections peak about
-12 and 24 days earlier than cases for these same states. \attn{These last two
-sentences read strangely: ``41 and 6 days''? what does that mean?} These temporal
-discrepancies underscore the importance of clearly distinguishing between
-infections and cases when assessing the disease burden and spread of COVID-19.
+time can vary widely. During the Delta wave, infections in Montana 
+peaked about 41 days before cases, while in Idaho, they peaked about 6 days before cases
+(\Cref{fig:state_infect_est}). During the Ancestral wave, 
+infections peaking about 12 days earlier than cases in Montana and 24 days earlier in Idaho,
+demonstrating a notable shift in lead times.
+%Such
+%trends are also observed during the Ancestral wave, where infections peak about
+%12 and 24 days earlier than cases for these same states. \attn{These last two
+%sentences read strangely: ``41 and 6 days''? what does that mean?} These temporal
+%discrepancies underscore the importance of clearly distinguishing between
+%infections and cases when assessing the disease burden and spread of COVID-19.
 
 \begin{figure}[H]
 \centering
@@ -104,9 +110,10 @@ third and fifth dates present the largest number of total infections across the
 \begin{figure}[H]
 \centering
 \includegraphics[width=.72\linewidth]{corr-plot-1.pdf} 
-\caption{Spearman's rank correlation between each of cases and
-infections with hospitalizations per 100,000. These are calculated for each lag,
-state, and rolling window of 61 days before averaging. The vertical dashed lines
+\caption{Spearman's rank correlation between each of 
+infections and cases with hospitalizations per 100,000. A rolling window of 61 days
+ is applied before averaging across all states and times for each lag.
+The vertical dashed lines
 indicate the lags for which the highest average correlation is attained.}
 \label{fig:correlations}
 \end{figure}
@@ -126,9 +133,10 @@ across states are due to the availability of the hospitalization data.}
 \subsection{Insights from cross-correlations, IHRs and CHRs}
 \label{sec:lagged-correlations}
 
-\attn{Need a connecting sentence here. Is this next sentence about infections?}
-The maximum Spearman's correlation, averaged across states, is 0.48, and occurs
-at a lag of 13 days (\Cref{fig:correlations}). In contrast, we find that the
+%\attn{Need a connecting sentence here. Is this next sentence about infections?}
+The maximum Spearman's correlation between infections and hospitalizations
+is 0.48 and occurs at a lag of 13 days (\Cref{fig:correlations}). 
+In contrast, we find that the
 largest average Spearman correlation for cases is 0.69 and occurs at a lag of 1
 day. That is, case reports are nearly contemporaneous to hospitalizations, while
 infection estimates clearly precede them. 
@@ -146,7 +154,7 @@ Carolina) show similar temporal patterns in IHRs and CHRs. In addition, similar
 spikes are evident across many states during waves of infections that are driven
 by variants of concern. For example, many states exhibit a striking increase in
 hospitalizations in mid-2021, which coincides with the rapid takeover of the
-Delta variant \citep{hodcroft2021covariants}. 
+Delta variant. \citep{hodcroft2021covariants}
 
 
 
