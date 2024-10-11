@@ -36,8 +36,8 @@ was used to estimate the necessary delay distributions. Together,
 these are the ingredients for Step 1 in \Cref{fig:cases_to_infect_flowchart}.
 Define $y_{\ell,t}$ to be the number of new cases reported in location $\ell$ at
 time $t$, as reported by the John Hopkins Center for Systems Science and
-Engineering (JHU CSSE)\citealp{dong2020interactive} and retrieved with the
-COVIDcast API. \citep{reinhart2021open} Let $\pi_{\ell,t}(k)$ be the probability
+Engineering (JHU CSSE, \citealp{dong2020interactive}) and retrieved with the
+COVIDcast API \citep{reinhart2021open}. Let $\pi_{\ell,t}(k)$ be the probability
 that cases with positive specimen collection at time $t-k$ are reported at $t$. 
 \end{linenomath*} 
 \begin{linenomath*} 
@@ -65,8 +65,8 @@ Thus, our estimator is given by
 %relative importance of these competing goals. 
 The solution to this minimization
 problem is an adaptive piecewise cubic polynomial \citep{tibshirani2014adaptive,
-tibshirani2022divided} and can be accurately computed with ease.
-\citep{ramdas2016fast,jahja2022real} We select the tuning parameter
+tibshirani2022divided} and can be accurately computed with ease
+\citep{ramdas2016fast,jahja2022real}. We select the tuning parameter
 $\lambda$ with cross-validation
 to minimize the out-of-sample reconvolution error. 
 %Additional details about convolution are given in the Supplement, \Cref{sec:convol}.
@@ -79,7 +79,7 @@ to minimize the out-of-sample reconvolution error.
 
 \begin{linenomath*} 
 To estimate the $\pi_{\ell,t}(k)$ for all states $\ell$, times $t$, and delays
-$k$, we use the CDC line list. \citep{cdc2020caserestr} The line list contains
+$k$, we use the CDC line list \citep{cdc2020caserestr}. The line list contains
 three key dates of interest for many cases that eventually appear in case
 reports: symptom onset, positive specimen collection, and report to the CDC.
 Handling missingness in these dates requires careful attention
@@ -101,7 +101,7 @@ where $\indicator(Z) = 1$ if $Z$ is true and 0 otherwise. We also compute a
 similar national pmf, $\tilde{p}_{t}(k)\indicator(0<k\leq 60)$, without
 restricting to location $\ell$. Next, let $\alpha_{\ell,t}$ be the ratio of
 $N_{\ell,t}$ to the number of cases reported by JHU
-CSSE\cite{dong2020interactive} in the window $[t-60+2, t+75]$. Then, compute
+CSSE \citep{dong2020interactive} in the window $[t-60+2, t+75]$. Then, compute
 $p_{\ell,t} = \alpha_{\ell,t}\tilde{p}_{\ell,t} +
 (1-\alpha_{\ell,t})\tilde{p}_t$. This construction was adopted to allow for more
 reliance on the state estimate when a larger fraction the JHU cases reports
@@ -129,10 +129,11 @@ We use our estimates from \Cref{sec:step1},
 $\widehat{\mathbf{x}}_\ell$, but we weight them corresponding to the mix of
 variants in circulation. To estimate the daily proportions of the variants
 circulating in each state, we use GISAID genomic sequencing data from
-CoVariants.org, \citep{hodcroft2021covariants, elbe2017data} and estimate a
+CoVariants.org \citep{hodcroft2021covariants, elbe2017data}, and estimate a
 multinomial logistic regression model. This procedure is now standard
-(Appendix~D).
-\citep{obermeyer2022analysis, annavajhala2021emergence, figgins2021sars}  The resulting
+(Appendix~D)
+\citep{obermeyer2022analysis, annavajhala2021emergence, figgins2021sars}.
+The resulting
 estimated probability of variant $j$ is given by $\hat{v}_{j\ell,t}$.
 
 To estimate variant-specific delays from infection to positive specimen
@@ -182,11 +183,11 @@ deconvolved case estimates by the inverse reporting ratio, the ratio of the
 number of incident infections to incident reported infections (Step 4 in
 \Cref{fig:cases_to_infect_flowchart}). Seroprevalence of anti-nucleocapsid
 antibodies represents the percentage of people who have at least one resolving
-or past infection, \citep{cdc2020data} so we develop a model that uses the
+or past infection \citep{cdc2020data}, so we develop a model that uses the
 change in subsequent seroprevalence measurements to estimate all new infections. 
 We use two seroprevalence surveys to estimate the proportion of the
 population with evidence of previous infection in each state over time  % the 2020--2021 Blood Donor Seroprevalence Survey and the Nationwide Commercial Lab Seroprevalence Survey 
-(Appendix~I). \citep{cdc2021blood, cdc2021comm}
+(Appendix~I) \citep{cdc2021blood, cdc2021comm}.
 
 To account
 for different surveys occurring on different dates with roughly weekly
@@ -225,9 +226,9 @@ $a_{\ell,m}$ is the inverse reporting ratio. Note that $\gamma$ is the fraction
 of people whose level of infection-induced antibodies falls below the detection
 threshold between time $t$ and time $t+1$. The daily fraction of new infections
 $z_t$ are based on surveillance work conducted by the Southern Nevada Health
-District, \citep{ruff2022rapid} and these estimates are broadly similar to those
-in other locations with available data. \citep{ruff2022rapid, nyreinfect2021,
-hireinfect2022, wareinfect2022} Finally, we specify the time-varying evolution
+District \citep{ruff2022rapid}, and these estimates are broadly similar to those
+in other locations with available data \citep{ruff2022rapid, nyreinfect2021,
+hireinfect2022, wareinfect2022}. Finally, we specify the time-varying evolution
 of the inverse reporting ratio as Gaussian with expectation,
 \begin{align}
   \label{eq:report-ratio}
@@ -253,7 +254,7 @@ are in Appendix~J.
 \subsection{Lagged correlation to hospitalizations and time-varying IHRs} 
 \label{sec:ihr-calculations}
 
-From the COVIDcast API, \citep{reinhart2021open} we retrieve the daily number of
+From the COVIDcast API \citep{reinhart2021open}, we retrieve the daily number of
 confirmed COVID-19 hospital admissions for each state that are collected by the
 \US Department of Health and Human Services (HHS). We use our infection
 estimates $\mathbf{\widehat{u}}_\ell$ to compute the lagged correlation with 
