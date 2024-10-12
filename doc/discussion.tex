@@ -14,26 +14,26 @@ unreported infections. Furthermore, since case reports generally follow symptom
 and infection onsets, cases have a built-in temporal bias. This is in addition
 to other biases from differences in reporting across states such as temporary
 bottlenecks due influxes of data or more persistent processing issues that
-increase the average time from case detection to report. \citep{wash2020dash,
-dunkel2020covid19} Thus, while reported cases provide an indication of the
+increase the average time from case detection to report \citep{wash2020dash,
+dunkel2020covid19}. Thus, while reported cases provide an indication of the
 trajectory of the pandemic, it is delayed and incomplete.
 
 Our approach offers a number of advantages. By incorporating state-level case,
 line list, and variant circulation data, we are able to construct incubation and
 delay distributions that are spatiotemporally specific. Time-varying and
 state-specific seroprevalence data allows the reporting ratio estimates to
-similarly vary over space and time, a departure from existing work.
-\citep{unwin2020state, uga2020covid19} Unlike previous approaches that use a
-single delay distribution to generate estimates for all states,
-\citep{chitwood2022reconstructing, jahja2022real, miller2022statistical} our
+similarly vary over space and time, a departure from existing work
+\citep{unwin2020state, uga2020covid19}. Unlike previous approaches that use a
+single delay distribution to generate estimates for all states
+\citep{chitwood2022reconstructing, jahja2022real, miller2022statistical}, our
 work avoids this assumption of geographic invariance, an assumption that is far
 from realistic due to differences in the reporting pipelines, pandemic response,
 and variants in circulation, among other things. Similarly, prior methodology
-relies on only one incubation period distribution, \citep{miller2022statistical}
+relies on only one incubation period distribution \citep{miller2022statistical},
 whereas our method incorporates variant-specific incubation periods. This
 enhances our infection onset estimation by accounting for the differences across
 variants--specifically, that newer variants tend to have shorter incubation
-periods. \citep{tanaka2022shorter, ogata2022shorter, wu2022incubation}
+periods \citep{tanaka2022shorter, ogata2022shorter, wu2022incubation}.
 
 Another limitation of previous approaches to estimate infections is that they
 often fail to account for reinfections. While reinfections constitute a small
@@ -42,7 +42,7 @@ portion of the total infections until the arrival of high immune-escape variants
 be underestimated with seroprevalence data alone. By accounting for reinfections
 as well as the waning of seropositivity, we more accurately estimate this ratio.
 However, future work could refine this analysis. Because the waning of immunity
-is likely to be variant-dependent, \citep{pooley2023durability} our model's
+is likely to be variant-dependent \citep{pooley2023durability}, our model's
 single waning parameter would be more accurately estimated as a mixture of
 variant-specific parameters with weights determined by the proportion of the
 variants circulating. 
@@ -54,8 +54,8 @@ variants circulating.
 We chose to end our analysis on November 29, 2021, for two main reasons. The
 first is that Omicron and subsequent variants come with substantial increases in
 the risk of reinfection in comparison to previous variants, likely due to
-increased immune escape. \citep{wei2024risk, pulliam2022increased,
-eythorsson2022rate} Access to reinfection data that is representative of each
+increased immune escape \citep{wei2024risk, pulliam2022increased,
+eythorsson2022rate}. Access to reinfection data that is representative of each
 location under study is paramount for extending the analysis. While it would be
 ideal to use the reinfection rates over time for each \US state, many states do
 not publicly report reinfection data over the entire time period under
@@ -87,13 +87,13 @@ examination, if at all.
 The second reason is that the case-ascertainment ratio after December 2021 can
 no longer be estimated with seroprevalence data alone. Specifically, while most
 state-level data suggests that reinfections still account for less than 20\% of
-reported cases during Omicron, \citep{ruff2022rapid, nyreinfect2021,
-hireinfect2022, wareinfect2022} seropositivity rapidly reaches nearly 100\% of
+reported cases during Omicron \citep{ruff2022rapid, nyreinfect2021,
+hireinfect2022, wareinfect2022}, seropositivity rapidly reaches nearly 100\% of
 the population. Therefore, alternative data sources for estimating the
 case-ascertainment ratio must be considered. For example, wastewater
 surveillance data may be complementary to seroprevalence data, especially when
-testing is low, or serve as a substitute when it is unavailable.
-\citep{mcmanus2023predicting} %In follow-up work, we extend our
+testing is low, or serve as a substitute when it is unavailable
+\citep{mcmanus2023predicting}. %In follow-up work, we extend our
 %construction of daily incident infections for the states where sufficient data
 % is available to track reinfections and to incorporate wastewater data.
 % However, viral detection is inconsistent across
@@ -101,8 +101,8 @@ testing is low, or serve as a substitute when it is unavailable.
 % \citep{mcmanus2023predicting, hart2020computational, li2023correlation}.
 An alternative approach could integrate surveillance streams from
 surveys, helplines, or medical records if they
-offer a sufficiently strong signal of the disease intensity over time.
-\citep{reinhart2021open,ecdc2020strategies}
+offer a sufficiently strong signal of the disease intensity over time
+\citep{reinhart2021open,ecdc2020strategies}.
 
 
 
