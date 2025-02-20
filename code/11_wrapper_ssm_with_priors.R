@@ -233,7 +233,7 @@ unadj_infect = unadj_infect_df_day$infect
 unadj_infect = unadj_infect[(start_date - decon_start_date + 1):(end_date - decon_start_date + 1)]
 infects <- unadj_infect
 
-k <- 3 # degree
+k <- k # degree
 
 # Compute obs var for each sero source and use mean as the initial obs_var estimate
 x <- 1:nrow(yorig)

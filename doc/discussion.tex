@@ -5,7 +5,7 @@ the period June 1, 2020 to November 29, 2021. Our estimates support the
 intuition that the pandemic impacted states earlier and at a larger scale
 than is indicated by reported cases. They also emphasize that using cases as a
 proxy for infections can lead to erroneous conclusions about trends in infections.
-More importantly, we observe outbreaks in infections that are missed from
+More importantly, we observed outbreaks in infections that are missed from
 inspecting cases alone such as the Delta wave in 
 New Jersey, Connecticut, and Maryland.
 These sorts of omissions serve to emphasize that cases paint an incomplete
@@ -13,13 +13,56 @@ picture of the pandemic, especially when outbreaks are largely driven by
 unreported infections. Furthermore, since case reports generally follow symptom
 and infection onsets, cases have a built-in temporal bias. This is in addition
 to other biases from differences in reporting across states such as temporary
-bottlenecks due influxes of data or more persistent processing issues that
+bottlenecks due to influxes of data or more persistent processing issues that
 increase the average time from case detection to report \citep{wash2020dash,
 dunkel2020covid19}. Thus, while reported cases provide an indication of the
 trajectory of the pandemic, it is delayed and incomplete.
 
-Our approach offers a number of advantages. By incorporating state-level case,
-line list, and variant circulation data, we are able to construct incubation and
+Case reporting has varied widely over time and across locations globally, not just in 
+the 
+\US, leading to misrepresentations of disease burden and complicating 
+ the development of evidence-based policy decisions. This geographical variation, 
+driven 
+by differing testing capacities and reporting standards, has made it difficult to establish 
+ accurate infection trends and implement appropriate responses. Misleading spatial 
+patterns of reported cases, such as overrepresentation in some areas and 
+underreporting in 
+others
+ (a glimpse of which was shown in \Cref{fig:choro_inf_case_rates}), have further 
+exacerbated the difficulty in 
+ evaluating the true scope of the pandemic and likely hindered effective policy 
+decisions.
+ 
+ While countries like England addressed these case-based challenges 
+ through large-scale infection-prevalence studies, such as the REACT-1 study 
+\citep{react12022},
+ these efforts are limited by the biases inherent 
+to the study design, specifically those related to response rates and population 
+coverage.
+For example, the response rate varied between 11.7\% and 30.5\% 
+in REACT-1, with demographic variation, particularly in relation to age 
+\citep{elliott2023design}. Additionally, 
+such studies are expensive to design and implement, requiring 
+substantial funding for participant recruitment, data collection, and analysis.
+Costs are further compounded due to comprehensive national sampling 
+  as well as mass PCR-based testing \citep{pavelka2021impact}.
+By leveraging routine data streams, our methodology provides a less expensive, more 
+sustainable way to track infections over time.
+Thus, our approach has the potential to be adapted into a cost-effective, real-time 
+alternative for pandemic monitoring, offering timely estimates to inform policymakers 
+and 
+overcoming the biases seen in case reporting (see \citet{jahja2022real}). 
+While large-scale prevalence studies and our approach each have unique strengths, 
+they 
+complement one another. If a large-scale infection prevalence study had been 
+conducted in 
+the \US during the pandemic, comparing the infection estimates from our retrospective 
+analysis with those from the prevalence study would have provided valuable insights, 
+revealing differences or limitations in both methods and ultimately strengthening public 
+health responses.
+
+Our approach offers a number of additional advantages. By incorporating state-level 
+case, line list, and variant circulation data, we are able to construct incubation and
 delay distributions that are spatiotemporally specific. Time-varying and
 state-specific seroprevalence data allows the reporting ratio estimates to
 similarly vary over space and time, a departure from existing work
@@ -38,7 +81,7 @@ periods \citep{tanaka2022shorter, ogata2022shorter, wu2022incubation}.
 Another limitation of previous approaches to estimate infections is that they
 often fail to account for reinfections. While reinfections constitute a small
 portion of the total infections until the arrival of high immune-escape variants
-(BA.1), disregarding them means that the infection-reporting ratio will tend to
+(Omicron BA.1), disregarding them means that the infection-reporting ratio will tend to
 be underestimated with seroprevalence data alone. By accounting for reinfections
 as well as the waning of seropositivity, we more accurately estimate this ratio.
 However, future work could refine this analysis. Because the waning of immunity
@@ -46,11 +89,41 @@ is likely to be variant-dependent \citep{pooley2023durability}, our model's
 single waning parameter would be more accurately estimated as a mixture of
 variant-specific parameters with weights determined by the proportion of the
 variants circulating. 
-%Relatedly, newer variants may escape detection
-%\citep{nih2022assessing, fda2023sars}. While in a retrospective analysis, where
-%finalized data is used, this is less likely to be an issue, detection escape
-%would pose a problem for real-time estimates of infections.
 
+While we did consider the waning of seropositivity in our modelling procedure, we did 
+not explicitly consider the relationship between the epidemic growth rate and the 
+probability of testing positive in PCR tests. Specifically, during high rates of growth in 
+an epidemic, a greater proportion of infections come from individuals early in their 
+infection, who have higher viral loads and are more likely to test positive. During a 
+decline, more individuals are later in their infection, having lower viral loads, which 
+makes them less likely to test positive. This dynamic relationship between infection 
+stage, viral load, and test positivity has been well-described by 
+\citet{hay2021estimating}. In the context of the data sources that we used, since viral 
+RNA loads tended to peak early on infection \citep{frediani2024new}, individuals in the 
+early stages of infection were more likely to test positive and, therefore, be 
+represented in case reports. We acknowledge that this effect may be substantial and 
+could influence the accuracy of the deconvolve case and infection estimates, 
+especially during rapid changes in the epidemic trajectory. Thus, future work could 
+explore how incorporating how viral loads change over time (and impact the probability 
+of testing positive) could the improve the precision of our infection estimates. 
+Additionally, incorporating individual-level viral load data could help to refine the timing 
+of infections relative to case report, improving the accuracy of the finalized infection 
+estimates. 
+
+In addition to incorporating viral load data in our analysis, another area for potential 
+improvement is the lag time between infections and hospitalizations.
+While studies such as REACT-1 in the UK have suggested that the lag between 
+infections and hospitalizations varies over time \citep{eales2023dynamics}, we utilized a single 
+lag in our analysis for two main reasons. The first was that our initial analytical goal 
+regarding hospitalizations was to identify a generalized lag that maximized the correlation 
+between infection and hospitalization rates across all states over a broad period of time. 
+Secondly, utilizing a single lag simplified the estimation process, helping to stabilize the ratios 
+and reducing modelling-induced variability. Overall, we aimed to estimate the IHRs in a 
+simple way that was robust across all states and that limited modelling assumptions. 
+Nevertheless, future work could explore time-varying lags, particularly with respect to how well they 
+align with the emergence of new variants and policy measures.
+
+Another aspect of our analysis that warrants consideration is the time period under study. 
 We chose to end our analysis on November 29, 2021, for two main reasons. The
 first is that Omicron and subsequent variants come with substantial increases in
 the risk of reinfection in comparison to previous variants, likely due to
@@ -60,30 +133,7 @@ location under study is paramount for extending the analysis. While it would be
 ideal to use the reinfection rates over time for each \US state, many states do
 not publicly report reinfection data over the entire time period under
 examination, if at all.
-% While it would be ideal to use confirmed rates over time for each \US state,
-% most states do not publicly report reinfection data over the entire time period
-% we considered. So we have turned to suspected reinfection data over time for
-% Clark County, USA, as that surveillance is among the most detailed and reputable
-% that we have found for the United States. Nevertheless, using such localized
-% data raises questions of representativeness and the applicability of such
-% estimates to Nevada and all other states. Furthermore, this data has no
-% information available beyond suspected third infections, which imposes an
-% irremediable bias. However, based on the third infection data available there,
-% we expect that the probability of being reinfected more than three times is
-% likely very low for time frame considered and so the omission of these would
-% impact our infection estimates to a minimal extent. 
-%
-% The vast majority of issues we encountered when trying to reconstruct the
-% infection time series for each state are due to an absence or a lack of data.
-% Such is the primary issue we had with the restricted line list. In comparison to
-% the number of JHU cases (which we are treating as a gold standard) for the same
-% release date, we noted there are about $10$ million cases that are unaccounted
-% for in the CDC line list. Moreover, the missingness does not appear to be random
-% and uniformly distributed across states. Rather it is unequally distributed,
-% suggesting that the dataset is likely biased. However, more information on the
-% cases that are missing versus present would be required to determine the extent
-% the missing cases led to a nonrepresentative, and therefore, biased sample, and
-% could be a topic of further study.
+
 The second reason is that the case-ascertainment ratio after December 2021 can
 no longer be estimated with seroprevalence data alone. Specifically, while most
 state-level data suggests that reinfections still account for less than 20\% of
@@ -93,57 +143,15 @@ the population. Therefore, alternative data sources for estimating the
 case-ascertainment ratio must be considered. For example, wastewater
 surveillance data may be complementary to seroprevalence data, especially when
 testing is low, or serve as a substitute when it is unavailable
-\citep{mcmanus2023predicting}. %In follow-up work, we extend our
-%construction of daily incident infections for the states where sufficient data
-% is available to track reinfections and to incorporate wastewater data.
-% However, viral detection is inconsistent across
-% locations due to temperature, per-capita water use, and in-sewer travel time
-% \citep{mcmanus2023predicting, hart2020computational, li2023correlation}.
+\citep{mcmanus2023predicting}. 
 An alternative approach could integrate surveillance streams from
 surveys, helplines, or medical records if they
 offer a sufficiently strong signal of the disease intensity over time
 \citep{reinhart2021open,ecdc2020strategies}.
 
-
-
-% \attn{Some into Methods, some into Supplement}
-% also runs the risk of being nonrepresentative of the
-% intended population \citep{bajema2021estimated}. For example, in the blood donor
-% dataset some states have region specific-estimates, which clearly do not stand
-% for the entire state. Another source of systematic variation is in the
-% characteristics of the individuals who opt for blood tests versus those who do
-% not. For instance, there may be a healthy user bias, in which a number of those
-% who opt for blood tests are generally more inclined to partake in proactive
-% healthy behaviors (such as checking on basic health markers by taking an annual
-% blood test) than those who do not \citep{parsley2018blood}. Alternatively, a
-% number of individuals may be recommended for blood tests by their doctors due to
-% signs of ill-health (ex. mineral deficiencies or underlying medical conditions).
-% The extent that each such bias persists depends on the purpose of the blood test
-% and whether it was used as a proactive or reactive medical tool. Since such
-% information is unavailable to us, all we can conclude is that participant-driven
-% sources of bias impact the seroprevalence samples to an undetermined extent.
-% There are additional concerns about the performance of antibody testing for
-% individuals with mild or asymptomatic disease as well as about the loss of
-% immunity over time \citep{kaku2021performance, seow2020longitudinal,
-% ibarrondo2020rapid}.
-% 
-% In this work, we do not attempt to directly address infection underascertainment
-% due to the increase in asymptomatic infections across variants
-% \citep{pho2023covid19}. We simply note that this would likely pose a greater
-% problem later in the pandemic, particularly after the Delta era
-% \citep{fan2022sars}. We hope that such infections would be largely represented
-% by the seroprevalence and reinfection estimates, but there is undoubtedly
-% increasing reliance on such estimates to be able to do this over time (owing to
-% the simultaneous decline in the reporting cadence and the apparent rise in
-% asymptomatic infections over time) \citep{oph2022covid, garrett2022high,
-% blauer2022reduce, ren2021asymptomatic}. Consequently, there is an increasing
-% uncertainty over time that is not captured by the model or the estimates.   
-
 Our work develops a deconvolution-based approach to inferring infection onset,
 combining available line list data with variant circulation estimates and
 literature derived incubation periods.
-%  The result removes the effects of the
-%delay from reported cases, pushing them back to infection onset.
  This approach is complemented with the development of a model that incorporates
  waning detectable antibody levels and major seroprevalence surveys.
 The resulting infection estimates as well as their geospatial and temporal
@@ -156,18 +164,3 @@ magnitude of the disease burden for each location, and highlight trends
 that may not be visible from reported case data alone. Therefore, these infection
 estimates provide key information for the ongoing investigation on the true size
 and impact of the pandemic.
-
-%
-% Our approach is predicated upon having case, line list, viral circulation, and
-% seroprevalence data for each state, all of which are readily available (or
-% available upon request in the case of restricted line list data). As a result of
-% this, we are able to demonstrate the feasibility of estimating COVID-19
-% infections at the state level by using standard sources of data. 
-%
-% Our framework is quite versatile as it lends itself to more localized, county or
-% community level estimates, or globalized, country-specific estimates.
-% Fundamentally, to produce estimates of infections for different geographic
-% regions, one would simply need to input the required data and re-run the code
-% pipeline. In this way, one could readily adapt our approach to generate
-% estimates for the provinces in Canada or the regions in England.
-%

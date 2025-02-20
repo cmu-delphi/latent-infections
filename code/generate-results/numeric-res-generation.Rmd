@@ -32,7 +32,8 @@ pop_used <- "population_2020"
 
 adj_df_by_var <- read_rds("data/adj_df_by_var.rds")
 
-corrs <- read_rds("data/corr_inf_decon_case_lags.rds")
+corrs_hosp <- read_rds("data/inf_case_corrs_hosp.rds") 
+corrs_deaths <- read_rds("data/inf_case_corrs_deaths.rds") 
 ```
 
 # Results
@@ -50,7 +51,7 @@ max_adj_inf_rate = max_adj_inf_rate %>% pull(max_adj_rate)
 adj_df %>%
   filter(adj_inf_rate %in% max_adj_inf_rate[1:5]) %>% # Top 5
   arrange(desc(adj_inf_rate)) %>% 
-  select(geo_value, date, adj_inf_rate)
+  select(geo_value, date, adj_inf_rate, ninetyfive_lowb_rate, ninetyfive_upb_rate)
 
 # Case rates max around the time of the peak for the top two
 adj_df %>% 
@@ -202,20 +203,36 @@ case_date_vec_delta = case_top_delta %>% pull(date)
 case_date_vec_delta - inf_date_vec_delta
 ```
 
-## The relationship between infections and hospitalizations is complicated.
+## The relationship between infections and hospitalizations/deaths is complicated.
 
 ```{r inf-case-corr}
+# Hospitalizations
 # Maximum average correlation across states for...
 
 # Infections
-with(corrs,
+with(corrs_hosp,
      infect_res[which(infect_res$cor == max(infect_res$cor)), ]
 )
 
 # Cases
-with(corrs,
+with(corrs_hosp,
      cases_res[which(cases_res$cor == max(cases_res$cor)), ]
 )
 
 ```
 
+```{r inf-case-corr-deaths}
+# Deaths
+# Maximum average correlation across states for...
+
+# Infections
+with(corrs_deaths,
+     infect_res[which(infect_res$cor == max(infect_res$cor)), ]
+)
+
+# Cases
+with(corrs_deaths,
+     cases_res[which(cases_res$cor == max(cases_res$cor)), ]
+)
+
+```

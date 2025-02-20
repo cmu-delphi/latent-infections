@@ -46,8 +46,10 @@ pop_used <- "population_2020"
 six_states = c("MT", "MA", "ID", "LA", "CA", "OH")
 state_decon_byvar_df <- read_rds(here("data", "state_decon_byvar_df.rds"))
 
-corrs <- read_rds(here("data", "corr_inf_decon_case_lags.rds"))
+corrs_hosp <- read_rds(here("data", "inf_case_corrs_hosp.rds"))
+corrs_deaths <- read_rds(here("data", "inf_case_corrs_deaths.rds"))
 ihrs_dat <- read_rds(here("data", "ihrs_dat.rds"))
+ifrs_dat <- read_rds(here("data", "ifrs_dat.rds"))
 density_data <- read_rds(here("data", "gamma_density_data.rds"))
 ca_interp_list <- read_rds(here("data", "ca_interp_list.rds"))
 
@@ -151,19 +153,20 @@ plot_usmap_fun <- function(plot_date, value, plot_name, max_choro_lim){
         legend.text = element_text(size = 12),
         plot.title = element_text(size = 12, vjust = 0))
 }
-# Adjusted infection rates plots
-p1 <- plot_usmap_fun(first_date, "adj_inf_rate", "Infections", max_choro_lim_inf) 
-p2 <- plot_usmap_fun(second_date, "adj_inf_rate", "Infections", max_choro_lim_inf) 
-p3 <- plot_usmap_fun(third_date, "adj_inf_rate", "Infections", max_choro_lim_inf) 
-p4 <- plot_usmap_fun(fourth_date, "adj_inf_rate", "Infections", max_choro_lim_inf) 
-p5 <- plot_usmap_fun(fifth_date, "adj_inf_rate", "Infections", max_choro_lim_inf) 
-
 # 7dav case rate plots
-p6 <- plot_usmap_fun(first_date, "cases_rate_7d_av", "Reported cases", max_choro_lim_cases) 
-p7 <- plot_usmap_fun(second_date, "cases_rate_7d_av", "Reported cases", max_choro_lim_cases) 
-p8 <- plot_usmap_fun(third_date, "cases_rate_7d_av", "Reported cases", max_choro_lim_cases) 
-p9 <- plot_usmap_fun(fourth_date, "cases_rate_7d_av", "Reported cases", max_choro_lim_cases) 
-p10 <- plot_usmap_fun(fifth_date, "cases_rate_7d_av", "Reported cases", max_choro_lim_cases) 
+p1 <- plot_usmap_fun(first_date, "cases_rate_7d_av", "Reported cases", max_choro_lim_cases) 
+p2 <- plot_usmap_fun(second_date, "cases_rate_7d_av", "Reported cases", max_choro_lim_cases) 
+p3 <- plot_usmap_fun(third_date, "cases_rate_7d_av", "Reported cases", max_choro_lim_cases) 
+p4 <- plot_usmap_fun(fourth_date, "cases_rate_7d_av", "Reported cases", max_choro_lim_cases) 
+p5 <- plot_usmap_fun(fifth_date, "cases_rate_7d_av", "Reported cases", max_choro_lim_cases) 
+
+# Adjusted infection rates plots
+p6 <- plot_usmap_fun(first_date, "adj_inf_rate", "Infections", max_choro_lim_inf) 
+p7 <- plot_usmap_fun(second_date, "adj_inf_rate", "Infections", max_choro_lim_inf) 
+p8 <- plot_usmap_fun(third_date, "adj_inf_rate", "Infections", max_choro_lim_inf) 
+p9 <- plot_usmap_fun(fourth_date, "adj_inf_rate", "Infections", max_choro_lim_inf) 
+p10 <- plot_usmap_fun(fifth_date, "adj_inf_rate", "Infections", max_choro_lim_inf) 
+
 
 # Use patchwork to arrange plots side-by-side in ggplot2
 p1 + p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9 + p10 + plot_layout(ncol = 5, guides = "collect") & theme(legend.position = 'right', legend.justification = 'right')
@@ -253,8 +256,8 @@ plot_grid(shared_y_lab, pg, nrow = 1, rel_widths = c(.05, 1))
 
 
 ```{r corr-plot, include = FALSE, fig.width=6, fig.height=4}
-# Infection and case average correlation across lags on the same plot
-corrs_df <- list_rbind(corrs[1:2], names_to = "type") |> 
+# Infection and case average correlation with hospitalizations across lags on the same plot
+corrs_df <- list_rbind(corrs_hosp[1:2], names_to = "type") |> 
   mutate(type = case_when(
     type == "infect_res" ~ "Infections",
     type == "cases_res" ~ "Reported cases"
@@ -289,8 +292,8 @@ ggplot(corrs_df, aes(lag, cor, color = type, group = type)) +
 # Rolling window time-varying IHRs for each state 
 
 ggplot(ihrs_dat, aes(x = time_value)) +
-  geom_line(aes(y = IHR, color = "Infections")) +
-  geom_line(aes(y = CHR, color = "Cases")) +
+  geom_line(aes(y = IHR, color = "IHR")) +
+  geom_line(aes(y = CHR, color = "CHR")) +
   facet_geo( ~ geo_value, grid = my_grid) +
   ylab("Hospitalization to incidence ratio") +
   scale_x_date(name = "", breaks = seq(as.Date("2020-07-01"), as.Date("2021-07-01"), by = "6 months"),
@@ -307,10 +310,69 @@ ggplot(ihrs_dat, aes(x = time_value)) +
         strip.text = element_text(size = 8, face = "bold", margin = margin(1, 0, 1, 0, "mm"))) +
   scale_color_manual(
     name = "",
-    values=c('Infections' = "midnightblue",'Cases' = "darkorange2")
+    values=c('IHR' = "midnightblue",'CHR' = "darkorange2")
     )
 ```
 
+```{r corr-plot-deaths, include = FALSE, fig.width=6, fig.height=4}
+# Infection and case average correlation with deaths across lags on the same plot
+corrs_df_deaths <- list_rbind(corrs_deaths[1:2], names_to = "type") |> 
+  mutate(type = case_when(
+    type == "infect_res" ~ "Infections",
+    type == "cases_res" ~ "Reported cases"
+  ))
+ggplot(corrs_df_deaths, aes(lag, cor, color = type, group = type)) +
+  geom_line() + 
+  geom_point() +
+  geom_vline(
+    data = filter(corrs_df_deaths, cor == max(cor), .by = type),
+    aes(xintercept = lag, color = type), linetype = 2) +
+  scale_color_manual(
+    name = "", 
+    values = c("Infections" = "midnightblue", 
+               "Reported cases" = "darkorange2"
+    )) +
+  labs(x = "Days before death", y = "Average correlation") +
+  theme_bw(16) +
+  theme(legend.position = "inside",
+        legend.position.inside = c(.85, .90),
+        axis.text.x = element_text(size = 12),
+        axis.title.x = element_text(size = 14),
+        axis.text.y = element_text(size = 12),
+        axis.title.y = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        legend.background=element_blank(),
+        legend.key = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+```
+
+```{r ifrs, include = FALSE, fig.width=12, fig.height=7}
+# Rolling window time-varying IFRs for each state 
+
+ggplot(ifrs_dat, aes(x = time_value)) +
+  geom_line(aes(y = IFR, color = "IFR")) +
+  geom_line(aes(y = CFR, color = "CFR")) +
+  facet_geo( ~ geo_value, grid = my_grid) +
+  ylab("Death to incidence ratio") +
+  scale_x_date(name = "", breaks = seq(as.Date("2020-07-01"), as.Date("2021-07-01"), by = "6 months"),
+               date_labels = "%m/%y", expand = c(0,0)) +
+  coord_cartesian(ylim = c(0, 0.075)) +  
+  theme_bw(16) +
+  theme(axis.text.x = element_text(hjust = 0.1, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.position = c(0.9, 0.15),
+        legend.key.size = unit(0.5, "cm"),
+        panel.spacing = unit(3, "pt"),
+        strip.text = element_text(size = 8, face = "bold", margin = margin(1, 0, 1, 0, "mm"))) +
+  scale_color_manual(
+    name = "",
+    values=c('IFR' = "midnightblue",'CFR' = "darkorange2")
+  )
+```
 
 ## Methods
 
