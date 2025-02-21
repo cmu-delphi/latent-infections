@@ -51,17 +51,32 @@ sustainable way to track infections over time.
 Thus, our approach has the potential to be adapted into a cost-effective, real-time 
 alternative for pandemic monitoring, offering timely estimates to inform policymakers 
 and 
-overcoming the biases seen in case reporting (see \citet{jahja2022real}). 
-While large-scale prevalence studies and our approach each have unique strengths, 
-they 
-complement one another. If a large-scale infection prevalence study had been 
-conducted in 
-the \US during the pandemic, comparing the infection estimates from our retrospective 
-analysis with those from the prevalence study would have provided valuable insights, 
-revealing differences or limitations in both methods and ultimately strengthening public 
-health responses.
+overcoming the biases seen in case reporting. 
 
-Our approach offers a number of additional advantages. By incorporating state-level 
+Though our approach could be extended to real-time estimation, it would be 
+complicated due to data-driven issues such as delay and right censoring. For instance, 
+\citet{jahja2022real} explore estimating infections in real-time using the CDC line list 
+data set in a similar deconvolution-based approach. They highlight complexities with 
+using this data set for estimation, including monthly updates and right censoring. To 
+handle the right censoring problem, they created a Kaplan-Meier-like method and they 
+applied specialized regularization techniques to manage fluctuations in estimates 
+around the date of interest. Similar techniques would likely need to be applied to 
+manage the CDC line list dataset if we were to extend our approach to a real-time 
+analysis. For a brief overview of the other main data sources we used, their data 
+collection period, update frequency, and major sources of delay, which are factors that 
+would likely impact right censoring and increase volatility in real-time estimation, please 
+see Appendix~A. 
+%While large-scale prevalence studies and our approach each have unique strengths, 
+%they 
+%complement one another. If a large-scale infection prevalence study had been 
+%conducted in 
+%the \US during the pandemic, comparing the infection estimates from our retrospective 
+%analysis with those from the prevalence study would have provided valuable insights, 
+%revealing differences or limitations in both methods and ultimately strengthening public 
+%health responses.
+
+Our approach offers a number of additional advantages.
+By incorporating state-level 
 case, line list, and variant circulation data, we are able to construct incubation and
 delay distributions that are spatiotemporally specific. Time-varying and
 state-specific seroprevalence data allows the reporting ratio estimates to
@@ -104,22 +119,21 @@ early stages of infection were more likely to test positive and, therefore, be
 represented in case reports. We acknowledge that this effect may be substantial and 
 could influence the accuracy of the deconvolve case and infection estimates, 
 especially during rapid changes in the epidemic trajectory. Thus, future work could 
-explore how incorporating how viral loads change over time (and impact the probability 
-of testing positive) could the improve the precision of our infection estimates. 
-Additionally, incorporating individual-level viral load data could help to refine the timing 
-of infections relative to case reports, improving the accuracy of the finalized infection 
-estimates. 
+explore how incorporating how viral loads change over time could the improve the precision
+ of our infection estimates, as incorporating individual-level viral load data could help to 
+ refine the timing of infections relative to case reports.
 
-In addition to incorporating viral load data in our analysis, another area for potential 
+In addition to incorporating viral load data, another area for potential 
 improvement is the lag time between infections and hospitalizations.
-While studies such as REACT-1 in the UK have suggested that the lag between 
-infections and hospitalizations varies over time \citep{eales2023dynamics}, we utilized a single 
-lag in our analysis for two main reasons. The first was that our initial analytical goal 
-regarding hospitalizations was to identify a generalized lag that maximized the correlation 
-between infection and hospitalization rates across all states over a broad period of time. 
-Secondly, utilizing a single lag simplified the estimation process, helping to stabilize the ratios 
-and reducing modelling-induced variability. Overall, we aimed to estimate the IHRs in a 
-simple way that was robust across all states and that limited modelling assumptions. 
+While REACT-1 has suggested that the lag between 
+infections and hospitalizations changes over time \citep{eales2022quantifying}, we used
+a single lag because our initial goal was to find 
+a lag that maximized the correlation between infection and hospitalization 
+rates across all states over a considerable period of time.
+Moreover, using a single lag simplified the estimation process, 
+relying on few modelling assumptions
+and helping to stabilize the ratios (especially in comparison to potentially 
+overfitting by varying the lags for each state).
 Nevertheless, future work could explore time-varying lags, particularly with respect to how well they 
 align with the emergence of new variants and policy measures.
 
