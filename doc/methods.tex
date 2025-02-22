@@ -45,7 +45,7 @@ modelled $y_{\ell,t}$ as a Gaussian with mean
   \mathbb{E}[y_{\ell,t} \mid x_{\ell,s}, s \leq t ] =\sum_{k} \pi_{\ell,t-k}(k)x_{\ell,t-k},
   \label{eq:cases-model}
 \end{align}
-which is a probability weighted sum of the number of positive specimens
+which is a probability-weighted sum of the number of positive specimens
 collected $k$ days earlier, $x_{\ell,t-k}$.
 We estimated $\mathbf{x}_\ell = \{x_{\ell,1},\ldots,x_{\ell,T}\}$ by minimizing
 the negative log-likelihood with a penalty that encouraged smoothness in time.
@@ -297,23 +297,18 @@ The results of this analysis are reported in Appendix~J.
 
 The same procedure used for IHRs was utilized to compute IFRs, with a few data-driven 
 adjustments. 
-Firstly, we retrieved the number of weekly new deaths with COVID-19 for each state from 
+We retrieved the number of weekly new deaths with COVID-19 for each state from 
 COVIDcast API \citep{reinhart2021open}, collected by the National Center for Health 
 Statistics (NCHS). We opted for these death counts over those from JHU CSSE because 
 they are aligned by the date of death and not  the report date. Since these are at the weekly 
-level, while the infection estimates are daily, we converted these to daily by using a simple 
-proportional allocation approach for distributing the weekly counts across the adjacent 
-weeks. Firstly, we created daily estimates for each such weekly total by dividing by seven. 
-For weeks that had a missing value, we used a simple forward fill approach to fill-in the 
-missing value. Then, since each weekly total count of mortality data was situated on a 
-Sunday, we estimated a value for each day in a week by using a weighted combination of 
-the preceding Sunday's and the following Sunday's values. For instance, Monday's value 
-was constructed from a weighted combination, using 6/7 of the preceding Sunday's value 
-and 1/7 of the following Sunday's values. Similarly, for Tuesday, the weighted combination 
-was comprised of 5/7 of the preceding Sunday's value and 2/7 of the following Sunday's 
-values. This approach extended to other days of the week. The underlying idea was 
-that the weight was adjusted based on the position of the day in the week, and weighting 
-more towards the value of the Sunday that the day under consideration was closer to. 
+level, while the infection estimates are daily, we converted these to daily by 
+proportionally allocating the weekly counts across the intervening
+days. First, all weekly totals were divided by 7 and missing weeks were imputed with the previous week's value.
+Then, since each weekly total was reported on a 
+Sunday, we estimated a value for each day within the week using a weighted combination of 
+the preceding Sunday's and the following Sunday's values (e.g.\ Tuesday
+was imputed of 5/7 of the preceding Sunday's value and 2/7 of the following Sunday's 
+value).
 
 To identify the optimal lag, we considered a larger range of lag values than for 
 hospitalizations, from 1 to 35 days, as deaths typically follow hospitalization. As with the 
