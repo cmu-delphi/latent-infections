@@ -34,7 +34,7 @@ exacerbated the difficulty in
 decisions.
  
  While countries like England addressed these case-based challenges 
- through large-scale infection-prevalence studies, such as the REACT-1 study 
+ through large-scale infection-prevalence surveys, such as the REACT-1 study 
 \citep{react12022},
  these efforts are limited by the biases inherent 
 to the study design, specifically those related to response rates and population 
@@ -53,9 +53,10 @@ alternative for pandemic monitoring, offering timely estimates to inform policym
 and 
 overcoming the biases seen in case reporting. 
 
-Though our approach could be extended to real-time estimation, it would be 
-complicated due to data-driven issues such as delay and right censoring. For instance, 
-\citet{jahja2022real} explore estimating infections in real-time using the CDC line list 
+Though this paper focused on retrospective estimation, this approach could be
+extended to the real-time case. However, such an extension would be 
+challenging due to data-driven issues, particularly reporting delays and right censoring. For instance, 
+\citet{jahja2022real} explores estimating infections in real-time using the CDC line list 
 data set in a similar deconvolution-based approach. They highlight complexities with 
 using this data set for estimation, including monthly updates and right censoring. To 
 handle the right censoring problem, they created a Kaplan-Meier-like method and they 
@@ -106,36 +107,30 @@ variant-specific parameters with weights determined by the proportion of the
 variants circulating. 
 
 While we did consider the waning of seropositivity in our modelling procedure, we did 
-not explicitly consider the relationship between the epidemic growth rate and the 
-probability of testing positive in PCR tests. Specifically, during high rates of growth in 
+not explicitly consider the relationship between the epidemic growth rates and the 
+probability of positive tests. Specifically, during upswings in 
 an epidemic, a greater proportion of infections come from individuals early in their 
-infection, who have higher viral loads and are more likely to test positive. During a 
+infection, who have higher viral loads and are more likely to test positive \citep{frediani2024new}. During a 
 decline, more individuals are later in their infection, having lower viral loads, which 
 makes them less likely to test positive. This dynamic relationship between infection 
 stage, viral load, and test positivity has been well-described by 
-\citet{hay2021estimating}. In the context of the data sources that we used, since viral 
-RNA loads tended to peak early on infection \citep{frediani2024new}, individuals in the 
-early stages of infection were more likely to test positive and, therefore, be 
-represented in case reports. We acknowledge that this effect may be substantial and 
-could influence the accuracy of the deconvolve case and infection estimates, 
+\citet{hay2021estimating}. This effect may be substantial and 
+could influence the accuracy of the deconvolved case and infection estimates, 
 especially during rapid changes in the epidemic trajectory. Thus, future work could 
-explore how incorporating how viral loads change over time could the improve the precision
- of our infection estimates, as incorporating individual-level viral load data could help to 
- refine the timing of infections relative to case reports.
+explore principled adjustments to combat these effects.
 
-In addition to incorporating viral load data, another area for potential 
-improvement is the lag time between infections and hospitalizations.
-While REACT-1 has suggested that the lag between 
-infections and hospitalizations changes over time \citep{eales2022quantifying}, we used
-a single lag because our initial goal was to find 
-a lag that maximized the correlation between infection and hospitalization 
-rates across all states over a considerable period of time.
-Moreover, using a single lag simplified the estimation process, 
-relying on few modelling assumptions
-and helping to stabilize the ratios (especially in comparison to potentially 
-overfitting by varying the lags for each state).
-Nevertheless, future work could explore time-varying lags, particularly with respect to how well they 
-align with the emergence of new variants and policy measures.
+Another area for potential 
+improvement is the use of the constant-lag relationship between infections and
+hospitalizations. We used
+a single lag in our analysis, emphasizing the contrast between case-based
+calculations and those based on estimated infections.
+However, using a single lag is problematic as these are likely to vary over space and
+time \citep{react12022} due to changing variants, local public health
+availability, and policy decisions, among other reasons. Additionally, this sort
+of estimator is likely to create bias, even if correctly specified, and should
+generally be avoided \citep{GoldwasserHu2024}. Future work could explore multiple lags or heterogenous
+convolutional estimators \citep{Overton2022} using distributions of delays rather than single lags.
+
 
 Another aspect of our analysis that warrants consideration is the time period under study. 
 We chose to end our analysis on November 29, 2021, for two main reasons. The
