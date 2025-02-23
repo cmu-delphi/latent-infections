@@ -152,9 +152,7 @@ we modelled the variant-specific, deconvolved cases as Gaussian with mean
 \widehat{\tau}_{j\ell,t-k}(k) u_{j\ell,t-k} 
 \end{align}
 and estimated $\mathbf{u}_{j\ell}$ by minimizing the negative log-likelihood with
-a penalty to promote smoothness between adjacent sets of estimates 
-over roughly weekly intervals, which allows for the model to adapt to abrupt temporal
-changes, while still encouraging localized smoothness:
+a penalty to promote smoothness:
 \begin{align}
 \widetilde{\mathbf{u}}_{j\ell} = \argmin_{\mathbf{u}}\ \sum_{t} 
 \left( 
@@ -164,6 +162,14 @@ changes, while still encouraging localized smoothness:
 + \lambda\ \sum_{t} \big|u_{t} - 4u_{t-1} + 6u_{t-2} -4u_{t-3}+ u_{t-4}\big|.
 \end{align} 
 \end{linenomath*} 
+
+Note that the $\ell_1$ penalty, applied to small, adjacent 
+subsets of deconvolved cases, results in piecewise polynomials with adaptively 
+chosen segment locations. This enables the model to capture localized changes 
+and promote smoothness within segments, in contrast to the $\ell_2$ penalty used in 
+smoothing splines that enforces global smoothness. The smoothing occurs over sets 
+of five consecutive case counts (roughly weekly smoothing) as determined by 
+the discrete derivative order. 
 
 We call the solution $\widetilde{\mathbf{u}}_{j\ell}$ the \emph{variant-specific
 deconvolved cases} and emphasize that these are cases that were eventually
@@ -318,7 +324,7 @@ more towards the value of the Sunday that the day under consideration was closer
 To identify the optimal lag, we considered a larger range of lag values than for 
 hospitalizations, from 1 to 35 days, as deaths typically follow hospitalization. As with the 
 IHRs, we performed an ablation study to evaluate the effect of our modelling choices 
-(Appendix~K). %%%
+(Appendix~K). 
  
 Next, we computed Spearman's rank-based correlation between the state infection and 
 death rates using a 91-day center-aligned rolling window. Then, we averaged across the 
@@ -327,4 +333,4 @@ highest correlation was used to compute time-varying IFRs. Similar to the approa
 IHRs, we constructed time-varying IFRs by using a 91-day rolling window to sum the deaths 
 and infections within that window. Finally, to account for the effect of window size on the 
 resulting IFRs, we conducted a sensitivity analysis by varying the window size from 31 to 
-101 days, with the results provided in Appendix~L. %%%
+101 days, with the results provided in Appendix~L. 

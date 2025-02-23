@@ -518,5 +518,13 @@ knitr::include_graphics("ifrs-win-91.pdf")
 knitr::include_graphics("ifrs-win-101.pdf")
 ```
 
+## Mean and 95% confidence intervals for IHRs and IFRs by state
+
+This presents the mean and asymptotic normal 95% confidence intervals for the overall IHRs and IFRs for each state. While the mean IHRs were comparable across states, Louisiana, New Hampshire, and Vermont had the highest mean IHRs, around 0.2, with larger spreads. For the IFRs, New Hampshire also had a slightly higher mean of 0.015, compared to the pattern of values being below 0.01 for most states.
+ 
+```{r overall-ihrs-ifrs, echo=FALSE, out.width = '100%', fig.cap="Mean and asymptotic normal 95% confidence intervals for the overall IHRs and IFRs for each state."}
+knitr::include_graphics("overall-ihrs-ifrs.pdf")
+```
+
 \newpage
 # Supplementary References {-}
