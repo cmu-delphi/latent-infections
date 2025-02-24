@@ -61,12 +61,18 @@ Thus, our estimator was given by
 %squared errors) with smoothness in the resulting estimates (the fourth order
 %differences of $\mathbf{x}$). The tuning parameter $\lambda$ determines the
 %relative importance of these competing goals. 
-The solution to this minimization
-problem was an adaptive piecewise cubic polynomial \citep{tibshirani2014adaptive,
-tibshirani2022divided} and could be accurately computed with ease
-\citep{ramdas2016fast,jahja2022real}. We selected the tuning parameter
-$\lambda$ with cross-validation
-to minimize the out-of-sample reconvolution error. 
+The solution to this minimization problem was an adaptive piecewise cubic
+polynomial \citep{tibshirani2014adaptive, tibshirani2022divided} and could be
+accurately computed with ease \citep{ramdas2016fast,jahja2022real}. We selected
+the tuning parameter $\lambda$ with cross-validation to minimize the
+out-of-sample reconvolution error. Note that the $\ell_1$ penalty is applied to
+all 4$^{th}$-order discrete differences. This choice results in piecewise cubic
+polynomials \citep[discrete splines,][]{tibshirani2022divided} where the number
+and length of each piece is chosen adaptively. This property enables the model
+to better capture localized changes in the estimated infections. In contrast, a
+squared $\ell_2$ penalty would produce smoothing splines resulting in global
+smoothness.
+
 %Additional details about convolution are given in the Supplement, \Cref{sec:convol}.
 % with $3$-fold cross validation
 % \citep{jahja2022real} in which every third day is reserved for testing, and the
@@ -130,8 +136,7 @@ variants in circulation. To estimate the daily proportions of the variants
 circulating in each state, we used GISAID genomic sequencing data from
 CoVariants.org \citep{hodcroft2021covariants, elbe2017data}, and estimated a
 multinomial logistic regression model. This procedure is standard
-(Appendix~E)
-\citep{obermeyer2022analysis, annavajhala2021emergence, figgins2021sars}.
+\citep[see Appendix~E for additional details]{obermeyer2022analysis, annavajhala2021emergence, figgins2021sars}.
 The resulting
 estimated probability of variant $j$ is given by $\hat{v}_{j\ell,t}$.
 
@@ -163,13 +168,6 @@ a penalty to promote smoothness:
 \end{align} 
 \end{linenomath*} 
 
-Note that the $\ell_1$ penalty, applied to small, adjacent 
-subsets of deconvolved cases, results in piecewise polynomials with adaptively 
-chosen segment locations. This enables the model to capture localized changes 
-and promote smoothness within segments, in contrast to the $\ell_2$ penalty used in 
-smoothing splines that enforces global smoothness. The smoothing occurs over sets 
-of five consecutive case counts (roughly weekly smoothing) as determined by 
-the discrete derivative order. 
 
 We call the solution $\widetilde{\mathbf{u}}_{j\ell}$ the \emph{variant-specific
 deconvolved cases} and emphasize that these are cases that were eventually
@@ -197,7 +195,7 @@ We used two seroprevalence surveys to estimate the proportion of the
 population with evidence of previous infection in each state over time  % the 2020--2021 
 Blood Donor Seroprevalence Survey and the Nationwide Commercial Lab Seroprevalence 
 Survey 
-(Appendix~G) \citep{cdc2021blood, cdc2021comm}.
+\citep[see also Appendix~G]{cdc2021blood, cdc2021comm}.
 
 To account
 for different surveys occurring on different dates with roughly weekly
