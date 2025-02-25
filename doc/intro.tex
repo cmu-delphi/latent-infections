@@ -1,29 +1,29 @@
 \section{Introduction}
 \label{sec:intro}
 
-Reported COVID-19 cases were a staple in tracking the pandemic at varying
+Reported COVID-19 cases are a staple in tracking the pandemic at varying
 geographic resolutions \citep{dong2020interactive, nyt2020corona,
 wp2020tracking}. Yet, for every case that was eventually reported to public
-health, several infections were likely to have occurred.
-To see why, it is important to understand \emph{whose} cases were being 
-reported and what differentiates them from unreported cases as well as \emph{when} 
-these case reports happen. \Cref{fig:chain_events_onset_report} shows an idealized
-path of a symptomatic infection that is eventually reported to public
-health. This figure illustrates a number of sources of bias in the
-reporting pipeline. For instance, diagnostic testing mainly targeted symptomatic
-individuals; thus, infected individuals exhibiting little to no symptoms were
-omitted \citep{cdc2022estimated}. In addition, testing practices, availability,
-and uptake vary temporally and spatially \citep{pitzer2021impact,
+health, several infections were likely to have occurred. To see why, it is
+important to understand \emph{whose} cases were being reported and what
+differentiates them from unreported cases as well as \emph{when} these case
+reports happened. \Cref{fig:chain_events_onset_report} shows an idealized path
+of a symptomatic infection that is eventually reported to public health. This
+figure illustrates a number of sources of bias in the reporting pipeline. For
+instance, diagnostic testing mainly targeted symptomatic individuals; thus,
+infected individuals exhibiting little to no symptoms were omitted
+\citep{cdc2022estimated}. In addition, testing practices, availability, and
+uptake varied temporally and spatially \citep{pitzer2021impact,
 ecdc2020strategies, hitchings2021usefulness}. Finally, cases provided a belated
 view of the pandemic's progression, because they were subject to delays due to
 the viral incubation period, the speed and severity of symptom onset, laboratory
 confirmation, test turnaround times, and eventual submission to public health
 \citep{pellis2021challenges, wash2020dash}. For these reasons, reported cases
 were lagging indicators of the course of the pandemic. Furthermore, they did not
-represent the actual number of new infections that occur on any given day based 
-on exposure to the pathogen. Since there was no large-scale surveillance effort in
-the United States that reliably tracked symptom onset, let alone infection
-onset, ascertaining the onset of all \emph{infections} is challenging.
+represent the actual number of new infections that occured on any given day
+based on exposure to the pathogen. Since there was no large-scale surveillance
+effort in the United States that reliably tracked symptom onset, let alone
+infection onset, ascertaining the onset of all \emph{infections} is challenging.
 
 \begin{figure}[b!]
 \centering
@@ -33,42 +33,37 @@ onset, ascertaining the onset of all \emph{infections} is challenging.
     \label{fig:chain_events_onset_report}
 \end{figure}
 
-Infection prevalence studies were conducted in various countries over the course 
-of the pandemic to measure and monitor the prevalence of COVID-19 in real-
-time. The UK was a leader in such large-scale COVID-19 surveillance studies 
-with the REACT-1 programme, which tracked the pandemic through at-home 
-testing of randomly selected individuals across England \citep{react12022}. In 
-addition, the ONS COVID-19 Infection Survey, took the at-home testing approach 
-to households across the UK to ascertain how many people presently and 
-previously had COVID-19 \citep{CIS2020}. Comparable studies were conducted 
-in other countries, including France \citep{vaux2023sars}, Germany 
-\citep{jacob2021prevalence}, Hungary \citep{merkely2020novel}, and Iceland 
-\citep{gudbjartsson2020spread}, though many of these efforts were smaller-scale 
-and shorter-term. The U.S. supported some smaller-scale studies like the 
-Community Prevalence of SARS-CoV-2 Study (COMPASS), which assessed the 
-population-based prevalence of COVID-19 infection in over 22,000 individuals 
-from 15 select communities across the U.S. in 2021 
-\citep{justman2024prevalence}, as well as the Digital Engagement and Tracking 
-for Early Control and Treatment (DETECT) study, which collected over 35,000 
-self-reported test results from 2020 to 2022 \citep{kolb2023prevalence}. While 
-these studies provided valuable insights, their voluntary nature and the resulting 
-participation bias meant they more likely captured emerging cases, and therefore, 
-tended towards incidence rather than true prevalence. Furthermore, large-scale 
-studies like REACT-1 or ONS are costly due to extensive sampling and mass 
-testing \citep{pavelka2021impact}. Alternatives such as seroprevalence sampling 
-may be more sustainable over time due to its focus on routine blood sampling, 
-and less resource-intensive than traditional PCR-based testing 
-\citep{serotaskforce2023}. While infection prevalence studies are important for 
-real-time monitoring, their cost, cross-sectional nature, and logistical complexity 
-limit their feasibility for long-term tracking and retrospective analysis. 
-Consequently, leveraging routine data streams already integrated with existing 
-infrastructure can give a more clear and consistent view of the pandemic's 
-progression, while enhancing transparency and public participation. 
+Infection prevalence studies were conducted in various countries over the course
+of the pandemic to measure and monitor the prevalence of COVID-19 in real- time.
+The UK was a leader in such large-scale surveillance with the REACT-1 programme,
+which used at-home testing of randomly selected individuals across England
+\citep{react12022}. In addition, the ONS COVID-19 Infection Survey took the
+at-home testing approach to households across the UK to ascertain how many
+people presently and previously had COVID-19 \citep{CIS2020}. Comparable studies
+were conducted in other countries, including France \citep{vaux2023sars},
+Germany \citep{jacob2021prevalence}, Hungary \citep{merkely2020novel}, and
+Iceland \citep{gudbjartsson2020spread}, though efforts were smaller-scale. The
+\US supported some similarly small-scale studies like the Community Prevalence
+of SARS-CoV-2 Study (COMPASS), which tracked around 22,000 individuals from 15
+communities across the during 2021 \citep{justman2024prevalence}, and the
+Digital Engagement and Tracking for Early Control and Treatment (DETECT) study,
+which collected over 35,000 self-reported test results from 2020 to 2022
+\citep{kolb2023prevalence}. These studies provided valuable insights, but their
+voluntary nature meant they were susceptible to participation bias. Large-scale
+studies like REACT-1 or ONS are costly due to extensive sampling and mass
+testing \citep{pavelka2021impact}, so alternatives, such as seroprevalence from
+routine blood sampling, may be more sustainable over time
+\citep{serotaskforce2023}. While infection prevalence studies are important for
+real-time monitoring, their cost, cross-sectional nature, and logistical
+complexity limit their feasibility for long-term tracking and retrospective
+analysis. Consequently, leveraging routine data streams already integrated with
+existing infrastructure can give a more clear and consistent view of the
+pandemic's progression, while enhancing transparency and public participation. 
 
 Contextualizing the course of the pandemic, understanding the effects of
 interventions, and drawing insights for future pandemics is challenging because
 the spatial and temporal behaviour of infections is unknown. While reported
-cases provide a convenient proxy of the disease burden in a population, it is still
+cases provide a convenient proxy of the disease burden in a population, it is
 incomplete, delayed, and misrepresents the true size and timing of the pandemic.
 Regardless of these difficulties, it is important to the public and to public
 health to perform a pandemic post-mortem. Estimates of daily incident infections
@@ -80,43 +75,38 @@ burden over space and time.
     \includegraphics[width=.9\textwidth]{li-flowchart.pdf} 
     \caption{Flowchart of the data and major analysis steps required to get from
     reported cases to incident infection estimates. In Step 1, we used the CDC
-    line list data to deconvolve (i.e.\ push back using the distribution of delays)
-    reported cases (grey) to the date of
-    positive specimen (red). Step 2 separately deconvolved these to the date of
-    infection by variant (Epsilon in Purple, Ancestral in Green), 
-    before summing across all variants (orange)
-    in Step 3. Finally, we used seroprevalence
-    survey and time-varying reinfection data to account for the unreported
-    infections. In the final infection estimates, note that the uncertainty comes 
-    solely from the seroprevalence step, while the other steps 
-    contribute deterministically.}
+    line list data to deconvolve (i.e.\ push back using the distribution of
+    delays) reported cases (grey) to the date of positive specimen (red). Step 2
+    separately deconvolved these to the date of infection by variant (Epsilon in
+    Purple, Ancestral in Green), before summing across all variants (orange) in
+    Step 3. Finally, we used seroprevalence survey and time-varying reinfection
+    data to account for the unreported infections. In the final infection
+    estimates, note that the uncertainty comes solely from the seroprevalence
+    step, while the other steps contribute deterministically.}
     \label{fig:cases_to_infect_flowchart}
 \end{figure}
     
 
 In this work, we provide a data-driven reconstruction of daily incident
-infections for each \US state before the onset of Omicron. Using
-state-level line list data, we estimated state-date specific distributions for
-the delay from symptom onset to positive specimen date and positive specimen to
-case report date. We combined these with variant-specific incubation period
-distributions to deconvolve (i.e.\ push back using the distribution of delays)
-daily reported COVID-19 cases back to their
-infection onset, removing the effects of the delays. Finally, we adjusted for
-unreported infections with seroprevalence and reinfection data, accounting for
-the waning of antigenic immunity over time. A graphical depiction of our
-procedure is shown in \Cref{fig:cases_to_infect_flowchart}. 
-We also provide a brief description of the key data sources used in our procedure
-in Appendix~A. 
+infections for each \US state before the onset of Omicron. Using state-level
+line list data, we estimate state-date specific distributions for the delay from
+symptom onset to positive specimen date and positive specimen to case report
+date. We combine these with variant-specific incubation period distributions to
+deconvolve (i.e.\ push back using the distribution of delays) daily reported
+COVID-19 cases back to their infection onset, removing the effects of the
+delays. Finally, we adjust for unreported infections with seroprevalence and
+reinfection data, accounting for the waning of antigenic immunity over time. A
+graphical depiction of our procedure is shown in
+\Cref{fig:cases_to_infect_flowchart}. We also provide a brief description of the
+key data sources used in our procedure in Appendix~A. 
 
-Our results focus on the
-features of the infection estimates and the implications of using them, rather
-than reported cases, to assess the impact of the pandemic in \US states. We also 
-calculated
-simple time-varying infection-hospitalization ratios (IHRs) 
-and infection-fatality ratios (IFRs) for each state and
-compared them with their case-based counterparts: the case-hospitalization ratios (CHRs)
- and case-fatality ratios (CFRs). While these analyses
-provide a glimpse into the utility of our infection estimates, we believe that
-there is much more to be explored, and we hope that our work serves as a
-benchmark for future retrospective analyses. 
+Our results examine the features of the infection estimates and the implications
+of using them, rather than reported cases, to assess the impact of the pandemic
+in \US states. We also calculate simple time-varying infection-hospitalization
+ratios (IHRs) and infection-fatality ratios (IFRs) for each state and compare
+them with their case-based counterparts: the case-hospitalization ratios (CHRs)
+and case-fatality ratios (CFRs). While these analyses provide a glimpse into the
+utility of our infection estimates, we believe that there is much more to be
+explored, and we hope that our work serves as a benchmark for future
+retrospective analyses. 
 
