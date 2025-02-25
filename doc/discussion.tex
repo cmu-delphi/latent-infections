@@ -5,7 +5,7 @@ the period June 1, 2020 to November 29, 2021. Our estimates support the
 intuition that the pandemic impacted states earlier and at a larger scale
 than is indicated by reported cases. They also emphasize that using cases as a
 proxy for infections can lead to erroneous conclusions about trends in infections.
-More importantly, we observed outbreaks in infections that are missed from
+More importantly, we observe outbreaks in infections that are missed from
 inspecting cases alone such as the Delta wave in 
 New Jersey, Connecticut, and Maryland.
 These sorts of omissions serve to emphasize that cases paint an incomplete
@@ -18,24 +18,24 @@ increase the average time from case detection to report \citep{wash2020dash,
 dunkel2020covid19}. Thus, while reported cases provide an indication of the
 trajectory of the pandemic, it is delayed and incomplete.
 
-Case reporting has varied widely over time and across locations globally, not just in 
+Case reporting varied widely over time and across locations globally, not just in 
 the 
 \US, leading to misrepresentations of disease burden and complicating 
  the development of evidence-based policy decisions. This geographical variation, 
 driven 
-by differing testing capacities and reporting standards, has made it difficult to establish 
- accurate infection trends and implement appropriate responses. Misleading spatial 
+by differing testing capacities and reporting standards, makes it difficult to establish 
+ accurate infection trends and investigate appropriate responses. Misleading spatial 
 patterns of reported cases, such as overrepresentation in some areas and 
 underreporting in 
 others
- (a glimpse of which was shown in \Cref{fig:choro_inf_case_rates}), have further 
-exacerbated the difficulty in 
+ (a glimpse of which was shown in \Cref{fig:choro_inf_case_rates}), further 
+exacerbate the difficulty in 
  evaluating the true scope of the pandemic and likely hindered effective policy 
 decisions.
  
  While countries like England addressed these case-based challenges 
- through large-scale infection-prevalence surveys, such as the REACT-1 study 
-\citep{react12022},
+ through large-scale infection-prevalence surveys (e.g.\ the REACT-1 study, 
+\citealp{react12022}),
  these efforts are limited by the biases inherent 
 to the study design, specifically those related to response rates and population 
 coverage.
@@ -65,7 +65,7 @@ around the date of interest. Similar techniques would likely need to be applied 
 manage the CDC line list dataset if we were to extend our approach to a real-time 
 analysis. For a brief overview of the other main data sources we used, their data 
 collection period, update frequency, and major sources of delay, which are factors that 
-would likely impact right censoring and increase volatility in real-time estimation, please 
+would likely impact right censoring and increase volatility in real-time estimation, 
 see Appendix~A. 
 %While large-scale prevalence studies and our approach each have unique strengths, 
 %they 
@@ -100,7 +100,7 @@ portion of the total infections until the arrival of high immune-escape variants
 (Omicron BA.1), disregarding them means that the infection-reporting ratio will tend to
 be underestimated with seroprevalence data alone. By accounting for reinfections
 as well as the waning of seropositivity, we more accurately estimate this ratio.
-However, future work could refine this analysis. Because the waning of immunity
+However, future work could further refine this analysis. Because the waning of immunity
 is likely to be variant-dependent \citep{pooley2023durability}, our model's
 single waning parameter would be more accurately estimated as a mixture of
 variant-specific parameters with weights determined by the proportion of the
@@ -111,13 +111,11 @@ not explicitly consider the relationship between the epidemic growth rates and t
 probability of positive tests. Specifically, during upswings in 
 an epidemic, a greater proportion of infections come from individuals early in their 
 infection, who have higher viral loads and are more likely to test positive \citep{frediani2024new}. During a 
-decline, more individuals are later in their infection, having lower viral loads, which 
-makes them less likely to test positive. This dynamic relationship between infection 
+decline, the opposite occurs. This dynamic relationship between infection 
 stage, viral load, and test positivity has been well-described by 
 \citet{hay2021estimating}. This effect may be substantial and 
 could influence the accuracy of the deconvolved case and infection estimates, 
-especially during rapid changes in the epidemic trajectory. Thus, future work could 
-explore principled adjustments to combat these effects.
+especially during rapid changes in the epidemic trajectory. 
 
 Another area for potential 
 improvement is the use of the constant-lag relationship between infections and
@@ -126,7 +124,8 @@ a single lag in our analysis, emphasizing the contrast between case-based
 calculations and those based on estimated infections.
 However, using a single lag is problematic as these are likely to vary over space and
 time \citep{react12022} due to changing variants, local public health
-availability, and policy decisions, among other reasons. Additionally, this sort
+availability, and policy decisions, among other reasons. Additionally, this
+fixed lag
 of estimator is likely to create bias, even if correctly specified, and should
 generally be avoided \citep{GoldwasserHu2024}. Future work could explore multiple lags or heterogenous
 convolutional estimators \citep{Overton2022} using distributions of delays rather than single lags.
