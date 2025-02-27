@@ -111,8 +111,12 @@ best-fitting gamma distribution by solving the moment equations $m_{\ell,t} =
 \alpha_{\ell,t}\theta_{\ell,t}^2$ for the shape $\alpha_{\ell,t}$ and scale
 $\theta_{\ell,t}$. Finally, we discretized the resulting gamma density to the
 original support to produce an estimate $\widehat{\pi}_{\ell,t}(k)$ of the delay
-distribution $\pi_{\ell,t}(k)$. Additional details are deferred to 
-Appendix~D.
+distribution $\pi_{\ell,t}(k)$. This procedure of estimating the delay distribution 
+by fitting a probability distribution to observed delays is similar to an
+approach described in Section 2 of \citet{park2024estimating}, although we made 
+specific data-driven decisions regarding how we handled missing data 
+and unusual reporting spikes (see Appendix~D for more details).
+%Additional details are deferred to Appendix~D.
  
 \subsection{From positive specimen collection to infection onset}
 \label{sec:step2-and-3}

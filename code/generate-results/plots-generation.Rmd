@@ -262,7 +262,7 @@ corrs_df <- list_rbind(corrs_hosp[1:2], names_to = "type") |>
     type == "infect_res" ~ "Infections",
     type == "cases_res" ~ "Reported cases"
   ))
-ggplot(corrs_df, aes(lag, cor, color = type, group = type)) +
+corr_plt1 <- ggplot(corrs_df, aes(lag, cor, color = type, group = type)) +
   geom_line() + 
   geom_point() +
   geom_vline(
@@ -286,6 +286,8 @@ ggplot(corrs_df, aes(lag, cor, color = type, group = type)) +
         legend.key = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())
+
+corr_plt1
 ```
 
 ```{r ihrs, include = FALSE, fig.width=12, fig.height=7}
@@ -321,7 +323,7 @@ corrs_df_deaths <- list_rbind(corrs_deaths[1:2], names_to = "type") |>
     type == "infect_res" ~ "Infections",
     type == "cases_res" ~ "Reported cases"
   ))
-ggplot(corrs_df_deaths, aes(lag, cor, color = type, group = type)) +
+corr_plt2 <- ggplot(corrs_df_deaths, aes(lag, cor, color = type, group = type)) +
   geom_line() + 
   geom_point() +
   geom_vline(
@@ -345,6 +347,8 @@ ggplot(corrs_df_deaths, aes(lag, cor, color = type, group = type)) +
         legend.key = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())
+
+corr_plt2
 ```
 
 ```{r ifrs, include = FALSE, fig.width=12, fig.height=7}
@@ -372,6 +376,13 @@ ggplot(ifrs_dat, aes(x = time_value)) +
     name = "",
     values=c('IFR' = "midnightblue",'CFR' = "darkorange2")
   )
+```
+
+```{r corr-plot-stacked, include = FALSE, fig.width=13, fig.height=4}
+# Infection and case average correlation with hospitalizations and deaths across lags in two side-by-side plots
+
+pg <- plot_grid(corr_plt1, corr_plt2, nrow = 1, align = "v", labels = "AUTO")
+pg
 ```
 
 ## Methods

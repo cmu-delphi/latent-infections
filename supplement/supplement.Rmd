@@ -31,11 +31,11 @@ csl: elsevier-harvard.csl
 knitr::opts_chunk$set(echo = FALSE, out.width='0.99\\linewidth', fig.align='center')
 ```
 
-# Supplementary Methods
+# Supplementary methods {-} 
 
 ## Summary table of key data sources
 
-Table \@ref(tab:summary-table-data) presents a brief description of the key data sources, their data collection period, update frequency, and major sources of delay that can present challenges for real-time infection estimation. More information on the restricted CDC line list, including details on how often it is updated, can be found at @cdc2020caserestr. The information stated about the GISAID data was retrieved from CoVariants.org [@hodcroft2021covariants]. The seroprevalence surveys are discussed in detail in Section \@ref(sec:serop). Finally, the 2022 publication on reinfection data is referenced as @ruff2022rapid.
+Table \@ref(tab:summary-table-data) presents a brief description of the key data sources, their data collection period, update frequency, and major sources of delay that can present challenges for real-time infection estimation. More information on the restricted CDC line list, including details on how often it is updated, can be found at @cdc2020caserestr. The information on the GISAID data is from CoVariants.org [@hodcroft2021covariants]. The seroprevalence surveys are discussed in detail in Section \@ref(sec:serop). Finally, the 2022 publication on reinfection data is referenced as @ruff2022rapid.
 
 ```{=latex}
 \begin{table}[H]
@@ -520,11 +520,11 @@ knitr::include_graphics("ifrs-win-101.pdf")
 
 ## Median and 95% confidence intervals for IHRs and IFRs by state
 
-This presents the median and asymptotic normal 95% confidence intervals of the IHRs and IFRs for each state. While the median IHRs were fairly comparable across states, Montana, Kentucky, New York, Louisiana, Georgia, and Oklahoma had the highest median IHRs, above 0.04. The remaining states' IHRs tended to be between 0.02 and 0.04. For the IFRs, New York had a slightly higher median of around 0.01, compared to most other states having medians closer to 0.005.
+This presents the median and asymptotic normal 95% confidence intervals of the IHRs and IFRs for each state. While the median IHRs are fairly comparable across states, Montana, Kentucky, New York, Louisiana, Georgia, and Oklahoma have the highest median IHRs, above 0.04. The remaining states' IHRs tend to be between 0.02 and 0.04. For the IFRs, New York has a slightly higher median of around 0.01, compared to most other states having medians closer to 0.005.
  
 ```{r overall-ihrs-ifrs, echo=FALSE, out.width = '100%', fig.cap="Median and asymptotic normal 95% confidence intervals of the IHRs and IFRs for each state."}
 knitr::include_graphics("overall-ihrs-ifrs.pdf")
 ```
 
 \newpage
-# Supplementary References {-}
+# Supplementary references {-}
