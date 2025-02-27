@@ -25,9 +25,9 @@ to reflect the fact that some cases take much longer to be reported than others
 (Appendix~B).
 
 \begin{linenomath*} 
-We will start by describing how the model for deconvolution infers the likely
+We begin by describing how the model for deconvolution infers the likely
 dates of positive specimen collection from reported cases before describing how
-the CDC line list \citep{cdc2020caserestr} was used to estimate the necessary
+the CDC line list \citep{cdc2020caserestr} is used to estimate the necessary
 delay distributions. Together, these are the ingredients for Step 1 in
 \Cref{fig:cases_to_infect_flowchart}. Define $y_{\ell,t}$ to be the number of
 new cases reported in location $\ell$ at time $t$, as reported by the John
@@ -45,8 +45,9 @@ model $y_{\ell,t}$ as a Gaussian with mean
 \end{align}
 which is a probability-weighted sum of the number of positive specimens
 collected $k$ days earlier, $x_{\ell,t-k}$. We estimate $\mathbf{x}_\ell =
-\{x_{\ell,1},\ldots,x_{\ell,T}\}$ by minimizing the negative log-likelihood with
-a penalty that encourages smoothness in time. Thus, our estimator is given by
+(x_{\ell,1},\ldots,x_{\ell,T})^{\mathsf{T}}$ by minimizing the negative
+log-likelihood with a penalty that encourages smoothness in time. Thus, our
+estimator is given by
 \begin{align}
   \widehat{\mathbf{x}}_\ell = \argmin_{\mathbf{x}}\ \sum_{t}
   \bigg( y_{\ell,t} -  \sum_k \pi_{\ell,t-k}(k) x_{t-k} \bigg)^2 
@@ -60,7 +61,7 @@ a penalty that encourages smoothness in time. Thus, our estimator is given by
 %relative importance of these competing goals. 
 The solution to this minimization problem is an adaptive piecewise cubic
 polynomial \citep{tibshirani2014adaptive, tibshirani2022divided} and can be
-accurately computed with ease \citep{ramdas2016fast,jahja2022real}. We select
+accurately computed easily \citep{ramdas2016fast,jahja2022real}. We select
 the tuning parameter $\lambda$ with cross-validation to minimize the
 out-of-sample reconvolution error. Note that the $\ell_1$ penalty is applied to
 all 4$^{th}$-order discrete differences. This choice results in piecewise cubic
@@ -101,23 +102,22 @@ Then, we compute the observed probability mass function (pmf)
 where $\indicator(Z) = 1$ if $Z$ is true and 0 otherwise. We also compute a
 similar national pmf, $\tilde{p}_{t}(k)\indicator(0<k\leq 60)$, without
 restricting to location $\ell$. Next, let $\alpha_{\ell,t}$ be the ratio of
-$N_{\ell,t}$ to the number of cases reported by JHU CSSE
-\citep{dong2020interactive} in the window $[t-60+2, t+75]$. Then, we compute
-$p_{\ell,t} = \alpha_{\ell,t}\tilde{p}_{\ell,t} +
-(1-\alpha_{\ell,t})\tilde{p}_t$. This construction was adopted to allow for more
-reliance on the state estimate when a larger fraction of the JHU case reports
-appeared in the CDC line list. We calculated the mean $m_{\ell,t}$
-and variance $v_{\ell,t}$ of the pmf $\{p_{\ell,t}(k)\}$ and estimated the
-best-fitting gamma distribution by solving the moment equations $m_{\ell,t} =
+$N_{\ell,t}$ to the number of reported cases in the window $[t-60+2, t+75]$.
+Then, we compute $p_{\ell,t} = \alpha_{\ell,t}\tilde{p}_{\ell,t} +
+(1-\alpha_{\ell,t})\tilde{p}_t$. This construction allows for more
+reliance on the state estimate when a larger fraction of case reports
+appear in the CDC line list. We calculate the mean $m_{\ell,t}$ and variance
+$v_{\ell,t}$ of the pmf $\{p_{\ell,t}(k)\}$ and estimate the best-fitting gamma
+distribution by solving the moment equations $m_{\ell,t} =
 \alpha_{\ell,t}\theta_{\ell,t}$ and $v_{\ell,t}=
 \alpha_{\ell,t}\theta_{\ell,t}^2$ for the shape $\alpha_{\ell,t}$ and scale
-$\theta_{\ell,t}$. Finally, we discretized the resulting gamma density to the
+$\theta_{\ell,t}$. Finally, we discretize the resulting gamma density to the
 original support to produce an estimate $\widehat{\pi}_{\ell,t}(k)$ of the delay
-distribution $\pi_{\ell,t}(k)$. This procedure of estimating the delay distribution 
-by fitting a probability distribution to observed delays is similar to an
-approach described in Section 2 of \citet{park2024estimating}, although we made 
-specific data-driven decisions regarding how we handled missing data 
-and unusual reporting spikes (see Appendix~D for more details).
+distribution $\pi_{\ell,t}(k)$. This procedure of estimating the delay
+distribution by fitting a probability distribution to observed delays is similar
+to an approach described in Section 2 of \citet{park2024estimating}, although we
+made specific data-driven decisions regarding how we handled missing data and
+unusual reporting spikes (see Appendix~D for more details).
 %Additional details are deferred to Appendix~D.
  
 \subsection{From positive specimen collection to infection onset}
@@ -173,7 +173,7 @@ reported to public health. Because this deconvolution is performed separately
 for each location and variant, we sum over the variants at each time $t$, and
 denote the total deconvolved cases at location $\ell$ as
 $\widehat{\mathbf{u}}_\ell = \sum_j \widetilde{\mathbf{u}}_{j\ell}$ (Step 3 in
-\Cref{fig:cases_to_infect_flowchart}). Note that these deconvolved cases are now
+\Cref{fig:cases_to_infect_flowchart}). These deconvolved cases are now
 indexed by the time of infection onset rather than case report.
 
 
