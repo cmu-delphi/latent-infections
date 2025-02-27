@@ -210,13 +210,13 @@ r^2_{\ell,m} \mid s_{\ell,m},\  w^2_{\ell,m}
 \end{align}
 \end{linenomath*}
 with source-specific measurement errors, $w^1_{\ell,m}$ and $w^2_{\ell,m}$, that
-scale proportional to reported uncertainty.
+scale proportionally to sampling uncertainty.
 
 \begin{linenomath*}
 To complete the model, we assume that latent seroprevalence is modelled as
 Gaussian with mean given by a fraction of the previous seroprevalence
-measurement at $m$ plus the reinfection-adjusted deconvolved cases multiplied by
-the inverse reporting ratio at time $m$:
+measurement at time $m$ plus the reinfection-adjusted deconvolved cases
+multiplied by the inverse reporting ratio at time $m$:
 \end{linenomath*}
 \begin{linenomath*}
 \postdisplaypenalty=0
@@ -251,8 +251,15 @@ latent variables $\mathbf{s}_{\ell}$ and $\mathbf{a}_{\ell}$. In this way, the
 latent variables and all unknown parameters can be estimated using maximum
 likelihood, despite missing or irregularly-spaced survey measurements.
 Additionally, latent quantities can be extrapolated beyond the times of measured
-seroprevalence. Additional details of this methodology and the computation of
-the associated uncertainty measurements are in Appendix~H.
+seroprevalence. Importantly, the specification of
+\Crefrange{eq:sero-measurements}{eq:report-ratio} naturally captures uncertainty
+in the estimates of the $\mathbf{a}_{\ell}$ curves around their point estimates.
+While Steps 1--3 in our analysis pipeline (\Cref{fig:cases_to_infect_flowchart})
+are also point estimates, and hence uncertain, their relative contribution to
+the uncertainty of estimated infections is much less than that of the
+seroprevalence and ascertainment fraction estimates. Additional details of this
+methodology and the computation of the associated uncertainty measurements are
+in Appendix~H.
 
 
 
