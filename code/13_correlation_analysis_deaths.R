@@ -1,4 +1,4 @@
-# Correlation analysis using epiprocess
+# Correlation analysis for deaths using epiprocess
 library(epidatr)
 library(epiprocess)
 library(tidyverse)
@@ -58,16 +58,54 @@ state_infections <- state_infections %>%
 
 head(state_infections, 10)
 
-# Hospitalizations
-hnum <- covidcast_signal(
-  data_source = "hhs",
-  signal = "confirmed_admissions_covid_1d", # Sum of adult and pediatric confirmed COVID-19 hospital admissions occurring each day.
+# Deaths
+options(covidcast.auth = "42ecb34c08d5")
+hnum <- covidcast_signal( #%%%
+  data_source = "nchs-mortality",
+  signal = "deaths_covid_incidence_num", 
   geo_type = "state",
-  start_day = start_date, end_day = end_date,
-  as_of = "2023-07-06") %>%
-  select(geo_value, time_value, out_num = value) %>%
+  time_type = "week",
+  start_day = start_date, end_day = end_date, # Aligned to the start of the week (Sunday) for the epiweek.
+  issue = c("2020-06-01","2023-07-06")) %>%   #%% as_of date for the week of 2023-07-06, but latest issue is only 2021-10-31
+  select(geo_value, time_value, issue, out_num = value) %>%
   as_epi_df() %>%
-  filter(geo_value %in% pop_df_lcg$geo_value) # Only use the 50 states
+  filter(geo_value %in% pop_df_lcg$geo_value) # Only use the 50 state
+
+# Only keep max issue per time_value per state (so no multiple issues/rows per time_value per state)
+hnum <- hnum %>%
+  group_by(geo_value, time_value) %>%
+  filter(issue == max(issue)) %>%
+  ungroup() %>% 
+  select(-issue)
+
+hnum <- hnum %>%
+  group_by(geo_value) %>%
+  arrange(time_value) %>%
+  # Step 0: Fill missing out_num values: using forward fill for missing data (carry forward the previous week's value)
+  tidyr::fill(out_num, .direction = "down") %>%
+  # Step 1: Create daily estimates by dividing by 7
+  mutate(daily_value = out_num / 7) %>%
+  # Step 2: Add rows for each day of the week
+  complete(time_value = seq(min(time_value), max(time_value), by = "day")) %>%
+  # Step 3: Fill geo_value with the first non-NA geo_value
+  mutate(geo_value = first(geo_value)) %>%
+  # Step 4: Calculate values proportionally based on the 7-day week span
+  mutate(
+    # Proportion for each day: adjusting based on position in the week
+    out_num = case_when(
+      wday(time_value) == 1 ~ daily_value,  # Sunday takes the whole previous week's value
+      wday(time_value) == 2 ~ lag(daily_value, 1) * 6/7 + lead(daily_value, 6) * 1/7,  # Monday
+      wday(time_value) == 3 ~ lag(daily_value, 2) * 5/7 + lead(daily_value, 5) * 2/7,  # Tuesday, using 5/7 from last Sunday and 2/7 from next Sunday
+      wday(time_value) == 4 ~ lag(daily_value, 3) * 4/7 + lead(daily_value, 4) * 3/7,  # Wednesday
+      wday(time_value) == 5 ~ lag(daily_value, 4) * 3/7 + lead(daily_value, 3) * 4/7,  # Thursday
+      wday(time_value) == 6 ~ lag(daily_value, 5) * 2/7 + lead(daily_value, 2) * 5/7,  # Friday
+      wday(time_value) == 7 ~ lag(daily_value, 6) * 1/7 + lead(daily_value, 1) * 6/7  # Saturday
+    )
+  ) %>%
+  filter(time_value >= start_date) %>%
+  select(-daily_value) %>%
+  as_epi_df()
+
 
 hrate_df <- hnum %>%
   group_by(geo_value) %>%
@@ -80,11 +118,11 @@ head(hrate_df, 10)
 
 ####################################################################################################################################################
 # Correlation per state per time average for each lag function
-window = 61
+window = 91
 
 cor_per_state_per_lag <- function(lags, lagCol, df){
   lagCol <- as.symbol(lagCol)
-
+  
   z <- map(lags, function(lag) {
     l <- df |> select(geo_value, time_value, !!lagCol) |> mutate(time_value = time_value + lag) |> # unquote
       rename(lagged = !!lagCol)
@@ -107,8 +145,8 @@ cor_per_state_per_lag <- function(lags, lagCol, df){
 
 # Look at correlations between infections and hospitalizations or deaths - pick one of them
 
-out_type = "hosp"
-if(out_type == "hosp"){
+out_type = "deaths"
+if(out_type == "deaths"){
   out_df = hrate_df
 }
 
@@ -116,26 +154,26 @@ x <- state_infections %>% full_join(out_df, by = c("geo_value", "time_value")) %
   as_epi_df()
 
 # Infects
-infect_res <- cor_per_state_per_lag(1:25, "adj_inf_rate_7dav", x)
+infect_res <- cor_per_state_per_lag(1:35, "adj_inf_rate_7dav", x)
 
 # Plot with a line to mark the highest correlation
 infect_res %>%
   ggplot(aes(x = lag, y = cor)) +
   geom_line() + geom_point() +
-  labs(x = "Days lagged from hospitalization", y = "Average correlation")
+  labs(x = "Days lagged from death", y = "Average correlation")
 
-best_lag <- infect_res[which(infect_res$cor == max(infect_res$cor)), ]$lag
+best_lag <- infect_res[which(infect_res$cor == max(infect_res$cor)), ]$lag # 24 days
 
 
 #####################################################################################################################################
-# Correlation of cases and hosp
+# Correlation of cases and deaths
 # confirmed_incidence_num = Number of new confirmed COVID-19 cases, daily
 
 case_num_df <- covidcast_signal("jhu-csse",
-                                 "confirmed_incidence_num",
-                          start_day = start_date, end_day = end_date,
-                          as_of = as.Date("2023-07-06"),
-                          geo_type = "state") %>%
+                                "confirmed_incidence_num",
+                                start_day = start_date, end_day = end_date,
+                                as_of = as.Date("2023-07-06"),
+                                geo_type = "state") %>%
   select(geo_value, time_value, case_num = value) %>%
   as_epi_df() %>%
   filter(geo_value %in% pop_df_lcg$geo_value) # Only use the 50 states
@@ -152,15 +190,14 @@ x2 <- case_prop_df %>% full_join(out_df, by = c("geo_value", "time_value")) %>%
   as_epi_df()
 
 # Cases
-cases_res <- cor_per_state_per_lag(0:25, "case_rate_7d_av", x2)
+cases_res <- cor_per_state_per_lag(0:35, "case_rate_7d_av", x2)
 
 cases_res %>%
   ggplot(aes(x = lag, y = cor)) +
   geom_line() + geom_point() +
   labs(x = "Lag", y = "Mean correlation")
 
-best_lag_case <- cases_res[which(cases_res$cor == max(cases_res$cor)), ]$lag
-
+best_lag_case <- cases_res[which(cases_res$cor == max(cases_res$cor)), ]$lag # 10 days
 
 ###############################################################################################################################################
 # Infection and case average correlation across lags on the same plot
@@ -168,17 +205,17 @@ best_lag_case <- cases_res[which(cases_res$cor == max(cases_res$cor)), ]$lag
 corrs_df <- bind_rows(data.frame(type = "Infections", infect_res), data.frame(type = "Reported cases", cases_res))
 
 ggplot(corrs_df, aes(lag, cor, color = type, group = type)) +
-  geom_line() +
+  geom_line() + 
   geom_point() +
   geom_vline(
     data = filter(corrs_df, cor == max(cor), .by = type),
     aes(xintercept = lag, color = type), linetype = 2) +
   scale_color_manual(
-    name = "",
-    values = c("Infections" = "midnightblue",
+    name = "", 
+    values = c("Infections" = "midnightblue", 
                "Reported cases" = "darkorange2"
     )) +
-  labs(x = "Days before hospitalizations", y = "Average correlation") +
+  labs(x = "Days before death", y = "Average correlation") +
   theme_bw(16) +
   theme(legend.position = "inside",
         legend.position.inside = c(.85, .90),
@@ -191,17 +228,18 @@ ggplot(corrs_df, aes(lag, cor, color = type, group = type)) +
         legend.key = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())
-ggsave(filename = here("gfx", "infect_case_hosp_lag_corr_F24.pdf"), width = 10, height = 6)
+ggsave(filename = here("gfx", "infect_case_deaths_lag_corr_F24.pdf"), width = 10, height = 6)
 
 inf_case_corrs <- list(infect_res = infect_res, cases_res = cases_res, best_lag_case = best_lag_case, best_lag = best_lag)
-saveRDS(inf_case_corrs, file = here("data", "inf_case_corrs_hosp.rds"))
+saveRDS(inf_case_corrs, file = here("data", "inf_case_corrs_deaths.rds"))
+
 
 ###############################################################################################################################################
 # Ablation
 ######################################################################################################################################
-# Correlation of unadjusted infections and hospitalizations
+# Correlation of unadjusted infections and deaths
 
-# Look at correlations between unadj infections and hospitalizations
+# Look at correlations between unadj infections and deaths
 
 x <- state_infections %>%
   full_join(out_df, by = c("geo_value", "time_value")) %>%
@@ -210,22 +248,22 @@ x <- state_infections %>%
 # Systematic lag analysis
 
 library(purrr)
-lags = 1:25
+lags = 1:35
 
 # Unadjusted Infections
-unadj_infect_res <- cor_per_state_per_lag(1:25, "unadj_inf_rate_7dav", x)
+unadj_infect_res <- cor_per_state_per_lag(1:35, "unadj_inf_rate_7dav", x)
 
 # Plot with a line to mark the highest correlation
 unadj_infect_res %>%
   ggplot(aes(x = lag, y = cor)) +
   geom_line() + geom_point() +
-  labs(x = "Days lagged from hospitalization", y = "Average correlation")
+  labs(x = "Days lagged from death", y = "Average correlation")
 
 best_lag_unadj_infect <- unadj_infect_res[which(unadj_infect_res$cor == max(unadj_infect_res$cor)), ]$lag
 
 # Save rds of
 save(infect_res, cases_res, unadj_infect_res, best_lag_case, best_lag,
-     best_lag_unadj_infect, file = here("data", "corr_inf_decon_case_lags.RData"))
+     best_lag_unadj_infect, file = here("data", "deaths_corr_inf_decon_case_lags.RData"))
 
 ######################################################################################################################################
 # Infection, deconvolved case, and case average correlation across lags on the same plot
@@ -243,7 +281,7 @@ ggplot(infect_res, aes(lag, cor)) +
                      values=c('Deconvolved cases' = "skyblue",
                               'Infections' = "midnightblue",
                               'Cases' = "darkorange2")) +
-  labs(x = "Days lagged from hospitalization", y = "Average correlation") +
+  labs(x = "Days lagged from death", y = "Average correlation") +
   theme_bw(16) +
   theme(legend.position=c(.85, .90),
         axis.text.x = element_text(size = 12),
@@ -254,10 +292,10 @@ ggplot(infect_res, aes(lag, cor)) +
         legend.background=element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())
-ggsave(filename = here("gfx", "adj_unadj_cases_hosp_lag_corr_F24.pdf"), width = 10, height = 6)
+ggsave(filename = here("gfx", "adj_unadj_cases_deaths_lag_corr_F24.pdf"), width = 10, height = 6)
 
 #####################################################################################################################################
-# Correlation of deconvolved reported cases by positive specimen date and hospitalizations
+# Correlation of deconvolved reported cases by positive specimen date and deaths
 # (ie. excluding positive specimen to infection onset)
 
 # library(reticulate) # load numpy file
@@ -268,15 +306,15 @@ ggsave(filename = here("gfx", "adj_unadj_cases_hosp_lag_corr_F24.pdf"), width = 
 unadj_infect_if_pos_infect = c()
 states = pop_df$geo_value
 for(state in states){
-  state_data <- here("data", "state")
-  unadj_infect_if_pos_infect_state <- read_rds(here(state_data, "final-thetas-pr.rds"))
+  setwd(paste0("/Users/admin/Downloads/variant-deconvolve/data/", state)) 
+  unadj_infect_if_pos_infect_state <- read_rds("final-thetas-pr.rds")
   unadj_infect_if_pos_infect <- c(unadj_infect_if_pos_infect, unadj_infect_if_pos_infect_state[(start_date - decon_start_date + 1):(end_date - decon_start_date + 1)])
 }
 
 # Make dataframe of results that is set-up like an epi_df
 df_pi_res <- data.frame(geo_value = rep(states, each = length(dates)),
-                         time_value = rep(dates, times = length(states)),
-                         unadj_infect_pi = unadj_infect_if_pos_infect)
+                        time_value = rep(dates, times = length(states)),
+                        unadj_infect_pi = unadj_infect_if_pos_infect)
 
 # Include incidence proportion (infections per 100,000 people)
 df_pi_res <- df_pi_res %>% left_join(pop_df, by = "geo_value")
@@ -286,7 +324,7 @@ df_pi_res <- df_pi_res %>% group_by(geo_value) %>% mutate(unadj_infect_pi_rate =
 # Make dataframe of results that is set-up like an epi_df
 # Be sure to include incidence rate (infections per 100,000 people)
 state_infections_by_pi <- df_pi_res %>% mutate(geo_value = tolower(geo_value)) %>% select(geo_value, time_value,
-                                                                                            unadj_infect_pi, unadj_infect_pi_rate) %>% as_epi_df()
+                                                                                          unadj_infect_pi, unadj_infect_pi_rate) %>% as_epi_df()
 
 # Convert adj_inf_rate to 7 day average
 state_infections_by_pi <- state_infections_by_pi %>%
@@ -298,25 +336,25 @@ state_infections_by_pi <- state_infections_by_pi %>%
 
 
 ###############################################################################################################################################
-# Correlation of deconvolved cases by positive specimen date and hospitalizations
+# Correlation of deconvolved cases by positive specimen date and deaths
 
-# Look at correlations between unadj infections and hospitalizations
+# Look at correlations between unadj infections and deaths
 
 x <- state_infections_by_pi %>%
   full_join(out_df, by = c("geo_value", "time_value")) %>%
   as_epi_df()
 
 # Systematic lag analysis
-lags = 1:25
+lags = 1:35
 
 # Unadjusted Infections
-inf_pi_res <- cor_per_state_per_lag(1:25, "inf_pi_rate_7_dav", x)
+inf_pi_res <- cor_per_state_per_lag(1:35, "inf_pi_rate_7_dav", x)
 
 # Plot with a line to mark the highest correlation
 inf_pi_res %>%
   ggplot(aes(x = lag, y = cor)) +
   geom_line() + geom_point() +
-  labs(x = "Days lagged from hospitalization", y = "Average correlation")
+  labs(x = "Days lagged from death", y = "Average correlation")
 
 best_lag_unadj_infect_if_pos_infect <- inf_pi_res[which(inf_pi_res$cor == max(inf_pi_res$cor)), ]$lag
 
@@ -337,7 +375,7 @@ ggplot(infect_res, aes(lag, cor)) +
                      values=c('Deconvolved cases by positive specimen date' = "forestgreen",
                               'Deconvolved cases' = "skyblue",
                               'Infections' = "midnightblue")) +
-  labs(x = "Days lagged from hospitalization", y = "Average correlation") +
+  labs(x = "Days lagged from death", y = "Average correlation") +
   theme_bw(16) +
   theme(legend.position=c(0.16, 0.94),
         axis.text.x = element_text(size = 12),
@@ -349,24 +387,24 @@ ggplot(infect_res, aes(lag, cor)) +
         legend.background=element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())
-ggsave(filename = here("gfx", "adj_unadj_pi_hosp_lag_corr_F24.pdf"),
+ggsave(filename = here("gfx", "adj_unadj_pi_deaths_lag_corr_F24.pdf"),
        width = 10, height = 6)
 
 #####################################################################################################################################
-# Correlation of cases from report to symptom onset (no incubation period) and hospitalizations
+# Correlation of cases from report to symptom onset (no incubation period) and deaths
 
 unadj_infect_no_inc = c()
 for(state in states){
-  state_data <- here("data", "state")
-  unadj_infect_no_inc_state_df = read_rds(here(state_data, "final-thetas-sp-df.rds"))
+  setwd(paste0("/Users/admin/Downloads/variant-deconvolve/data/", state)) 
+  unadj_infect_no_inc_state_df = read_rds("final-thetas-sp-df.rds")
   unadj_infect_no_inc_state_df = unadj_infect_no_inc_state_df %>% group_by(time_value) %>% summarise(infect_sum = sum(infect))
   unadj_infect_no_inc <- c(unadj_infect_no_inc, unadj_infect_no_inc_state_df$infect_sum[(start_date - decon_start_date + 1):(end_date - decon_start_date + 1)])
 }
 
 # Make dataframe of results that is set-up like an epi_df
 df_no_inc_res <- data.frame(geo_value = rep(states, each = length(dates)),
-                         time_value = rep(dates, times = length(states)),
-                         unadj_infect_no_inc = unadj_infect_no_inc)
+                            time_value = rep(dates, times = length(states)),
+                            unadj_infect_no_inc = unadj_infect_no_inc)
 
 # Include incidence proportion (infections per 100,000 people)
 df_no_inc_res = df_no_inc_res %>% left_join(pop_df, by = "geo_value")
@@ -389,25 +427,25 @@ state_infections_no_inc <- state_infections_no_inc %>%
 
 
 ###############################################################################################################################################
-# Correlation of infections by symptom onset and hospitalizations
+# Correlation of infections by symptom onset and deaths
 
-# Look at correlations between unadj infections and hospitalizations
+# Look at correlations between unadj infections and deaths
 
 x <- state_infections_no_inc %>%
   full_join(out_df, by = c("geo_value", "time_value")) %>%
   as_epi_df()
 
 # Systematic lag analysis
-lags = 1:25
+lags = 1:35
 
 # Unadjusted Infections unadj_infect_inc_lag_dat
-unadj_infect_no_inc_res <- cor_per_state_per_lag(1:25, "inf_no_inc_rate_7_dav", x)
+unadj_infect_no_inc_res <- cor_per_state_per_lag(1:35, "inf_no_inc_rate_7_dav", x)
 
 # Plot with a line to mark the highest correlation
 unadj_infect_no_inc_res %>%
   ggplot(aes(x = lag, y = cor)) +
   geom_line() + geom_point() +
-  labs(x = "Days lagged from hospitalization", y = "Average correlation")
+  labs(x = "Days lagged from deaths", y = "Average correlation")
 
 best_lag_unadj_infect_no_inc <- unadj_infect_no_inc_res[which(unadj_infect_no_inc_res$cor == max(unadj_infect_no_inc_res$cor)), ]$lag
 
@@ -434,7 +472,7 @@ ggplot(infect_res, aes(lag, cor)) +
                               'Deconvolved cases' = "skyblue",
                               'Deconvolved cases by positive specimen date' = "forestgreen",
                               'Deconvolved cases by symptom onset' = "darkorange")) +
-  labs(x = "Days lagged from hospitalization", y = "Average correlation") +
+  labs(x = "Days lagged from deaths", y = "Average correlation") +
   theme_bw(16) +
   theme(legend.position=c(.16, 0.92),
         axis.text.x = element_text(size = 12),
@@ -446,35 +484,40 @@ ggplot(infect_res, aes(lag, cor)) +
         legend.background=element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())
-ggsave(filename = here("gfx", "adj_unadj_pi_no_inc_hosp_lag_corr_F24.pdf"),
+ggsave(filename = here("gfx", "adj_unadj_pi_no_inc_deaths_lag_corr_F24.pdf"),
        width = 10, height = 6)
 
 
 ###############################################################################################################################################
-# Rolling window IHR
-# Use 7 day average of infections and hospitalizations
+# Rolling window IFR
 
-# Use 7 day average of infections and hospitalizations
+# Create grid for plotting
+my_grid <- us_state_without_DC_grid1
+my_grid$row[my_grid$code == "AK"] <- 2
+my_grid$row <- my_grid$row - 1
+# grid_preview(my_grid)
+
+# Use 7 day average of infections and deaths
 hrate_df_no_pop <- hrate_df %>%
   select(-c(population_2020, population_2021, population_2022))
 
-ihrs_dat <- state_infections %>%
+ifrs_dat <- state_infections %>%
   full_join(hrate_df_no_pop, by = c("geo_value", "time_value")) %>%
   as_epi_df() %>%
   select(-c(population_2020, population_2021, population_2022)) %>%
   left_join(case_prop_df %>% select(time_value, geo_value, case_num, case_num_7_dav), by = c("geo_value", "time_value"))
 
 # Add column for lagged infections by using best_lag
-ihrs_dat <- ihrs_dat %>% group_by(geo_value) %>% mutate(lagged_adj_inf = lag(adj_inf_num_7_dav, n = best_lag),
-                                          lagged_cases = lag(case_num_7_dav, n = best_lag_case)) %>%
-  epi_slide(~ sum(.x$lagged_adj_inf, na.rm = T), before = 30, after = 30, new_col_name = "roll_lagged_adj_inf") %>%
-  epi_slide(~ sum(.x$lagged_cases, na.rm = T), before = 30, after = 30, new_col_name = "roll_lagged_cases") %>%
-  epi_slide(~ sum(.x$out_num_7_dav, na.rm = T), before = 30, after = 30, new_col_name = "roll_out_num_7_dav")
+ifrs_dat <- ifrs_dat %>% group_by(geo_value) %>% mutate(lagged_adj_inf = lag(adj_inf_num_7_dav, n = best_lag),
+                                                        lagged_cases = lag(case_num_7_dav, n = best_lag_case)) %>%
+  epi_slide(~ sum(.x$lagged_adj_inf, na.rm = T), before = 45, after = 45, new_col_name = "roll_lagged_adj_inf") %>%
+  epi_slide(~ sum(.x$lagged_cases, na.rm = T), before = 45, after = 45, new_col_name = "roll_lagged_cases") %>%
+  epi_slide(~ sum(.x$out_num_7_dav, na.rm = T), before = 45, after = 45, new_col_name = "roll_out_num_7_dav")
 
-# Now, calculate IHR for each state
-ihrs_dat <- ihrs_dat %>% mutate(IHR = if_else((roll_out_num_7_dav / roll_lagged_adj_inf) == Inf, NA, roll_out_num_7_dav / roll_lagged_adj_inf),
-                  CHR = if_else((roll_out_num_7_dav / roll_lagged_cases) == Inf, NA, roll_out_num_7_dav / roll_lagged_cases))
+# Now, calculate IFR for each state
+ifrs_dat <- ifrs_dat %>% mutate(IFR = if_else((roll_out_num_7_dav / roll_lagged_adj_inf) == Inf, NA, roll_out_num_7_dav / roll_lagged_adj_inf),
+                                CFR = if_else((roll_out_num_7_dav / roll_lagged_cases) == Inf, NA, roll_out_num_7_dav / roll_lagged_cases))
 
-ihrs_dat <- ihrs_dat %>% mutate(geo_value = toupper(geo_value))
-# Save off ihrs_dat for plotting
-saveRDS(ihrs_dat, file = here("data", "ihrs_dat.rds"))
+ifrs_dat <- ifrs_dat %>% mutate(geo_value = toupper(geo_value))
+# Save off ifrs_dat for plotting
+saveRDS(ifrs_dat, file = here("data", "ifrs_dat.rds"))

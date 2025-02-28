@@ -44,7 +44,7 @@ dat <- adj_df |>
          time_value <= ymd("2021-03-01")) |>
   select(time_value, geo_value, adj_inf_rate, unadj_inf_rate, cases_rate_7d_av,
          ninetyfive_lowb_rate, ninetyfive_upb_rate, eighty_lowb_rate,
-         eighty_upb_rate, fifty_lowb_rate, fifty_upb_rate) |>
+         eighty_upb_rate, fifty_lowb_rate, fifty_upb_rate, ratios) |>
   as_tibble() |>
   left_join(deconv_cases, by = "time_value") |>
   left_join(
